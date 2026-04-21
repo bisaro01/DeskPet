@@ -1,0 +1,17 @@
+image: openjdk:21
+
+stages:
+  - test
+
+variables:
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+cache:
+  paths:
+    - .gradle/
+
+test:
+  stage: test
+  script:
+    - chmod +x gradlew
+    - ./gradlew test --no-daemon
