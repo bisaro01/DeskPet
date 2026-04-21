@@ -5,3 +5,19 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/9.4.1/samples
  * This project uses @Incubating APIs which are subject to change.
  */
+
+plugins {
+    java
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
