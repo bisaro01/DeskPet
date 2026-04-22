@@ -11,6 +11,9 @@ build
 .idea
 *.iml
 
+# VSCode
+settings.json
+
 # Java
 *.class
 
