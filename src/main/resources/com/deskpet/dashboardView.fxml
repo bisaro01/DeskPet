@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.deskpet.dashboardController">
+    <children>
+        <Label layoutX="270.0" layoutY="27.0" text="Dashboard" />
+        <Label layoutX="67.0" layoutY="68.0" text="Happiness" />
+        <ProgressBar fx:id="happinessBar" layoutX="67.0" layoutY="85.0" prefHeight="20.0" prefWidth="467.0" progress="1.0" />
+        <Label layoutX="67.0" layoutY="117.0" text="Hunger" />
+        <ProgressBar fx:id="comfortBar" layoutX="321.0" layoutY="134.0" prefHeight="20.0" prefWidth="213.0" progress="1.0" />
+        <Label layoutX="321.0" layoutY="117.0" text="Comfort" />
+        <ProgressBar fx:id="hungerBar" layoutX="67.0" layoutY="134.0" prefHeight="20.0" prefWidth="213.0" progress="1.0" />
+    </children>
+</Pane>

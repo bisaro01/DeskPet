@@ -9,6 +9,7 @@
 plugins {
     java
     application
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 application {
@@ -25,6 +26,11 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
     implementation("org.postgresql:postgresql:42.7.10")
+}
+
+javafx {
+    version = "21.0.6"
+    modules = listOf("javafx.controls", "javafx.fxml")
 }
 
 tasks.named<Test>("test") {

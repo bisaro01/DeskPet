@@ -1,6 +1,7 @@
 package com.deskpet;
 
 import java.sql.Connection;
+import javafx.application.Application;
 
 public class App {
     public static int add(int a, int b) {
@@ -14,6 +15,8 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
 
+        // Launch the GUI.
+        Application.launch(dashboardApplication.class, args);
+    }
 }
