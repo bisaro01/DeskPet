@@ -12,7 +12,7 @@ Assumes SensorData has following functions:
  */
 public interface SensorDataProvider {
     double getTemperature();
-    int getPetId();
+    long getPetId();
     Timestamp getRecordedAt();
     double getHumidity();
 }
