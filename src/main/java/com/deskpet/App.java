@@ -16,7 +16,7 @@ public class App {
             e.printStackTrace();
         }
 
-        // Launch the GUI. Uncomment below if you want to launch the GUI.
-        // Application.launch(dashboardApplication.class, args);
+        // Launch the GUI.
+        Application.launch(dashboardApplication.class, args);
     }
 }
