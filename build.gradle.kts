@@ -5,6 +5,7 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/9.4.1/samples
  * This project uses @Incubating APIs which are subject to change.
  */
+import org.gradle.api.tasks.Exec
 
 plugins {
     java
@@ -39,3 +40,17 @@ val dbName = "deskpet"
 val dbUser = "postgres"
 // Empty by default, if needed enter password here and in Database.java(PASSWORD).
 val dbPassword = ""
+
+val createDatabase by tasks.registering(Exec::class) {
+    group = "database"
+    description = "Creates the database if it does not already exist."
+
+    commandLine(
+        "bash", "-lc", """
+        export PGPASSWORD="$dbPassword"
+        if ! psql -h $dbHost -p $dbPort -U $dbUser -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$dbName'" | grep -q 1; then
+            createdb -h $dbHost -p $dbPort -U $dbUser $dbName
+        fi
+        """.trimIndent()
+    )
+}
