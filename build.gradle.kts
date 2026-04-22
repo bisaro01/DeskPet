@@ -39,6 +39,7 @@ val dbHost = "localhost"
 val dbPort = "5432"
 val dbName = "deskpet"
 val dbUser = "postgres"
+val dbPassword = "123"
 
 val createDatabase by tasks.registering(Exec::class) {
     group = "database"
@@ -46,8 +47,9 @@ val createDatabase by tasks.registering(Exec::class) {
 
     commandLine(
         "bash", "-lc", """
-        if ! psql -U $dbUser -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$dbName'" | grep -q 1; then
-            createdb -U $dbUser $dbName
+        export PGPASSWORD="$dbPassword"
+        if ! psql -h $dbHost -p $dbPort -U $dbUser -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$dbName'" | grep -q 1; then
+            createdb -h $dbHost -p $dbPort -U $dbUser $dbName
         fi
         """.trimIndent()
     )
@@ -61,7 +63,8 @@ val applySchema by tasks.registering(Exec::class) {
     // src/main/resources/schema.sql might have to be changed depending on file structure
     commandLine(
         "bash", "-lc", """
-        psql -U $dbUser -d $dbName -f src/main/resources/schema.sql
+        export PGPASSWORD="$dbPassword"
+        psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -f src/main/resources/schema.sql
         """.trimIndent()
     )
 }
@@ -74,7 +77,12 @@ val seedDatabase by tasks.registering(Exec::class) {
     // src/main/resources/seed.sql might have to be changed depending on file structure
     commandLine(
         "bash", "-lc", """
-        psql -U $dbUser -d $dbName -f src/main/resources/seed.sql
+        export PGPASSWORD="$dbPassword"
+        psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -f src/main/resources/seed.sql
         """.trimIndent()
     )
+}
+
+tasks.named("run") {
+    dependsOn(seedDatabase)
 }
