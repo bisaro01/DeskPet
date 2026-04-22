@@ -5,7 +5,6 @@
  * Learn more about Gradle by exploring our Samples at https://docs.gradle.org/9.4.1/samples
  * This project uses @Incubating APIs which are subject to change.
  */
-import org.gradle.api.tasks.Exec
 
 plugins {
     java
@@ -40,57 +39,4 @@ tasks.named<Test>("test") {
     testLogging {
         events("passed", "skipped", "failed")
     }
-}
-
-// Database setup variables
-val dbHost = "localhost"
-val dbPort = "5432"
-val dbName = "deskpet"
-val dbUser = "postgres"
-val dbPassword = "123"
-
-val createDatabase by tasks.registering(Exec::class) {
-    group = "database"
-    description = "Creates the database if it does not already exist."
-
-    commandLine(
-        "bash", "-lc", """
-        export PGPASSWORD="$dbPassword"
-        if ! psql -h $dbHost -p $dbPort -U $dbUser -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$dbName'" | grep -q 1; then
-            createdb -h $dbHost -p $dbPort -U $dbUser $dbName
-        fi
-        """.trimIndent()
-    )
-}
-
-val applySchema by tasks.registering(Exec::class) {
-    group = "database"
-    description = "Applies the schema to the database."
-    dependsOn(createDatabase)
-
-    // src/main/resources/schema.sql might have to be changed depending on file structure
-    commandLine(
-        "bash", "-lc", """
-        export PGPASSWORD="$dbPassword"
-        psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -f src/main/resources/schema.sql
-        """.trimIndent()
-    )
-}
-
-val seedDatabase by tasks.registering(Exec::class) {
-    group = "database"
-    description = "Resets and seeds the database with demo data."
-    dependsOn(applySchema)
-
-    // src/main/resources/seed.sql might have to be changed depending on file structure
-    commandLine(
-        "bash", "-lc", """
-        export PGPASSWORD="$dbPassword"
-        psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -f src/main/resources/seed.sql
-        """.trimIndent()
-    )
-}
-
-tasks.named("run") {
-    dependsOn(seedDatabase)
 }
