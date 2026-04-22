@@ -31,3 +31,11 @@ tasks.named<Test>("test") {
         events("passed", "skipped", "failed")
     }
 }
+
+// Database setup variables
+val dbHost = "localhost"
+val dbPort = "5432"
+val dbName = "deskpet"
+val dbUser = "postgres"
+// Empty by default, if needed enter password here and in Database.java(PASSWORD).
+val dbPassword = ""
