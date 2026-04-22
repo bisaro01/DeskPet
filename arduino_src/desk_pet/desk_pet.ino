@@ -167,6 +167,43 @@ void sadSound() {
     noTone(BUZZER);
 }
 
+// ===============================  sensor functions  ========================================
+
+void readTempHumidity() {
+    /*
+        Reads the humidity and temperature values trough the DHT11 sensro, and publihses to
+        defined MQTT broker.
+
+        - Stores the values in tempHumVal array
+        - tempHumVal[0] = humidity
+        - tempHumVal[1] = temperature
+        - publishes data to MQTT broke on topic "wio/humTemp"
+    */
+
+    // defines array of size 2 for the readings and initialises both as 0
+    float tempHumVal[2] = {0};
+
+    // check if reading didnt fail read the values
+    if(!dht.readTempAndHumidity(tempHumVal)) {
+        float humidity = tempHumVal[0];
+        float temperature = tempHumVal[1];
+
+        // debugging terminal print
+        // Serial.print(humidity);
+        // Serial.print("%, ");
+        // Serial.print(temperature);
+        // Serial.println("C");
+
+        // publish readings to MQTT broker
+        String payload = String(humidity) + "," + String(temperature);
+        client.publish("wio/humTemp", payload.c_str());
+    }
+    // othervise debug on serial
+    else {
+        Serial.print("Failed to get humidity and temperature values.");
+    }
+}
+
 // ==================================  set up stage  =========================================
 void setup() {
 
