@@ -135,6 +135,38 @@ void sadFace() {
     tft. fillCircle(200, 80, 8, TFT_BLACK);
 }
 
+void happySound() {
+    tone(BUZZER, 1000);
+    delay(80);
+
+    tone(BUZZER, 1600);
+    delay(80);
+
+    tone(BUZZER, 1200);
+    delay(120);
+
+    noTone(BUZZER);
+    delay(50);
+
+    tone(BUZZER, 1800);
+    delay(100);
+
+    noTone(BUZZER);
+}
+
+void sadSound() {
+    tone(BUZZER, 1000);
+    delay(300);
+
+    tone(BUZZER, 500);
+    delay(200);
+
+    tone(BUZZER, 200);
+    delay(100);
+
+    noTone(BUZZER);
+}
+
 // ==================================  set up stage  =========================================
 void setup() {
 
