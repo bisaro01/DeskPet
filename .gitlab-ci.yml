@@ -19,7 +19,7 @@ test:
     - source "$HOME/.sdkman/bin/sdkman-init.sh"
 
     # install java (non-interactive)
-    - sdk install java 21-tem
+    - sdk install java 21-tem -y
 
     # verify
     - java -version
