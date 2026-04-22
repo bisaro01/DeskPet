@@ -8,6 +8,11 @@
 
 plugins {
     java
+    application
+}
+
+application {
+    mainClass = "com.deskpet.App"
 }
 
 repositories {
