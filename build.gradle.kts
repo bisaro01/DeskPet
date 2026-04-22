@@ -68,3 +68,17 @@ val applySchema by tasks.registering(Exec::class) {
         """.trimIndent()
     )
 }
+
+val seedDatabase by tasks.registering(Exec::class) {
+    group = "database"
+    description = "Resets and seeds the database with demo data."
+    dependsOn(applySchema)
+
+    // dbConfig/seed.sql might have to be changed depending on file structure
+    commandLine(
+        "bash", "-lc", """
+        export PGPASSWORD="$dbPassword"
+        psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -f dbConfig/seed.sql
+        """.trimIndent()
+    )
+}
