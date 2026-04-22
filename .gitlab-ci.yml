@@ -1,4 +1,4 @@
-image: openjdk:21
+image: eclipse-temurin:21
 
 stages:
   - test
@@ -12,6 +12,19 @@ cache:
 
 test:
   stage: test
+  tags:
+    - shell
   script:
+    # load sdkman
+    - source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+    # install java (non-interactive)
+    - sdk install java 21-tem -y
+    - sdk use java 21-tem
+
+    # verify
+    - java -version
+
+    # run gradle
     - chmod +x gradlew
     - ./gradlew test --no-daemon
