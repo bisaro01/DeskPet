@@ -23,6 +23,7 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("org.postgresql:postgresql:42.7.10")
 }
 
 tasks.named<Test>("test") {
@@ -38,8 +39,6 @@ val dbHost = "localhost"
 val dbPort = "5432"
 val dbName = "deskpet"
 val dbUser = "postgres"
-// Empty by default, if needed enter password here and in Database.java(PASSWORD).
-val dbPassword = ""
 
 val createDatabase by tasks.registering(Exec::class) {
     group = "database"
@@ -47,9 +46,8 @@ val createDatabase by tasks.registering(Exec::class) {
 
     commandLine(
         "bash", "-lc", """
-        export PGPASSWORD="$dbPassword"
-        if ! psql -h $dbHost -p $dbPort -U $dbUser -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$dbName'" | grep -q 1; then
-            createdb -h $dbHost -p $dbPort -U $dbUser $dbName
+        if ! psql -U $dbUser -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$dbName'" | grep -q 1; then
+            createdb -U $dbUser $dbName
         fi
         """.trimIndent()
     )
@@ -60,11 +58,10 @@ val applySchema by tasks.registering(Exec::class) {
     description = "Applies the schema to the database."
     dependsOn(createDatabase)
 
-    // dbConfig/schema.sql might have to be changed depending on file structure
+    // src/main/resources/schema.sql might have to be changed depending on file structure
     commandLine(
         "bash", "-lc", """
-        export PGPASSWORD="$dbPassword"
-        psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -f dbConfig/schema.sql
+        psql -U $dbUser -d $dbName -f src/main/resources/schema.sql
         """.trimIndent()
     )
 }
@@ -74,15 +71,10 @@ val seedDatabase by tasks.registering(Exec::class) {
     description = "Resets and seeds the database with demo data."
     dependsOn(applySchema)
 
-    // dbConfig/seed.sql might have to be changed depending on file structure
+    // src/main/resources/seed.sql might have to be changed depending on file structure
     commandLine(
         "bash", "-lc", """
-        export PGPASSWORD="$dbPassword"
-        psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -f dbConfig/seed.sql
+        psql -U $dbUser -d $dbName -f src/main/resources/seed.sql
         """.trimIndent()
     )
-}
-
-tasks.named("run") {
-    dependsOn(seedDatabase)
 }
