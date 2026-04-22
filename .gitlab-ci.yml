@@ -12,8 +12,8 @@ cache:
 
 test:
   stage: test
+  tags:
+    - docker
   script:
-    - apt-get update
-    - apt-get install -y openjdk-21-jdk
     - chmod +x gradlew
     - ./gradlew test --no-daemon
