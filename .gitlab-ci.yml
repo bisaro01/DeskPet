@@ -20,6 +20,7 @@ test:
 
     # install java (non-interactive)
     - sdk install java 21-tem -y
+    - sdk use java 21-tem
 
     # verify
     - java -version
