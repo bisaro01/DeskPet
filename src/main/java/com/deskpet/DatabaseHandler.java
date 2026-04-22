@@ -92,7 +92,7 @@ public class DatabaseHandler {
         }
     }
 
-    // Load current pet_state.
+    // Load current pet_state (initial load).
     /*
     Assumes Pet has a constructor: Pet(long petId, int hunger, int social, int comfort)
     */
@@ -120,4 +120,26 @@ public class DatabaseHandler {
 //        }
 //        throw new SQLException("No pet_state found for pet_id = " + petId);
 //    }
+
+    // Get food_id from RFID tag.
+    public long getFoodIdFromTag(String rfidTag) throws SQLException {
+        String sql = """
+                SELECT food_id
+                FROM food
+                WHERE rfid_tag = ?
+                """;
+
+        try (Connection connection = Database.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, rfidTag);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getLong("food_id");
+                }
+            }
+        }
+        throw new SQLException("No food found for RFID tag: " + rfidTag);
+    }
 }
