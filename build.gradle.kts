@@ -82,3 +82,7 @@ val seedDatabase by tasks.registering(Exec::class) {
         """.trimIndent()
     )
 }
+
+tasks.named("run") {
+    dependsOn(seedDatabase)
+}
