@@ -1,7 +1,7 @@
 image: eclipse-temurin:21
 
 stages:
-  - probe
+  - test
 
 variables:
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
@@ -11,29 +11,19 @@ cache:
     - .gradle/
 
 test:
-  stage: probe
+  stage: test
   tags:
     - shell
   script:
-    - echo "=== SYSTEM INFO ==="
-    - uname -a
+    # load sdkman
+    - source "$HOME/.sdkman/bin/sdkman-init.sh"
 
-    - echo "\n=== USER ==="
-    - whoami
+    # install java (non-interactive)
+    - sdk install java 21-tem
 
-    - echo "\n=== PATH ==="
-    - echo $PATH
+    # verify
+    - java -version
 
-    - echo "\n=== JAVA ==="
-    - which java || echo "java not found"
-    - java -version || echo "no java"
-
-    - echo "\n=== JAVAC ==="
-    - which javac || echo "javac not found"
-    - javac -version || echo "no javac"
-
-    - echo "\n=== GRADLE ==="
-    - which gradle || echo "gradle not found"
-
-    - echo "\n=== HOME CONTENTS ==="
-    - ls -la ~
+    # run gradle
+    - chmod +x gradlew
+    - ./gradlew test --no-daemon
