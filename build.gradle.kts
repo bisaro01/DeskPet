@@ -12,7 +12,8 @@ plugins {
 }
 
 application {
-    mainClass = "com.deskpet.App"
+    // mainClass = "com.deskpet.App"
+    mainClass = "com.deskpet.HappinessSubscriber"
 }
 
 repositories {
@@ -22,6 +23,7 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
 }
 
 tasks.named<Test>("test") {
