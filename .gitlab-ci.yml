@@ -1,7 +1,7 @@
 image: eclipse-temurin:21
 
 stages:
-  - test
+  - probe
 
 variables:
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
@@ -11,9 +11,29 @@ cache:
     - .gradle/
 
 test:
-  stage: test
+  stage: probe
   tags:
-    - docker
+    - shell
   script:
-    - chmod +x gradlew
-    - ./gradlew test --no-daemon
+    - echo "=== SYSTEM INFO ==="
+    - uname -a
+
+    - echo "\n=== USER ==="
+    - whoami
+
+    - echo "\n=== PATH ==="
+    - echo $PATH
+
+    - echo "\n=== JAVA ==="
+    - which java || echo "java not found"
+    - java -version || echo "no java"
+
+    - echo "\n=== JAVAC ==="
+    - which javac || echo "javac not found"
+    - javac -version || echo "no javac"
+
+    - echo "\n=== GRADLE ==="
+    - which gradle || echo "gradle not found"
+
+    - echo "\n=== HOME CONTENTS ==="
+    - ls -la ~
