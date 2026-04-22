@@ -205,11 +205,54 @@ void readTempHumidity() {
 }
 
 // ==================================  set up stage  =========================================
+// main set up
 void setup() {
+    // <<< PINS / HARDWARE >>>
+    pinMode(BUZZER, OUTPUT);
 
+
+    // start serial (Arduino IDE terminal)
+    Serial.begin(9600);
+
+    // begin graphics drawing
+    tft.begin();
+    tft.setRotation(3);
+    // begin temp&hum sensor
+    dht.begin();
+
+
+    // <<< CONNECTIVITY >>>
+    // connect to WiFi
+    connectWifi();
+
+    // connect MQTT
+    client.setServer(mqttServer, mqttPort);
 }
 
 // ===================================  main loop =========================================
 void loop() {
+    // maintains MQTT connection on very iteration of main loop
+    if(!client.connected()) {
+        connectMQTT();
+    }
+    client.loop();
 
+    // test code for facial expressions
+    int mood = random(0, 100);
+
+    if (mood < 50) {
+        sadFace();
+        sadSound();
+        client.publish("wio/mood", "sad");
+    }
+    else {
+        happyFace();
+        happySound();
+        client.publish("wio/mood", "happy");
+    }
+
+    // temp and humidity test
+    readTempHumidity();
+
+    delay(1000);
 }
