@@ -13,8 +13,8 @@ plugins {
 }
 
 application {
-    // mainClass = "com.deskpet.App"
-    mainClass = "com.deskpet.HappinessSubscriber"
+    mainClass = "com.deskpet.App"
+    //mainClass = "com.deskpet.HappinessSubscriber"
 }
 
 repositories {
