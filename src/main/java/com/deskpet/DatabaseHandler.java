@@ -2,9 +2,6 @@ package com.deskpet;
 // Imports might have to change depending on file structure
 // Assumes following classes exists: SensorData, Pet
 
-import com.deskpet.SensorDataProvider;
-import com.deskpet.PetDataProvider;
-
 import java.sql.*;
 import java.time.LocalDateTime;
 
@@ -21,11 +18,10 @@ public class DatabaseHandler {
     // Inserts all sensor values
     public void insertSensorData(SensorDataProvider sensorData) throws SQLException {
         String sql = """
-                INSERT INTO sensor_data (pet_id, senor_type, value, recorded_at)
+                INSERT INTO sensor_data (pet_id, sensor_type, value, recorded_at)
                 VALUES (?, ?, ?, ?)
                 """;
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             // Writes temperature values into the database.
             statement.setLong(1, sensorData.getPetId());
@@ -53,8 +49,7 @@ public class DatabaseHandler {
                 INSERT INTO feeding_log (pet_id, food_id, fed_at)
                 VALUES (?, ?, ?)
                 """;
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, petId);
             statement.setLong(2, foodId);
@@ -80,8 +75,7 @@ public class DatabaseHandler {
                 WHERE pet_id = ?
                 """;
 
-        try (Connection connection = Database.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, pet.getHunger());
             statement.setInt(2, pet.getSocial());
@@ -129,8 +123,7 @@ public class DatabaseHandler {
                 WHERE rfid_tag = ?
                 """;
 
-        try (Connection connection = Database.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, rfidTag);
 
