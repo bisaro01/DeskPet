@@ -5,13 +5,10 @@ package com.deskpet;
 import com.deskpet.SensorDataProvider;
 import com.deskpet.PetDataProvider;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.LocalDateTime;
 
-// Handles database interactions
+// Handles database interactions.
 /* Assumes Class SensorData exists.
 Validation must occur externally.
 Assumes SensorData has following functions:
@@ -49,7 +46,7 @@ public class DatabaseHandler {
         }
     }
 
-    // Inserts a feeding event
+    // Inserts a feeding event.
 
     public void insertFeedingEvent(long petId, long foodId, LocalDateTime fedAt) throws SQLException {
         String sql = """
@@ -66,7 +63,7 @@ public class DatabaseHandler {
         }
     }
 
-    // Updates the current pet_state
+    // Updates the current pet_state.
     /* Assumes Class Pet exists.
     Validation must occur externally.
     Assumes Pet has following functions:
@@ -94,4 +91,33 @@ public class DatabaseHandler {
             statement.executeUpdate();
         }
     }
+
+    // Load current pet_state.
+    /*
+    Assumes Pet has a constructor: Pet(long petId, int hunger, int social, int comfort)
+    */
+//    public Pet loadPet(long petId) throws SQLException {
+//        String sql = """
+//                SELECT hunger, social, comfort, happiness
+//                FROM pet_state
+//                WHERE pet_id = ?
+//                """;
+//
+//        try (Connection connection = Database.getConnection();
+//            PreparedStatement statement = connection.prepareStatement(sql)) {
+//
+//            statement.setLong(1, petId);
+//
+//            try (ResultSet resultSet = statement.executeQuery()) {
+//                if (resultSet.next()) {
+//                    int hunger = resultSet.getInt("hunger");
+//                    int social = resultSet.getInt("social");
+//                    int comfort = resultSet.getInt("comfort");
+//
+//                    return new Pet(petId, hunger, social, comfort);
+//                }
+//            }
+//        }
+//        throw new SQLException("No pet_state found for pet_id = " + petId);
+//    }
 }
