@@ -6,7 +6,7 @@ import java.util.Optional;
 /* Assumes Class SensorData exists
 Assumes SensorData has following functions:
 - getTemperature(), returns double
-- getPetId(), returns int?
+- getPetId(), returns long
 - getRecordedAt(), returns time and date
 - getHumidity(), returns double
  */

@@ -1,8 +1,9 @@
 package com.deskpet;
 // Imports might have to change depending on file structure
-// Assumes following classes exists: SensorData
+// Assumes following classes exists: SensorData, Pet
 
 import com.deskpet.SensorDataProvider;
+import com.deskpet.PetDataProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 Validation must occur externally.
 Assumes SensorData has following functions:
 - getTemperature(), returns double
-- getPetId(), returns int?
+- getPetId(), returns long
 - getRecordedAt(), returns time and date
 - getHumidity(), returns double
  */
@@ -47,7 +48,9 @@ public class DatabaseHandler {
             //TODO: Write movement values into the database (Version 2)
         }
     }
+
     // Inserts a feeding event
+
     public void insertFeedingEvent(long petId, long foodId, LocalDateTime fedAt) throws SQLException {
         String sql = """
                 INSERT INTO feeding_log (pet_id, food_id, fed_at)
@@ -59,6 +62,35 @@ public class DatabaseHandler {
             statement.setLong(1, petId);
             statement.setLong(2, foodId);
             statement.setTimestamp(3, Timestamp.valueOf(fedAt));
+            statement.executeUpdate();
+        }
+    }
+
+    // Updates the current pet_state
+    /* Assumes Class Pet exists.
+    Validation must occur externally.
+    Assumes Pet has following functions:
+    - getHunger(), returns int
+    - getSocial(), returns int
+    - getComfort(), returns int
+    - getHappiness(), returns int
+    - getPetId(), returns long
+     */
+    public void updatePetState(PetDataProvider pet) throws SQLException {
+        String sql = """
+                UPDATE pet_state
+                SET hunger = ?, social = ?, comfort = ?, happiness = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE pet_id = ?
+                """;
+
+        try (Connection connection = Database.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, pet.getHunger());
+            statement.setInt(2, pet.getSocial());
+            statement.setInt(3, pet.getComfort());
+            statement.setInt(4, pet.getHappiness());
+            statement.setLong(5, pet.getPetId());
             statement.executeUpdate();
         }
     }
