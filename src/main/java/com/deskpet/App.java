@@ -5,7 +5,7 @@ public class App {
         return a + b;
     }
 
-    static void main() {
+    public static void main(String[] args) {
         System.out.println("hello deskpet");
     }
 }
