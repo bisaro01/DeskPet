@@ -54,3 +54,17 @@ val createDatabase by tasks.registering(Exec::class) {
         """.trimIndent()
     )
 }
+
+val applySchema by tasks.registering(Exec::class) {
+    group = "database"
+    description = "Applies the schema to the database."
+    dependsOn(createDatabase)
+
+    // dbConfig/schema.sql might have to be changed depending on file structure
+    commandLine(
+        "bash", "-lc", """
+        export PGPASSWORD="$dbPassword"
+        psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -f dbConfig/schema.sql
+        """.trimIndent()
+    )
+}
