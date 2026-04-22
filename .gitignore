@@ -20,3 +20,6 @@ settings.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Local database config
+src/main/resources/config.properties
