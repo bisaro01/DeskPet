@@ -48,6 +48,9 @@ public class DeskPetApplication extends Application {
         stage.setScene(scene);
         stage.show();
         stage.setOnCloseRequest(event -> {
+            if (subscriber != null) {
+                subscriber.stop();
+            }
             Platform.exit();
             System.exit(0);
         });
