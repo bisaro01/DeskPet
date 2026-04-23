@@ -1,12 +1,20 @@
 package com.deskpet.models;
 
+import com.deskpet.HappinessSubscriber;
+import com.deskpet.domain.HappinessListener;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
-public class dashboardModel {
+public class dashboardModel implements HappinessListener {
     private final FloatProperty happiness = new SimpleFloatProperty(1);
     private final FloatProperty hunger = new SimpleFloatProperty(1);
     private final FloatProperty comfort = new SimpleFloatProperty(1);
+
+    private HappinessSubscriber happinessSubscriber;
+
+    public void setHappinessSubscriber(HappinessSubscriber sub) {
+        happinessSubscriber = sub;
+    }
 
     public float getHappiness() {
         return happiness.get();
@@ -43,5 +51,10 @@ public class dashboardModel {
     }
     public FloatProperty comfortProperty() {
         return comfort;
+    }
+
+    @Override
+    public void updateHappiness(double value) {
+
     }
 }
