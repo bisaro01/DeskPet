@@ -56,6 +56,17 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
 //        }
     }
 
+    public void stop() {
+        try {
+            if (mqttClient != null && mqttClient.isConnected()) {
+                mqttClient.disconnect();
+                System.out.println("MQTT disconnected");
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Runs when a message arrives
     @Override
     public void messageArrived(String topic, MqttMessage message) {
