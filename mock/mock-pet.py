@@ -36,13 +36,16 @@ def loop():
         delta = now - last_time
         last_time = now
 
-        state["hunger"] -= (0.5 / 60) * delta
+        state["hunger"] -= (30 / 60) * delta
         state["hunger"] = max(0, min(100, state["hunger"]))
+        state["happiness"] -= (30 / 60) * delta
+        state["happiness"] = max(0, min(100, state["happiness"]))
 
         client.publish("deskpet/happiness", state["happiness"])
         client.publish("deskpet/hunger", state["hunger"])
 
-        print(f"hunger={state['hunger']:.2f}")
+        print(f"MOCK PET: hunger={state['hunger']:.2f}")
+        print(f"MOCK PET: happiness={state['happiness']:.2f}")
         time.sleep(2)
 
 client.on_connect = on_connect
