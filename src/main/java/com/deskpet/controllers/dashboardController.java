@@ -1,6 +1,6 @@
 package com.deskpet.controllers;
 
-import com.deskpet.dashboardModel;
+import com.deskpet.models.dashboardModel;
 import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ProgressBar;
