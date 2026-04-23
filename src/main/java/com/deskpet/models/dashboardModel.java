@@ -1,4 +1,4 @@
-package com.deskpet;
+package com.deskpet.models;
 
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
