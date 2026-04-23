@@ -15,15 +15,15 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
     private final static String TOPIC = "deskpet/happiness"; // Topic we want to listen to
 
     // This is where the program starts
-    public static void main(String[] args) {
-        try {
-            // Create the subscriber and start it
-            HappinessSubscriber subscriber = new HappinessSubscriber(); 
-            subscriber.start();
-        } catch (MqttException e) { // Triggered when MQTT connection fails
-            System.out.println("Failed to start: " + e.getMessage());
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//            // Create the subscriber and start it
+//            HappinessSubscriber subscriber = new HappinessSubscriber();
+//            subscriber.start();
+//        } catch (MqttException e) { // Triggered when MQTT connection fails
+//            System.out.println("Failed to start: " + e.getMessage());
+//        }
+//    }
 
     // Constructor, creates a new HappinessSubscriber
     public HappinessSubscriber() throws MqttException {
@@ -40,21 +40,21 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
 
     // This is where it starts listening for messages
     public void start() throws MqttException {
-    mqttClient.subscribe(TOPIC);
-    
-    System.out.println("Listening to: " + TOPIC);
-    System.out.println("Waiting for happiness values...");
-    System.out.println("Press Ctrl+C to stop");
-    
-    // Keep the program running
-    while (true) {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            break;
-        }
+        mqttClient.subscribe(TOPIC);
+
+        System.out.println("Listening to: " + TOPIC);
+        System.out.println("Waiting for happiness values...");
+        System.out.println("Press Ctrl+C to stop");
+
+        // Keep the program running
+//        while (true) {
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                break;
+//            }
+//        }
     }
-}
 
     // Runs when a message arrives
     @Override
