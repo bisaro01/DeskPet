@@ -1,6 +1,120 @@
 # Desk pet
 
+## Pre-requisites
 
+1. PostgreSQL (TODO: add minimum version)
+    - Ensure postgreSQL server is running
+    - Create a user with a password (**password cannot be empty**)
+    - `src/main/resources/config.properties` exists and contains:
+        - username
+        - password
+        - database name
+
+2. Python 3 (for mock Pet)
+    - Verify with: `python --version` or `py --version`
+
+3. MQTT Broker (Mosquitto)
+    - Ensure installed
+        - Arch
+            ```bash
+            sudo pacman -S mosquitto
+            ```
+        - Ubuntu
+            ```bash
+            sudo apt install mosquitto mosquitto-clients
+            ```
+        - MacOS
+            ```bash
+            brew install mosquitto
+            ```
+        - Windows
+            Download installer from [official website](https://mosquitto.org/download)
+    - Broker must be running on:
+        - host: `localhost`
+        - port: `1883`
+
+## Setup
+
+### Linux/MacOS
+
+In a terminal:
+
+1. Clone the repository:
+    ```bash
+    git clone <repo-url>
+    cd <repo>
+    ```
+
+2. Build the project:
+    ```bash
+    ./gradlew build
+    ```
+
+3. Set up mock pet (Python):
+    ```bash
+    cd mock
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    ```
+    - For fish/csh shell users, activation scripts available in bin directory
+
+### Windows (PowerShell)
+
+1. Clone the repository:
+    ```powershell
+    git clone <repo-url>
+    cd <repo>
+    ```
+
+2. Build the project:
+    ```powershell
+    .\gradlew.bat build
+    ```
+
+3. Set up mock pet (Python):
+    ```powershell
+    cd mock
+    py -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    pip install -r requirements.txt
+    ```
+
+PowerShell may block script execution:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+## Verify setup
+
+- Run tests:
+    ```bash
+    ./gradlew test          # Linux/macOS
+    .\gradlew.bat test      # Windows
+    ```
+
+- Start MQTT broker
+    Linux/MacOS
+    ```bash
+    mosquitto -v
+    ```
+    Windows
+    ```powershell
+    mosquitto.exe -v
+    ```
+
+- Start mock pet:
+    ```bash
+    python mock/mock-pet.py # Linux/macOS
+    py mock\mock-pet.py     # Windows
+    ```
+
+- Start Application
+    ```bash
+    ./gradlew run           # Linux/macOS
+    .\gradlew.bat run       # Windows
+    ```
 
 ## Getting started
 
