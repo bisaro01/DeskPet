@@ -11,8 +11,5 @@ public class App {
     public static void main(String[] args) {
         DeskPetApplication app = new DeskPetApplication();
         app.run();
-
-        // Launch the GUI.
-//        Application.launch(DeskPetApplication.class, args);
     }
 }
