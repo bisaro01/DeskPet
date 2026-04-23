@@ -1,7 +1,6 @@
-package com.deskpet;
+package com.deskpet.domain;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 
 /* Assumes Class SensorData exists
 Assumes SensorData has following functions:
