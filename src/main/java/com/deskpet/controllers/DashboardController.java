@@ -1,6 +1,7 @@
 package com.deskpet.controllers;
 
-import com.deskpet.models.dashboardModel;
+import com.deskpet.models.DashboardModel;
+import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ProgressBar;
@@ -21,7 +22,11 @@ public class DashboardController {
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
 
-    private dashboardModel model = new dashboardModel();
+    private DashboardModel model = new DashboardModel();
+
+    public DashboardModel getModel() {
+        return model;
+    }
 
     public void bindProgressBarWithColor(ProgressBar progressBar, FloatProperty property) {
         progressBar.progressProperty().bind(property);

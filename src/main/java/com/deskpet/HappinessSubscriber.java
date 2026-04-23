@@ -1,5 +1,6 @@
 package com.deskpet;
 
+import com.deskpet.domain.HappinessListener;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -13,6 +14,8 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
     private final static String BROKER = "tcp://localhost:1883"; // If on another computer, use IP instead
     private final static String CLIENT_ID = "happiness-subscriber"; // Client name
     private final static String TOPIC = "deskpet/happiness"; // Topic we want to listen to
+
+    private HappinessListener happinessListener;
 
     // This is where the program starts
 //    public static void main(String[] args) {
@@ -36,6 +39,10 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
 
         mqttClient.connect(options);
         System.out.println("Connected to MQTT broker!");
+    }
+
+    public void setHappinessListener(HappinessListener listener) {
+        happinessListener = listener;
     }
 
     // This is where it starts listening for messages
@@ -72,6 +79,11 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
     public void messageArrived(String topic, MqttMessage message) {
         String payload = new String(message.getPayload()); // Convert message to string
         System.out.println("Happiness = " + payload + "%");
+
+        double value = Double.parseDouble(payload);
+        if (happinessListener != null) {
+            happinessListener.updateHappiness(value);
+        }
     }
 
     // Runs when connection is lost

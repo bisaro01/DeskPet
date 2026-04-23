@@ -1,5 +1,7 @@
 package com.deskpet;
 
+import com.deskpet.controllers.DashboardController;
+import com.deskpet.models.DashboardModel;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -11,7 +13,7 @@ import java.sql.Connection;
 public class DeskPetApplication extends Application {
     private final Connection db;
     private HappinessSubscriber subscriber;
-    private HappinessPublisher publisher;
+//    private HappinessPublisher publisher;
 
     public DeskPetApplication() {
         try{
@@ -25,8 +27,14 @@ public class DeskPetApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(DeskPetApplication.class.getResource("/com/deskpet/views/dashboardView.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        DashboardController controller = fxmlLoader.getController();
+        DashboardModel model = controller.getModel();
+
         try {
             subscriber = new HappinessSubscriber();
+            subscriber.setHappinessListener(controller.getModel());
             subscriber.start();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             System.out.println("Failed to create HappinessSubscriber: " + e.getMessage());
@@ -34,16 +42,15 @@ public class DeskPetApplication extends Application {
             throw new RuntimeException(e);
         }
 
-        try {
-            publisher = new HappinessPublisher();
-        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            System.out.println("Failed to create HappinessPublisher" + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+//        try {
+//            publisher = new HappinessPublisher();
+//        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+//            System.out.println("Failed to create HappinessPublisher" + e.getMessage());
+//            e.printStackTrace();
+//            throw new RuntimeException(e);
+//        }
 
-        FXMLLoader fxmlLoader = new FXMLLoader(DeskPetApplication.class.getResource("/com/deskpet/views/dashboardView.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
+        model.setHappinessSubscriber(subscriber);
         stage.setTitle("Desk Pet");
         stage.setScene(scene);
         stage.show();
