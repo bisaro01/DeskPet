@@ -11,22 +11,20 @@ cache:
   paths:
     - .gradle/
 
+.before_script_template: &java_setup
+  # Ensure java 21 installed and being used
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
+  - sdk install java 21-tem -y
+  - sdk use java 21-tem
+  - java -version
+
 test:
   stage: test
   tags:
     - shell
+  before_script: *java_setup
   script:
-    # load sdkman
-    - source "$HOME/.sdkman/bin/sdkman-init.sh"
-
-    # install java (non-interactive)
-    - sdk install java 21-tem -y
-    - sdk use java 21-tem
-
-    # verify
-    - java -version
-
-    # run gradle
+    # run tests
     - chmod +x gradlew
     - ./gradlew test --no-daemon --no-configuration-cache
 
@@ -34,8 +32,8 @@ build:
   stage: build
   tags:
     - shell
+  needs: ["test"] # depend on test job (test stage must run first)
+  before_script: *java_setup
   script:
-    - source "$HOME/.sdkman/bin/sdkman-init.sh"
-    - sdk install java 21-tem -y
-    - sdk use java 21-tem
+    # build project
     - ./gradlew build --no-daemon --no-configuration-cache
