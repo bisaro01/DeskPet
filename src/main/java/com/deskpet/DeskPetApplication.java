@@ -6,11 +6,43 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.sql.Connection;
 
-public class dashboardApplication extends Application {
+public class DeskPetApplication extends Application {
+    private final Connection db;
+    private HappinessSubscriber subscriber;
+    private HappinessPublisher publisher;
+
+    public DeskPetApplication() {
+        try{
+            db = Database.getConnection();
+        } catch (java.sql.SQLException e) {
+            System.out.println("Failed to create Database connection" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(dashboardApplication.class.getResource("dashboardView.fxml"));
+        try {
+            subscriber = new HappinessSubscriber();
+            subscriber.start();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create HappinessSubscriber: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        try {
+            publisher = new HappinessPublisher();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create HappinessPublisher" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        FXMLLoader fxmlLoader = new FXMLLoader(DeskPetApplication.class.getResource("/com/deskpet/views/dashboardView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Desk Pet");
         stage.setScene(scene);
@@ -19,5 +51,9 @@ public class dashboardApplication extends Application {
             Platform.exit();
             System.exit(0);
         });
+    }
+
+    public void run() {
+        Application.launch(this.getClass());
     }
 }
