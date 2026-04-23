@@ -27,4 +27,4 @@ test:
 
     # run gradle
     - chmod +x gradlew
-    - ./gradlew test --no-daemon
+    - ./gradlew build --no-daemon --no-configuration-cache
