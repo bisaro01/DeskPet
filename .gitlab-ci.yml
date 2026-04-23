@@ -34,6 +34,9 @@ build:
     - shell
   needs: ["test"] # depend on test job (test stage must run first)
   before_script: *java_setup
+  artifacts:
+    paths:
+      - build/
   script:
     # build project
     - ./gradlew build --no-daemon --no-configuration-cache
