@@ -2,6 +2,7 @@ image: eclipse-temurin:21
 
 stages:
   - test
+  - build
 
 variables:
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
@@ -28,3 +29,13 @@ test:
     # run gradle
     - chmod +x gradlew
     - ./gradlew test --no-daemon --no-configuration-cache
+
+build:
+  stage: build
+  tags:
+    - shell
+  script:
+    - source "$HOME/.sdkman/bin/sdkman-init.sh"
+    - sdk install java 21-tem -y
+    - sdk use java 21-tem
+    - ./gradlew build --no-daemon --no-configuration-cache
