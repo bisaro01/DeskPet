@@ -1,8 +1,8 @@
-package com.deskpet;
+package com.deskpet.controllers;
 
+import com.deskpet.dashboardModel;
 import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.beans.binding.Bindings;
 import java.util.concurrent.Executors;
