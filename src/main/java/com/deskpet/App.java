@@ -9,14 +9,10 @@ public class App {
     }
 
     public static void main(String[] args) {
-        System.out.println("hello deskpet");
-        try (Connection connection = Database.getConnection()) {
-            System.out.println("Database connection successful");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        DeskPetApplication app = new DeskPetApplication();
+        app.run();
 
         // Launch the GUI.
-        Application.launch(dashboardApplication.class, args);
+//        Application.launch(DeskPetApplication.class, args);
     }
 }
