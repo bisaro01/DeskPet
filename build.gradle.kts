@@ -12,6 +12,12 @@ plugins {
     id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 application {
     mainClass = "com.deskpet.App"
     //mainClass = "com.deskpet.HappinessSubscriber"
