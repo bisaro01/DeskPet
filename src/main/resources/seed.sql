@@ -7,9 +7,9 @@ VALUES (1, 'Bob', CURRENT_TIMESTAMP);
 INSERT INTO pet_state (pet_id, hunger, social, comfort, happiness, updated_at)
 VALUES (1, 80, 75, 85, 80, CURRENT_TIMESTAMP);
 
--- TODO: Replace TAG001 and TAG002 with the actual tag UID
+-- TODO: Replace TAG002 with the actual tag UID
 INSERT INTO food (food_id, name, rfid_tag, hunger_gain)
-VALUES (1, 'Fish', 'TAG001', 40),
+VALUES (1, 'Fish', '2A:88:64:06', 40),
        (2, 'Cookie', 'TAG002', 40);
 
 INSERT INTO sensor_data (sensor_data_id, pet_id, sensor_type, value, recorded_at)
