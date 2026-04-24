@@ -2,6 +2,8 @@
 #include "rpcWiFi.h"
 #include <PubSubClient.h>
 #include "Grove_Temperature_And_Humidity_Sensor.h"
+#include <SPI.h>
+#include <MFRC522.h>
 
 // ==================================== CONSTANTS ==============================================
 // WiFi login
@@ -25,11 +27,18 @@ PubSubClient client(wifiClient);
 // <<< DEFINED PINS >>>
 #define BUZZER WIO_BUZZER   // inbuilt buzzer
 #define DHTPIN 2            // humidity and temp sensor pin D2 on WIO diagram
+#define RFID_RST_PIN 9      // Change depending on physical build connections
+#define RFID_SS_PIN 10      // Change depending on physical build connections
 
 
 // <<< OTHER INSTANCES >>>
 TFT_eSPI tft;               // graphical drawing object
 DHT dht(DHTPIN, DHTTYPE);   // humidity and temp object
+MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
+
+// RFID cooldown
+unsigned long lastRfidReadTime = 0;
+const unsigned long RFID_COOLDOWN = 60000;  // 60 seconds
 
 // ============================  WiFi & MQTT functions  =======================================
 
@@ -204,6 +213,57 @@ void readTempHumidity() {
     }
 }
 
+void readRfidTag() {
+    // Check if cooldown has passed
+    if (millis() - lastRfidReadTime < RFID_COOLDOWN) {
+        return;
+    }
+
+    // Check if a tag is close enough to read
+    if (!rfid.PICC_IsNewCardPresent()) {
+        return;
+    }
+
+    // Read tag
+    if (!rfid.PICC_ReadCardSerial()) {
+        return;
+    }
+
+    String uid = "";
+
+    // Loop through UID
+    for (byte i = 0; i < rfid.uid.size; i++) {
+        if (rfid.uid.uidByte[i] < 0x10) {
+        uid += "0";
+        }
+
+        // Add as hecadecimal text
+        uid += String(rfid.uid.uidByte[i], HEX);
+
+        // Add ':' between UID sections
+        if (i < rfid.uid.size - 1) {
+        uid += ":";
+        }
+    }
+
+    // Make UID uppercase
+    uid.toUpperCase();
+
+    // Debugging
+    //Serial.print("RFID UID: ");
+    //Serial.println(uid);
+
+    // Publish reading to MQTT
+    client.publish("wio/rfid", uid.c_str());
+
+    // Time last read, for cooldown
+    lastRfidReadTime = millis();
+
+    // Ends communication with current tag
+    rfid.PICC_HaltA();
+    rfid.PCD_StopCrypto1();
+}
+
 // ==================================  set up stage  =========================================
 // main set up
 void setup() {
@@ -220,6 +280,9 @@ void setup() {
     // begin temp&hum sensor
     dht.begin();
 
+    // begin RFID reader
+    SPI.begin();
+    rfid.PCD_Init();
 
     // <<< CONNECTIVITY >>>
     // connect to WiFi
@@ -253,6 +316,9 @@ void loop() {
 
     // temp and humidity test
     readTempHumidity();
+
+    // RFID scanner function
+    readRfidTag();
 
     delay(1000);
 }
