@@ -10,7 +10,7 @@ VALUES (1, 80, 75, 85, 80, CURRENT_TIMESTAMP);
 -- TODO: Replace TAG002 with the actual tag UID
 INSERT INTO food (food_id, name, rfid_tag, hunger_gain)
 VALUES (1, 'Fish', '2A:88:64:06', 40),
-       (2, 'Cookie', 'TAG002', 40);
+       (2, 'Cookie', '9C:DA:6C:06', 40);
 
 INSERT INTO sensor_data (sensor_data_id, pet_id, sensor_type, value, recorded_at)
 VALUES (1, 1, 'TEMPERATURE', 21.5, CURRENT_TIMESTAMP - INTERVAL '20 minutes'),
