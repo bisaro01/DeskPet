@@ -1,12 +1,21 @@
-package com.deskpet;
+package com.deskpet.models;
 
+import com.deskpet.HappinessSubscriber;
+import com.deskpet.domain.HappinessListener;
+import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
-public class dashboardModel {
+public class DashboardModel implements HappinessListener {
     private final FloatProperty happiness = new SimpleFloatProperty(1);
     private final FloatProperty hunger = new SimpleFloatProperty(1);
     private final FloatProperty comfort = new SimpleFloatProperty(1);
+
+    private HappinessSubscriber happinessSubscriber;
+
+    public void setHappinessSubscriber(HappinessSubscriber sub) {
+        happinessSubscriber = sub;
+    }
 
     public float getHappiness() {
         return happiness.get();
@@ -14,9 +23,10 @@ public class dashboardModel {
     // Updates the value of Happiness based on the four needs
     public void setHappiness() {
         //Calculate value of happiness TODO: Will need to add the two remaining needs and change to / 4
-        float happinessValue = (hunger.get() + comfort.get()) / 2;
-        happiness.set(Math.clamp(happinessValue, 0.0f, 1.0f));
+//        float happinessValue = (hunger.get() + comfort.get()) / 2;
+//        happiness.set(Math.clamp(happinessValue, 0.0f, 1.0f));
     }
+
     // Method used for binding and observing changes to the property.
     // I.e., to make sure the GUI updates automatically if the value updates.
     public FloatProperty happinessProperty() {
@@ -43,5 +53,13 @@ public class dashboardModel {
     }
     public FloatProperty comfortProperty() {
         return comfort;
+    }
+
+    @Override
+    public void updateHappiness(double value) {
+        Platform.runLater(() -> {
+            happiness.set(Math.clamp((float)(value / 100.0), 0.0f, 1.0f));
+            System.out.println("model: " + happiness);
+        });
     }
 }

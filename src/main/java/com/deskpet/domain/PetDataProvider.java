@@ -1,4 +1,4 @@
-package com.deskpet;
+package com.deskpet.domain;
 
 /* Assumes Class Pet exists.
 Validation must occur externally.
