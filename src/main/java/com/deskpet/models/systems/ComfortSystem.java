@@ -5,10 +5,10 @@ public class ComfortSystem {
     Attributes that can be changed depending on user
     settings in version 2 with getters and setters
     */
-    private static float MinTemp = 18.0F;
-    private static float MaxTemp = 24.0F;
-    private static float MinHumidity = 30.0F;
-    private static float MaxHumidity = 50.0F;
+    private float minTemp = 18.0F;
+    private float maxTemp = 24.0F;
+    private float minHumidity = 30.0F;
+    private float maxHumidity = 50.0F;
 
 
     // Values for comfort calculations
@@ -23,49 +23,55 @@ public class ComfortSystem {
         return comfort;
     }
     public void setComfort(float value) {
-        this.comfort = value;
+        if (value > 100) {
+            this.comfort = 100;
+        } else if (value < 0) {
+            this.comfort = 0;
+        } else {
+            this.comfort = value;
+        }
     }
 
     public float getMinTemp() {
-        return  MinTemp;
+        return  minTemp;
     }
     public void setMinTemp(float value) {
-        this.MinTemp = value;
+        this.minTemp = value;
     }
 
-    public double getMaxTemp() {
-        return  MaxTemp;
+    public float getMaxTemp() {
+        return  maxTemp;
     }
     public void setMaxTemp(float value) {
-        this.MaxTemp = value;
+        this.maxTemp = value;
     }
 
     public float getMinHumidity() {
-        return  MinHumidity;
+        return  minHumidity;
     }
     public void setMinHumidity(float value) {
-        this.MinHumidity = value;
+        this.minHumidity = value;
     }
 
     public float getMaxHumidity() {
-        return MaxHumidity;
+        return maxHumidity;
     }
     public void setMaxHumidity(float value) {
-        this.MaxHumidity = value;
+        this.maxHumidity = value;
     }
 
 
     // Method for calculating comfort levels
     public void updateComfort(float humidity, float temperature) {
         // Logic for humidity comfort calculation
-        if (humidity >= MinHumidity && humidity <= MaxHumidity) {
+        if (humidity >= minHumidity && humidity <= maxHumidity) {
             comfort += COMFORT_INCREASE;
         } else {
             comfort -= COMFORT_DECREASE;
         }
 
         // Logic for temperature comfort calculation
-        if (temperature >= MinTemp && temperature <= MaxTemp) {
+        if (temperature >= minTemp && temperature <= maxTemp) {
             comfort += COMFORT_INCREASE;
         } else {
             comfort -= COMFORT_DECREASE;
