@@ -2,6 +2,9 @@ package com.deskpet;
 // Imports might have to change depending on file structure
 // Assumes following classes exists: SensorData, Pet
 
+import com.deskpet.domain.PetDataProvider;
+import com.deskpet.domain.SensorDataProvider;
+
 import java.sql.*;
 import java.time.LocalDateTime;
 

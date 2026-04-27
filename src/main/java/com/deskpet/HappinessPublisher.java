@@ -1,5 +1,3 @@
-// Test happiness values, not actual ones yet 
-
 package com.deskpet;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -15,15 +13,15 @@ public class HappinessPublisher {
     private final static String TOPIC = "deskpet/happiness"; // Topic we want to send to
 
     // This is where the program starts
-    public static void main(String[] args) {
-        try {
-            HappinessPublisher publisher = new HappinessPublisher();
-            publisher.sendTestMessages(); // Test messages
-
-        } catch (MqttException e) {
-            System.out.println("Failed: " + e.getMessage());
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//            HappinessPublisher publisher = new HappinessPublisher();
+//            publisher.sendTestMessages(); // Test messages
+//
+//        } catch (MqttException e) {
+//            System.out.println("Failed: " + e.getMessage());
+//        }
+//    }
 
     // Constructor, runs when we create a new HappinessPublisher
     public HappinessPublisher() throws MqttException {

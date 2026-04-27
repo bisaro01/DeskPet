@@ -1,15 +1,16 @@
-package com.deskpet;
+package com.deskpet.controllers;
 
+import com.deskpet.models.DashboardModel;
+import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.beans.binding.Bindings;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class dashboardController {
+public class DashboardController {
     @FXML
     private ProgressBar happinessBar;
     @FXML
@@ -21,7 +22,11 @@ public class dashboardController {
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
 
-    private dashboardModel model = new dashboardModel();
+    private DashboardModel model = new DashboardModel();
+
+    public DashboardModel getModel() {
+        return model;
+    }
 
     public void bindProgressBarWithColor(ProgressBar progressBar, FloatProperty property) {
         progressBar.progressProperty().bind(property);

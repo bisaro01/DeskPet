@@ -1,5 +1,6 @@
 package com.deskpet;
 
+import com.deskpet.domain.HappinessListener;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -14,16 +15,18 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
     private final static String CLIENT_ID = "happiness-subscriber"; // Client name
     private final static String TOPIC = "deskpet/happiness"; // Topic we want to listen to
 
+    private HappinessListener happinessListener;
+
     // This is where the program starts
-    public static void main(String[] args) {
-        try {
-            // Create the subscriber and start it
-            HappinessSubscriber subscriber = new HappinessSubscriber(); 
-            subscriber.start();
-        } catch (MqttException e) { // Triggered when MQTT connection fails
-            System.out.println("Failed to start: " + e.getMessage());
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//            // Create the subscriber and start it
+//            HappinessSubscriber subscriber = new HappinessSubscriber();
+//            subscriber.start();
+//        } catch (MqttException e) { // Triggered when MQTT connection fails
+//            System.out.println("Failed to start: " + e.getMessage());
+//        }
+//    }
 
     // Constructor, creates a new HappinessSubscriber
     public HappinessSubscriber() throws MqttException {
@@ -38,29 +41,49 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
         System.out.println("Connected to MQTT broker!");
     }
 
+    public void setHappinessListener(HappinessListener listener) {
+        happinessListener = listener;
+    }
+
     // This is where it starts listening for messages
     public void start() throws MqttException {
-    mqttClient.subscribe(TOPIC);
-    
-    System.out.println("Listening to: " + TOPIC);
-    System.out.println("Waiting for happiness values...");
-    System.out.println("Press Ctrl+C to stop");
-    
-    // Keep the program running
-    while (true) {
+        mqttClient.subscribe(TOPIC);
+
+        System.out.println("Listening to: " + TOPIC);
+        System.out.println("Waiting for happiness values...");
+        System.out.println("Press Ctrl+C to stop");
+
+        // Keep the program running
+//        while (true) {
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                break;
+//            }
+//        }
+    }
+
+    public void stop() {
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            break;
+            if (mqttClient != null && mqttClient.isConnected()) {
+                mqttClient.disconnect();
+                System.out.println("MQTT disconnected");
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
         }
     }
-}
 
     // Runs when a message arrives
     @Override
     public void messageArrived(String topic, MqttMessage message) {
         String payload = new String(message.getPayload()); // Convert message to string
         System.out.println("Happiness = " + payload + "%");
+
+        double value = Double.parseDouble(payload);
+        if (happinessListener != null) {
+            happinessListener.updateHappiness(value);
+        }
     }
 
     // Runs when connection is lost
