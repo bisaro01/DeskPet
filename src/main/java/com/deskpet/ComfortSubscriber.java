@@ -31,7 +31,7 @@ public class ComfortSubscriber implements MqttCallback {
     }
 
 
-    // Subscriber methods
+    // ComfortSubscriber start and stop MQTT broker connection methods
     public void start() throws MqttException {
         MqttClient.subscribe(TOPIC);
 
@@ -41,21 +41,34 @@ public class ComfortSubscriber implements MqttCallback {
         // System.out.println("Press Ctrl+C to stop");
     }
 
+    public void stop() throws MqttException {
+        try {
+            if (MqttClient != null && MqttClient.isConnected()) {
+                MqttClient.disconnect();
+                // System.out.println("MQTT disconnected.");
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
+    // Mandatory MqttCallback abstract methods
     @Override
     public void connectionLost(Throwable cause) {
-
+        System.out.println("Connection lost: " + cause.getMessage());
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
+        String payload = new String(message.getPayload());
+        System.out.println("Humidity&Temp = " + payload);
 
+        // TODO: Split and pass data to the comfort system once Pet class available
     }
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
-
     }
 }
