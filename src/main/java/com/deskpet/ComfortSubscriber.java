@@ -10,7 +10,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class ComfortSubscriber implements MqttCallback {
     private IMqttClient MqttClient;
-    private final static String BROKER = "tpc://localhost:1883";
+    private final static String BROKER = "tcp://localhost:1883";
     private final static String CLIENT_ID = "comfort-subscriber";
     private final static String TOPIC = "deskpet/comfort";
 
