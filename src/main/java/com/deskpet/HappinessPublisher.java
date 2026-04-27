@@ -1,5 +1,3 @@
-// Test happiness values, not actual ones yet 
-
 package com.deskpet;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
