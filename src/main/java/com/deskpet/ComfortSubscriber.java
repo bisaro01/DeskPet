@@ -1,5 +1,10 @@
 package com.deskpet;
 
+// talking directly to the dashboard through the comfortListener same as Happiness system
+import com.deskpet.domain.ComfortListener;
+import com.deskpet.domain.HappinessListener;
+import com.deskpet.models.systems.ComfortSystem;
+
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -14,20 +19,30 @@ public class ComfortSubscriber implements MqttCallback {
     private final static String CLIENT_ID = "comfort-subscriber";
     private final static String TOPIC = "deskpet/comfort";
 
+    // talking directly to the dashboard through the comfortListener same as Happiness system
+    private ComfortSystem comfortSystem;
+    private ComfortListener comfortListener;
+
 
     // Constructor
-    public ComfortSubscriber() throws  MqttException {
+    public ComfortSubscriber(ComfortSystem comfortSystem) throws  MqttException {
+        // talking directly to the dashboard through the comfortListener same as Happiness system
+        this.comfortSystem = comfortSystem;
+
+
         MqttClient = new MqttClient(BROKER, CLIENT_ID);
         MqttClient.setCallback(this);
-
         // basic set up for connection keep connection actively alive every
         // 60 seconds
         MqttConnectOptions options = new MqttConnectOptions();
         options.setKeepAliveInterval(60);
         options.setAutomaticReconnect(true);
-
         MqttClient.connect(options);
         System.out.println("Connected to MQTT broker.");
+    }
+
+    public void setComfortListener(ComfortListener listener) {
+        comfortListener = listener;
     }
 
 
@@ -65,7 +80,20 @@ public class ComfortSubscriber implements MqttCallback {
         String payload = new String(message.getPayload());
         System.out.println("Humidity&Temp = " + payload);
 
-        // TODO: Split and pass data to the comfort system once Pet class available
+        // Payload will be a string e.g. ("50.0, 21.0")
+        String[] sensorReading = payload.split(",");
+        if (sensorReading.length == 2) {
+            float humidity = Float.parseFloat(sensorReading[0]);
+            float temperature = Float.parseFloat(sensorReading[1]);
+
+            // pass the readings to the comfort system to calculate the value
+            comfortSystem.updateComfort(humidity, temperature);
+
+            // pass the comfort value to the dashboard
+            if (comfortListener != null) {
+                comfortListener.updateComfort(comfortSystem.getComfort());
+            }
+        }
     }
 
     @Override
