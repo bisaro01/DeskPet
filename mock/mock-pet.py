@@ -1,11 +1,12 @@
 import time
 import paho.mqtt.client as mqtt
+import random
 
 state = {
     "happiness": 80.0,
     "hunger": 80.0,
-    "temp": 23.0,
-    "humidity": 0.4
+    "temp": 24.0,
+    "humidity": 48.0
 }
 
 client = mqtt.Client()
@@ -41,11 +42,17 @@ def loop():
         state["happiness"] -= (30 / 60) * delta
         state["happiness"] = max(0, min(100, state["happiness"]))
 
+        # Simulated humidity and temp tests
+        state["humidity"] += random.uniform(-0.2, 0.2)
+        state["temp"] += random.uniform(-0.5, 0.5)
+
         client.publish("deskpet/happiness", state["happiness"])
         client.publish("deskpet/hunger", state["hunger"])
+        client.publish("deskpet/comfort", f"{state["humidity"]},{state["temp"]}")
 
         print(f"MOCK PET: hunger={state['hunger']:.2f}")
         print(f"MOCK PET: happiness={state['happiness']:.2f}")
+        print(f"MOCK PET: humidty={state['humidity']:.2f}, temp={state['temp']:.2f}")
         time.sleep(2)
 
 client.on_connect = on_connect

@@ -78,7 +78,6 @@ public class ComfortSubscriber implements MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         String payload = new String(message.getPayload());
-        System.out.println("Humidity&Temp = " + payload);
 
         // Payload will be a string e.g. ("50.0, 21.0")
         String[] sensorReading = payload.split(",");
@@ -86,8 +85,14 @@ public class ComfortSubscriber implements MqttCallback {
             float humidity = Float.parseFloat(sensorReading[0]);
             float temperature = Float.parseFloat(sensorReading[1]);
 
+            // for debugging when we run Gradle
+            System.out.printf("Humidity: %.1f%% | Temp: %.1fC%n", humidity, temperature);
+
             // pass the readings to the comfort system to calculate the value
             comfortSystem.updateComfort(humidity, temperature);
+
+            // for debugging when we run Gradle
+            System.out.printf("Comfort: %.1f%%%n", comfortSystem.getComfort());
 
             // pass the comfort value to the dashboard
             if (comfortListener != null) {
