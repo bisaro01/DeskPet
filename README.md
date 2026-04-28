@@ -2,9 +2,44 @@
 
 ## Pre-requisites
 
-1. PostgreSQL (TODO: add minimum version)
+1. PostgreSQL (version 13+ recommended)
+    - Ensure installed
+      - Arch
+        ```bash
+        sudo pacman -S postgresql
+        ``` 
+      - Ubuntu
+        ```bash
+        sudo apt install postgresql postgresql-contrib
+        ```
+      - MacOS
+        ```bash
+        brew install postgresql
+        ```
+      - Windows<br>
+        Download installer from [official website](https://www.postgresql.org/download/)
     - Ensure postgreSQL server is running
-    - Create a user with a password (**password cannot be empty**)
+      - Arch & Ubuntu
+        ```bash
+        sudo systemctl start postgresql
+        ``` 
+      - MacOS
+        ```bash
+        brew services start postgresql
+        ``` 
+      - Windows<br>
+        Starts automatically (or use Services panel)
+    - Create a postgres user with a password (**password cannot be empty**)
+      - Open PostgreSQL shell
+        - Create user<br> 
+         _Default: user 'postgre', password '123', database 'deskpet'_
+          ```sql
+          CREATE USER youruser WITH PASSWORD 'yourpassword';
+          ``` 
+        - Change password
+          ```sql
+          ALTER USER youruser WITH PASSWORD 'newpassword';
+          ```
     - `src/main/resources/config.properties` exists and contains:
         - username
         - password
@@ -27,7 +62,7 @@
             ```bash
             brew install mosquitto
             ```
-        - Windows
+        - Windows<br>
             Download installer from [official website](https://mosquitto.org/download)
     - Broker must be running on:
         - host: `localhost`
@@ -44,13 +79,18 @@ In a terminal:
     git clone <repo-url>
     cd <repo>
     ```
+2. Set up database:<br>
+   From project root
+     ```bash
+     sh scr/main/scripts/db-setup.sh
+     ```
 
-2. Build the project:
+3. Build the project:
     ```bash
     ./gradlew build
     ```
 
-3. Set up mock pet (Python):
+4. Set up mock pet (Python):
     ```bash
     cd mock
     python3 -m venv .venv
@@ -67,12 +107,18 @@ In a terminal:
     cd <repo>
     ```
 
-2. Build the project:
+2. Set up database:<br>
+   From project root
+    ```bash
+    powershell -ExecutionPolicy Bypass -File src/main/scripts/db-setup.ps1
+    ```
+
+3. Build the project:
     ```powershell
     .\gradlew.bat build
     ```
 
-3. Set up mock pet (Python):
+4. Set up mock pet (Python):
     ```powershell
     cd mock
     py -m venv .venv
@@ -94,7 +140,19 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
     .\gradlew.bat test      # Windows
     ```
 
-- Start MQTT broker
+- Start PostgreSQL
+  - Linux
+    ```bash
+    sudo systemctl start postgresql
+    ```
+  - MacOS
+    ```bash
+    brew services start postgresql
+    ```
+  - Windows<br>
+  Starts automatically (or use Services panel)
+
+- Start MQTT broker<br>
     Linux/MacOS
     ```bash
     mosquitto -v
