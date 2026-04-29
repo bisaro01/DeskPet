@@ -27,4 +27,14 @@ public class HungerSystem {
             this.hunger = value;
         }
     }
+    public void updateHunger(String rfidTag) {
+        if (foodTags.contains(rfidTag)) {
+            hunger += hunger_increase;
+        } else {
+            hunger -= hunger_decrease;
+        }
+
+        if (hunger > 100) {hunger = 100;}
+        if (hunger < 0) {hunger = 0.0;}
+    }
 }
