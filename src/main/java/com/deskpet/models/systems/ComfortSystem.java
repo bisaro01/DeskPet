@@ -5,24 +5,24 @@ public class ComfortSystem {
     Attributes that can be changed depending on user
     settings in version 2 with getters and setters
     */
-    private float minTemp = 18.0F;
-    private float maxTemp = 24.0F;
-    private float minHumidity = 30.0F;
-    private float maxHumidity = 50.0F;
+    private double minTemp = 18.0;
+    private double maxTemp = 24.0;
+    private double minHumidity = 30.0;
+    private double maxHumidity = 50.0;
 
 
     // Values for comfort calculations
-    private static final float COMFORT_INCREASE = 0.5F;
-    private static final float COMFORT_DECREASE = 1.0F;
+    private static final double COMFORT_INCREASE = 0.5;
+    private static final double COMFORT_DECREASE = 1.0;
 
-    private float comfort = 100.0F;
+    private double comfort = 100.0;
 
 
     // getters and setters
-    public float getComfort() {
+    public double getComfort() {
         return comfort;
     }
-    public void setComfort(float value) {
+    public void setComfort(double value) {
         if (value > 100) {
             this.comfort = 100;
         } else if (value < 0) {
@@ -32,37 +32,37 @@ public class ComfortSystem {
         }
     }
 
-    public float getMinTemp() {
+    public double getMinTemp() {
         return  minTemp;
     }
-    public void setMinTemp(float value) {
+    public void setMinTemp(double value) {
         this.minTemp = value;
     }
 
-    public float getMaxTemp() {
+    public double getMaxTemp() {
         return  maxTemp;
     }
-    public void setMaxTemp(float value) {
+    public void setMaxTemp(double value) {
         this.maxTemp = value;
     }
 
-    public float getMinHumidity() {
+    public double getMinHumidity() {
         return  minHumidity;
     }
-    public void setMinHumidity(float value) {
+    public void setMinHumidity(double value) {
         this.minHumidity = value;
     }
 
-    public float getMaxHumidity() {
+    public double getMaxHumidity() {
         return maxHumidity;
     }
-    public void setMaxHumidity(float value) {
+    public void setMaxHumidity(double value) {
         this.maxHumidity = value;
     }
 
 
     // Method for calculating comfort levels
-    public void updateComfort(float humidity, float temperature) {
+    public void updateComfort(double humidity, double temperature) {
         // Logic for humidity comfort calculation
         if (humidity >= minHumidity && humidity <= maxHumidity) {
             comfort += COMFORT_INCREASE;

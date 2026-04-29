@@ -65,9 +65,9 @@ public class DashboardModel implements HappinessListener, ComfortListener {
     }
 
     @Override
-    public void updateComfort(float value) {
+    public void updateComfort(double value) {
         Platform.runLater(() -> {
-            comfort.set(Math.clamp(value / 100.0F, 0.0F, 1.0F));
+            comfort.set(Math.clamp((float) (value / 100.0F), 0.0F, 1.0F));
             System.out.println("comfort: " + comfort);
         });
     }

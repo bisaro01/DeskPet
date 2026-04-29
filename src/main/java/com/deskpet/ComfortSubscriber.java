@@ -2,7 +2,6 @@ package com.deskpet;
 
 // talking directly to the dashboard through the comfortListener same as Happiness system
 import com.deskpet.domain.ComfortListener;
-import com.deskpet.domain.HappinessListener;
 import com.deskpet.models.systems.ComfortSystem;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -89,7 +88,7 @@ public class ComfortSubscriber implements MqttCallback {
             System.out.printf("Humidity: %.1f%% | Temp: %.1fC%n", humidity, temperature);
 
             // pass the readings to the comfort system to calculate the value
-            comfortSystem.updateComfort(humidity, temperature);
+            comfortSystem.updateComfort((double)humidity, (double)temperature);
 
             // for debugging when we run Gradle
             System.out.printf("Comfort: %.1f%%%n", comfortSystem.getComfort());
