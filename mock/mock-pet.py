@@ -1,11 +1,13 @@
 import time
 import paho.mqtt.client as mqtt
+import random
 
 state = {
     "happiness": 80.0,
     "hunger": 80.0,
     "temp": 23.0,
-    "humidity": 0.4
+    "humidity": 0.4,
+    "rfid_tag": "9C:DA:6C:06",
 }
 
 client = mqtt.Client()
@@ -43,6 +45,10 @@ def loop():
 
         client.publish("deskpet/happiness", state["happiness"])
         client.publish("deskpet/hunger", state["hunger"])
+
+        value = random.randint(0, 100)
+        if value < 10:
+            client.publish("deskpet/rfid_tag", state["rfid_tag"])
 
         print(f"MOCK PET: hunger={state['hunger']:.2f}")
         print(f"MOCK PET: happiness={state['happiness']:.2f}")

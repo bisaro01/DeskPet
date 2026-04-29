@@ -24,8 +24,8 @@ public class DashboardModel implements HappinessListener, HungerListener {
     // Updates the value of Happiness based on the four needs
     public void setHappiness() {
         //Calculate value of happiness TODO: Will need to add the two remaining needs and change to / 4
-//        float happinessValue = (hunger.get() + comfort.get()) / 2;
-//        happiness.set(Math.clamp(happinessValue, 0.0f, 1.0f));
+        //        float happinessValue = (hunger.get() + comfort.get()) / 2;
+        //        happiness.set(Math.clamp(happinessValue, 0.0f, 1.0f));
     }
 
     // Method used for binding and observing changes to the property.

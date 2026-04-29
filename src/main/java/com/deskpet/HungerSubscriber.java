@@ -7,8 +7,8 @@ import org.eclipse.paho.client.mqttv3.*;
 public class HungerSubscriber implements MqttCallback {
     private IMqttClient mqttClient;
     private final static String BROKER = "tcp://localhost:1883";
-    private final static String CLIENT_ID = "happiness-subscriber";
-    private final static String TOPIC = "deskpet/happiness";
+    private final static String CLIENT_ID = "hunger-subscriber";
+    private final static String TOPIC = "deskpet/rfid_tag"; //Changed to rfid_tag topic for testing purposes
 
     private HungerListener hungerListener;
     private HungerSystem hungerSystem;
@@ -45,17 +45,17 @@ public class HungerSubscriber implements MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage message) {
         String payload = new String(message.getPayload());
-        System.out.println("Hunger = " + payload + "%");
+        System.out.println("Hunger = " + hungerSystem.getHunger() + "%");
+        System.out.println("RFID Tag = " + payload);
 
-
-        if (hungerListener != null) {
-            hungerListener.updateHunger(hungerSystem.getHunger());
+        if (hungerSystem != null) {
+            hungerSystem.updateHunger(payload);
         }
     }
 
     @Override
     public void connectionLost(Throwable cause) {
-        System.out.println("Connection lost: " + cause.getMessage());
+        System.out.println("Connection lost hunger: " + cause.getMessage());
     }
 
     @Override
