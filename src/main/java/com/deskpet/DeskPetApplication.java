@@ -57,6 +57,7 @@ public class DeskPetApplication extends Application {
             HungerSystem hungerSystem = new HungerSystem();
             hungerSubscriber = new HungerSubscriber(hungerSystem);
             hungerSubscriber.setHungerListener(model);
+            hungerSystem.setHungerListener(model);
             hungerSubscriber.start();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             System.out.println("Failed to create HungerSubscriber: " + e.getMessage());

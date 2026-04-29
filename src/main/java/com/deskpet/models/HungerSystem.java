@@ -11,18 +11,10 @@ import java.util.concurrent.TimeUnit;
 public class HungerSystem {
     // Value for hunger calculations
     private double hunger = 100.0;
-    private static final double hunger_decrease = 4.0; // base decay -0.4 per minute
+    private static final double hunger_decrease = 0.4/60; // base decay -0.4 per minute
     private static final double hunger_increase = 40.0; // +40 hunger when fed
     private HungerListener hungerListener;
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-
-    // Constructor
-    public HungerSystem() {
-        scheduler.scheduleAtFixedRate(() -> {
-            decreaseHunger();
-        },0,1, TimeUnit.MILLISECONDS);
-    }
 
     // For demo purposes :-P
     private final Set<String> foodTags = Set.of(
@@ -47,10 +39,14 @@ public class HungerSystem {
 
     public void decreaseHunger() {
         hunger -= hunger_decrease;
-
+        System.out.println("Hunger decrease: " + hunger);
         hungerListener.updateHunger(hunger);
     }
 
     public void setHungerListener(HungerListener hungerListener) {
-        this.hungerListener = hungerListener;}
+        this.hungerListener = hungerListener;
+        scheduler.scheduleAtFixedRate(() -> {
+            decreaseHunger();
+        },0,1, TimeUnit.SECONDS);
+    }
 }
