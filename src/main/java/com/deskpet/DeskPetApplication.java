@@ -2,6 +2,7 @@ package com.deskpet;
 
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.models.DashboardModel;
+import com.deskpet.models.HungerSystem;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +15,8 @@ public class DeskPetApplication extends Application {
     private final Connection db;
     private HappinessSubscriber subscriber;
 //    private HappinessPublisher publisher;
+
+    private HungerSubscriber hungerSubscriber;
 
     public DeskPetApplication() {
         try{
@@ -50,6 +53,17 @@ public class DeskPetApplication extends Application {
 //            throw new RuntimeException(e);
 //        }
 
+        try {
+            HungerSystem hungerSystem = new HungerSystem();
+            hungerSubscriber = new HungerSubscriber(hungerSystem);
+            hungerSubscriber.setHungerListener(model);
+            hungerSubscriber.start();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create HungerSubscriber: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
         model.setHappinessSubscriber(subscriber);
         stage.setTitle("Desk Pet");
         stage.setScene(scene);
@@ -57,6 +71,9 @@ public class DeskPetApplication extends Application {
         stage.setOnCloseRequest(event -> {
             if (subscriber != null) {
                 subscriber.stop();
+            }
+            if (hungerSubscriber != null) {
+                try { hungerSubscriber.stop();} catch (Exception e) {e.printStackTrace();}
             }
             Platform.exit();
             System.exit(0);
