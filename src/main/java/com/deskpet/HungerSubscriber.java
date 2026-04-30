@@ -3,6 +3,8 @@ package com.deskpet;
 import com.deskpet.domain.HungerListener;
 import com.deskpet.models.systems.HungerSystem;
 import org.eclipse.paho.client.mqttv3.*;
+
+/* HungerSubscriber listens to the MQTT messages and updates the HungerSystem accordingly */
 public class HungerSubscriber implements MqttCallback {
     private IMqttClient mqttClient;
     private final static String BROKER = "tcp://localhost:1883";
