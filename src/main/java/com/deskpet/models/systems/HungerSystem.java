@@ -12,7 +12,7 @@ public class HungerSystem {
     private double hunger = 100.0;
 
     // How much hunger decreases per second (-0.4 per minute)
-    private static final double hunger_decrease = 0.4/60;
+    private static final double hunger_decrease = 0.4/60.0;
 
     // How much hunger increases when valid RFID tag is read
     private static final double hunger_increase = 40.0;
@@ -47,11 +47,10 @@ public class HungerSystem {
     /* Gradually decreases hunger over time, by having the schedular call the method periodically. */
     public void decreaseHunger() {
         hunger -= hunger_decrease;
-        System.out.println("Hunger decrease: " + hunger);
         hungerListener.updateHunger(hunger);
     }
 
-    /* Sets the listener and starts the automatic hunger decay loop. Hunger decreses every second. */
+    /* Sets the listener and starts the automatic hunger decay loop. Hunger decreases every second. */
     public void setHungerListener(HungerListener hungerListener) {
         this.hungerListener = hungerListener;
         scheduler.scheduleAtFixedRate(() -> {

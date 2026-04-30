@@ -16,10 +16,8 @@ import java.sql.Connection;
 public class DeskPetApplication extends Application {
     private final Connection db;
     private HappinessSubscriber subscriber;
-//    private HappinessPublisher publisher;
-
+//  private HappinessPublisher publisher;
     private ComfortSubscriber comfortSubscriber;
-
     private HungerSubscriber hungerSubscriber;
 
     public DeskPetApplication() {
@@ -72,7 +70,6 @@ public class DeskPetApplication extends Application {
         try {
             HungerSystem hungerSystem = new HungerSystem();
             hungerSubscriber = new HungerSubscriber(hungerSystem);
-            hungerSubscriber.setHungerListener(model);
             hungerSystem.setHungerListener(model);
             hungerSubscriber.start();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
