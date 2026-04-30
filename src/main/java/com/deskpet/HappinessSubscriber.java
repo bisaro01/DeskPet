@@ -18,15 +18,15 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
     private HappinessListener happinessListener;
 
     // This is where the program starts
-//    public static void main(String[] args) {
-//        try {
-//            // Create the subscriber and start it
-//            HappinessSubscriber subscriber = new HappinessSubscriber();
-//            subscriber.start();
-//        } catch (MqttException e) { // Triggered when MQTT connection fails
-//            System.out.println("Failed to start: " + e.getMessage());
-//        }
-//    }
+    //    public static void main(String[] args) {
+    //        try {
+    //            // Create the subscriber and start it
+    //            HappinessSubscriber subscriber = new HappinessSubscriber();
+    //            subscriber.start();
+    //        } catch (MqttException e) { // Triggered when MQTT connection fails
+    //            System.out.println("Failed to start: " + e.getMessage());
+    //        }
+    //    }
 
     // Constructor, creates a new HappinessSubscriber
     public HappinessSubscriber() throws MqttException {
@@ -89,11 +89,11 @@ public class HappinessSubscriber implements MqttCallback { // MqttCallback handl
     // Runs when connection is lost
     @Override
     public void connectionLost(Throwable cause) {
-        System.out.println("Connection lost: " + cause.getMessage());
+        System.out.println("Connection lost happiness: " + cause.getMessage());
     }
 
     // This is required but we don't need it for subscribing
     @Override
-    public void deliveryComplete(IMqttDeliveryToken token) {
+     public void deliveryComplete(IMqttDeliveryToken token) {
     }
 }

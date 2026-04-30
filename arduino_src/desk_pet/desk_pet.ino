@@ -27,8 +27,8 @@ PubSubClient client(wifiClient);
 // <<< DEFINED PINS >>>
 #define BUZZER WIO_BUZZER   // inbuilt buzzer
 #define DHTPIN 2            // humidity and temp sensor pin D2 on WIO diagram
-#define RFID_RST_PIN 9      // Change depending on physical build connections
-#define RFID_SS_PIN 10      // Change depending on physical build connections
+#define RFID_RST_PIN 0      // Change depending on physical build connections
+#define RFID_SS_PIN 1      // Change depending on physical build connections
 
 
 // <<< OTHER INSTANCES >>>

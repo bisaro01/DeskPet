@@ -6,7 +6,8 @@ state = {
     "happiness": 80.0,
     "hunger": 80.0,
     "temp": 24.0,
-    "humidity": 48.0
+    "humidity": 48.0,
+    "rfid_tag": "9C:DA:6C:06",
 }
 
 client = mqtt.Client()
@@ -45,6 +46,11 @@ def loop():
         # Simulated humidity and temp tests
         state["humidity"] += random.uniform(-0.2, 0.2)
         state["temp"] += random.uniform(-0.5, 0.5)
+
+        # Sends signals at random that a rfid tag has been registered
+        value = random.randint(0, 100)
+        if value < 10:
+            client.publish("deskpet/rfid_tag", state["rfid_tag"])
 
         client.publish("deskpet/happiness", state["happiness"])
         client.publish("deskpet/hunger", state["hunger"])

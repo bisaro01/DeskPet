@@ -51,12 +51,7 @@ public class DashboardController {
         bindProgressBarWithColor(happinessBar, model.happinessProperty());
 
         bindProgressBarWithColor(hungerBar, model.hungerProperty());
-        scheduler.scheduleAtFixedRate(() -> {
-            // Hunger decreases with -0.5 per minute (0.5 of 100 = 0.005 of 1), GUI gets updated every second.
-            model.setHunger(model.getHunger() - (0.005f / 60));
-        }, 0, 1, TimeUnit.SECONDS);
 
-        // No base decay added for comfort
         bindProgressBarWithColor(comfortBar, model.comfortProperty());
     }
 }

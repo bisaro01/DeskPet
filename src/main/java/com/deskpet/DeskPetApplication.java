@@ -3,12 +3,12 @@ package com.deskpet;
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.models.DashboardModel;
+import com.deskpet.models.systems.HungerSystem;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -16,9 +16,9 @@ import java.sql.Connection;
 public class DeskPetApplication extends Application {
     private final Connection db;
     private HappinessSubscriber subscriber;
-//    private HappinessPublisher publisher;
+//  private HappinessPublisher publisher;
     private ComfortSubscriber comfortSubscriber;
-
+    private HungerSubscriber hungerSubscriber;
 
     public DeskPetApplication() {
         try{
@@ -67,6 +67,16 @@ public class DeskPetApplication extends Application {
             throw new RuntimeException(e);
         }
 
+        try {
+            HungerSystem hungerSystem = new HungerSystem();
+            hungerSubscriber = new HungerSubscriber(hungerSystem);
+            hungerSystem.setHungerListener(model);
+            hungerSubscriber.start();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create HungerSubscriber: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
 
         model.setHappinessSubscriber(subscriber);
         stage.setTitle("Desk Pet");
@@ -75,6 +85,9 @@ public class DeskPetApplication extends Application {
         stage.setOnCloseRequest(event -> {
             if (subscriber != null) {
                 subscriber.stop();
+            }
+            if (hungerSubscriber != null) {
+                try { hungerSubscriber.stop();} catch (Exception e) {e.printStackTrace();}
             }
             if (comfortSubscriber != null) {
                 try { comfortSubscriber.stop();}  catch (Exception e) {e.printStackTrace();}
