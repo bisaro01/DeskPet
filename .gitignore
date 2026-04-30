@@ -26,3 +26,5 @@ src/main/resources/config.properties
 
 # Python virtual environment
 .venv
+
+.lck
