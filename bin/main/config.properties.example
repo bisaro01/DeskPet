@@ -1,0 +1,9 @@
+# Create resources/config.properties file
+# Copy and paste the contents of this file into the config.properties file
+# If needed edit the values for your local setup
+
+db.host=localhost
+db.port=5432
+db.name=deskpet
+db.user=postgres
+db.password=123
