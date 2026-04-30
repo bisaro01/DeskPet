@@ -1,9 +1,8 @@
 package com.deskpet;
 
 import com.deskpet.domain.HungerListener;
-import com.deskpet.models.HungerSystem;
+import com.deskpet.models.systems.HungerSystem;
 import org.eclipse.paho.client.mqttv3.*;
-
 public class HungerSubscriber implements MqttCallback {
     private IMqttClient mqttClient;
     private final static String BROKER = "tcp://localhost:1883";
@@ -16,12 +15,14 @@ public class HungerSubscriber implements MqttCallback {
     // Constructor
     public HungerSubscriber(HungerSystem hungerSystem) throws MqttException {
         this.hungerSystem = hungerSystem;
+
         mqttClient = new MqttClient(BROKER, CLIENT_ID);
         mqttClient.setCallback(this);
 
         MqttConnectOptions options = new MqttConnectOptions();
         options.setKeepAliveInterval(60);
         options.setAutomaticReconnect(true);
+
         mqttClient.connect(options);
     }
 
@@ -42,6 +43,7 @@ public class HungerSubscriber implements MqttCallback {
             e.printStackTrace();
         }
     }
+
     @Override
     public void messageArrived(String topic, MqttMessage message) {
         String payload = new String(message.getPayload());

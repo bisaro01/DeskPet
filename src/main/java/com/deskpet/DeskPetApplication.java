@@ -3,13 +3,12 @@ package com.deskpet;
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.models.DashboardModel;
-import com.deskpet.models.HungerSystem;
+import com.deskpet.models.systems.HungerSystem;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.IOException;
 import java.sql.Connection;
