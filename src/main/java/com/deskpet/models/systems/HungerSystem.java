@@ -8,7 +8,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class HungerSystem {
-    // Current hunger value
+    // Values for calculating hunger
     private double hunger = 100.0;
 
     // How much hunger decreases per second (-0.4 per minute)
@@ -17,7 +17,6 @@ public class HungerSystem {
     // How much hunger increases when valid RFID tag is read
     private static final double hunger_increase = 40.0;
 
-    // Listener to notify other parts of the system when hunger changes
     private HungerListener hungerListener;
 
     // Scheduler to repeatedly decrease hunger over time

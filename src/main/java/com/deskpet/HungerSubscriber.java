@@ -7,9 +7,9 @@ import org.eclipse.paho.client.mqttv3.*;
 /* HungerSubscriber listens to the MQTT messages and updates the HungerSystem accordingly */
 public class HungerSubscriber implements MqttCallback {
     private IMqttClient mqttClient;
-    private final static String BROKER = "tcp://localhost:1883";
-    private final static String CLIENT_ID = "hunger-subscriber";
-    private final static String TOPIC = "deskpet/rfid_tag"; //Changed to rfid_tag topic for testing purposes
+    private static final String BROKER = "tcp://localhost:1883";
+    private static final String CLIENT_ID = "hunger-subscriber";
+    private static final String TOPIC = "deskpet/rfid_tag"; //Changed to rfid_tag topic for testing purposes
 
     private HungerListener hungerListener;
     private HungerSystem hungerSystem;
