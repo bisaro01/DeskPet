@@ -23,3 +23,6 @@ Thumbs.db
 
 # Local database config
 src/main/resources/config.properties
+
+# Python virtual environment
+.venv

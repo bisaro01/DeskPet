@@ -1,0 +1,84 @@
+package com.deskpet.models.systems;
+
+public class ComfortSystem {
+    /*
+    Attributes that can be changed depending on user
+    settings in version 2 with getters and setters
+    */
+    private double minTemp = 18.0;
+    private double maxTemp = 24.0;
+    private double minHumidity = 30.0;
+    private double maxHumidity = 50.0;
+
+
+    // Values for comfort calculations
+    private static final double COMFORT_INCREASE = 0.5;
+    private static final double COMFORT_DECREASE = 1.0;
+
+    private double comfort = 100.0;
+
+
+    // getters and setters
+    public double getComfort() {
+        return comfort;
+    }
+    public void setComfort(double value) {
+        if (value > 100) {
+            this.comfort = 100;
+        } else if (value < 0) {
+            this.comfort = 0;
+        } else {
+            this.comfort = value;
+        }
+    }
+
+    public double getMinTemp() {
+        return  minTemp;
+    }
+    public void setMinTemp(double value) {
+        this.minTemp = value;
+    }
+
+    public double getMaxTemp() {
+        return  maxTemp;
+    }
+    public void setMaxTemp(double value) {
+        this.maxTemp = value;
+    }
+
+    public double getMinHumidity() {
+        return  minHumidity;
+    }
+    public void setMinHumidity(double value) {
+        this.minHumidity = value;
+    }
+
+    public double getMaxHumidity() {
+        return maxHumidity;
+    }
+    public void setMaxHumidity(double value) {
+        this.maxHumidity = value;
+    }
+
+
+    // Method for calculating comfort levels
+    public void updateComfort(double humidity, double temperature) {
+        // Logic for humidity comfort calculation
+        if (humidity >= minHumidity && humidity <= maxHumidity) {
+            comfort += COMFORT_INCREASE;
+        } else {
+            comfort -= COMFORT_DECREASE;
+        }
+
+        // Logic for temperature comfort calculation
+        if (temperature >= minTemp && temperature <= maxTemp) {
+            comfort += COMFORT_INCREASE;
+        } else {
+            comfort -= COMFORT_DECREASE;
+        }
+
+        // stop comfort from going outside bounds 0-100
+        if (comfort > 100) {comfort = 100;}
+        if (comfort < 0) {comfort = 0;}
+    }
+}

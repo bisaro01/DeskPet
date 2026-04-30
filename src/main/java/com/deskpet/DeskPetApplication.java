@@ -1,6 +1,7 @@
 package com.deskpet;
 
 import com.deskpet.controllers.DashboardController;
+import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.models.DashboardModel;
 import com.deskpet.models.HungerSystem;
 import javafx.application.Application;
@@ -8,6 +9,8 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.io.IOException;
 import java.sql.Connection;
 
@@ -15,6 +18,8 @@ public class DeskPetApplication extends Application {
     private final Connection db;
     private HappinessSubscriber subscriber;
 //    private HappinessPublisher publisher;
+
+    private ComfortSubscriber comfortSubscriber;
 
     private HungerSubscriber hungerSubscriber;
 
@@ -53,6 +58,18 @@ public class DeskPetApplication extends Application {
 //            throw new RuntimeException(e);
 //        }
 
+        // added the comfort subscriber system
+        try {
+            ComfortSystem comfortSystem = new ComfortSystem();
+            comfortSubscriber = new ComfortSubscriber(comfortSystem);
+            comfortSubscriber.setComfortListener(model);
+            comfortSubscriber.start();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create ComfortSubscriber: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
         try {
             HungerSystem hungerSystem = new HungerSystem();
             hungerSubscriber = new HungerSubscriber(hungerSystem);
@@ -75,6 +92,9 @@ public class DeskPetApplication extends Application {
             }
             if (hungerSubscriber != null) {
                 try { hungerSubscriber.stop();} catch (Exception e) {e.printStackTrace();}
+            }
+            if (comfortSubscriber != null) {
+                try { comfortSubscriber.stop();}  catch (Exception e) {e.printStackTrace();}
             }
             Platform.exit();
             System.exit(0);
