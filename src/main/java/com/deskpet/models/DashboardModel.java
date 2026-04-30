@@ -1,12 +1,13 @@
 package com.deskpet.models;
 
 import com.deskpet.HappinessSubscriber;
+import com.deskpet.domain.ComfortListener;
 import com.deskpet.domain.HappinessListener;
 import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
-public class DashboardModel implements HappinessListener {
+public class DashboardModel implements HappinessListener, ComfortListener {
     private final FloatProperty happiness = new SimpleFloatProperty(1);
     private final FloatProperty hunger = new SimpleFloatProperty(1);
     private final FloatProperty comfort = new SimpleFloatProperty(1);
@@ -60,6 +61,14 @@ public class DashboardModel implements HappinessListener {
         Platform.runLater(() -> {
             happiness.set(Math.clamp((float)(value / 100.0), 0.0f, 1.0f));
             System.out.println("model: " + happiness);
+        });
+    }
+
+    @Override
+    public void updateComfort(double value) {
+        Platform.runLater(() -> {
+            comfort.set(Math.clamp((float) (value / 100.0F), 0.0F, 1.0F));
+            System.out.println("comfort: " + comfort);
         });
     }
 }
