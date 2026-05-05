@@ -35,6 +35,7 @@ public class DeskPetApplication extends Application {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        dbHandler = new DatabaseHandler(db);
     }
 
     @Override
@@ -42,9 +43,27 @@ public class DeskPetApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(DeskPetApplication.class.getResource("/com/deskpet/views/dashboardView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         DashboardController controller = fxmlLoader.getController();
+        controller.setModelDbHandler(dbHandler);
         DashboardModel model = controller.getModel();
 
         try {
+            pet = dbHandler.loadPet(1);
+
+            if (pet == null) {
+                System.out.println("DB error: unable to load pet. Using demo pet.");
+                pet = new Pet(1, 80, 80, 80);
+            } else {
+                System.out.println("Loaded pet 1:");
+                System.out.println("Happiness: " + pet.getHappiness());
+                System.out.println("Hunger: " + pet.getHunger());
+                System.out.println("Comfort: " + pet. getComfort());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        /*try {
             subscriber = new HappinessSubscriber();
             subscriber.setHappinessListener(controller.getModel());
             subscriber.start();
@@ -52,7 +71,7 @@ public class DeskPetApplication extends Application {
             System.out.println("Failed to create HappinessSubscriber: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException(e);
-        }
+        } */
 
 //        try {
 //            publisher = new HappinessPublisher();
