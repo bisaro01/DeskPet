@@ -23,19 +23,19 @@ PubSubClient client(wifiClient);
 
 
 // <<< SENSOR TYPES >>>
-#define DHTTYPE DHT11       // humidity and temp specifying type DH11
+#define DHTTYPE DHT11       // Humidity and temp specifying type DH11
 
 
 // <<< DEFINED PINS >>>
-#define BUZZER WIO_BUZZER   // inbuilt buzzer
-#define DHTPIN 2            // humidity and temp sensor pin D2 on WIO diagram
+#define BUZZER WIO_BUZZER   // Inbuilt buzzer
+#define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
 #define RFID_RST_PIN 0      // Change depending on physical build connections
 #define RFID_SS_PIN 1      // Change depending on physical build connections
 
 
 // <<< OTHER INSTANCES >>>
-TFT_eSPI tft;               // graphical drawing object
-DHT dht(DHTPIN, DHTTYPE);   // humidity and temp object
+TFT_eSPI tft;               // Graphical drawing object
+DHT dht(DHTPIN, DHTTYPE);   // Humidity and temperature object
 MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 
 // RFID cooldown
@@ -48,7 +48,7 @@ const unsigned long SENSOR_INTERVAL = 2000;
 int mood = 100;
 int lastMood = -1;
 
-// ============================  WiFi & MQTT functions  =======================================
+// ============================  WiFi & MQTT FUNCTIONS  =======================================
 
 void connectWifi() {
     tft.fillScreen(TFT_WHITE);
@@ -56,16 +56,16 @@ void connectWifi() {
     tft.setTextSize(2);
     tft.drawString("Connecitng to WiFi...", 40, 100);
 
-    // beginn connection attempt
+    // Begin connection attempt
     WiFi.begin(wifiName, password);
 
-    // keep trying to connect every 5ms untill successfull
+    // Keep trying to connect every 5ms untill successfull
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.println(".");
     }
 
-    // display sucess message once connected on both serial and WIO
+    // Display sucess message once connected on both serial and WIO
     tft.fillScreen(TFT_WHITE);
     tft.drawString("WiFi connected.", 80, 100);
 
@@ -93,7 +93,7 @@ void connectMQTT() {
     }
 }
 
-// ===============================  facial functions  =========================================
+// ===============================  FACIAL FUNCTIONS  =========================================
 
 void happyFace() {
     // Reset background
