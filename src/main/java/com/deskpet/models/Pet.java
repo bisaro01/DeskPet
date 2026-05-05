@@ -3,11 +3,11 @@ package com.deskpet.models;
 import com.deskpet.domain.PetDataProvider;
 import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.domain.PetStateListener;
-// import com.deskpet.models.systems.ComfortSystem;
+import com.deskpet.models.systems.ComfortSystem;
 // import com.deskpet.models.systems.HungerSystem;
 
 public class Pet implements PetDataProvider, PetStateListener {
-    // private final ComfortSystem comfortSystem;
+    private final ComfortSystem comfortSystem;
     // private final HungerSystem hungerSystem;
 
     private long petId;
@@ -21,13 +21,13 @@ public class Pet implements PetDataProvider, PetStateListener {
         this.hunger = hunger;
         this.social = social;
         this.comfort = comfort;
-        // comfortSystem = new ComfortSystem();
+        comfortSystem = new ComfortSystem();
         // hungerSystem = new HungerSystem();
         calculateHappiness();
     }
 
     public void applyDecay(double delta) {
-        // comfort = comfortSystem.applyDecay(delta);
+        comfort = comfortSystem.applyDecay(delta);
         // hunger = hungerSystem.applyDecay(delta);
     }
 
