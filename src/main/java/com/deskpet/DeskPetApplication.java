@@ -15,8 +15,7 @@ import java.sql.Connection;
 
 public class DeskPetApplication extends Application {
     private final Connection db;
-    private HappinessSubscriber subscriber;
-//  private HappinessPublisher publisher;
+    private HappinessPublisher publisher;
     private ComfortSubscriber comfortSubscriber;
     private HungerSubscriber hungerSubscriber;
 
