@@ -1,7 +1,9 @@
 package com.deskpet;
 
 import com.deskpet.domain.HungerListener;
+import com.deskpet.domain.PetStateListener;
 import com.deskpet.models.systems.HungerSystem;
+import javafx.application.Platform;
 import org.eclipse.paho.client.mqttv3.*;
 
 /* HungerSubscriber listens to the MQTT messages and updates the HungerSystem accordingly */
