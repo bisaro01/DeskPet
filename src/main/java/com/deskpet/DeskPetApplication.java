@@ -111,7 +111,10 @@ public class DeskPetApplication extends Application {
                         ex.printStackTrace();
                     }
 
-
+                    System.out.println("----------------------------------");
+                    System.out.println("Happiness: " + pet.getHappiness());
+                    System.out.println("Comfort: " + pet.getComfort());
+                    System.out.println("Hunger: " + pet.getHunger());
                 })
         )
         try {
