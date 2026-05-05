@@ -23,7 +23,7 @@ PubSubClient client(wifiClient);
 
 
 // <<< SENSOR TYPES >>>
-#define DHTTYPE DHT11       // Humidity and temp specifying type DH11
+#define DHTTYPE DHT11       // Humidity and temperature specifying type DH11
 
 
 // <<< DEFINED PINS >>>
@@ -331,9 +331,9 @@ void setup() {
     client.setCallback(callback);
 }
 
-// ===================================  main loop =========================================
+// ===================================  MAIN LOOP =========================================
 void loop() {
-    // maintains MQTT connection on very iteration of main loop
+    // Maintains MQTT connection on every iteration of main loop
     if(!client.connected()) {
         tft.drawString("MQTT: OFF", 10, 10);
         connectMQTT();
@@ -342,7 +342,7 @@ void loop() {
     }
     client.loop();
 
-    // test code for facial expressions
+    // Test code for facial expressions
     // int mood = random(0, 100);
 
     if (mood != lastMood) {
@@ -360,7 +360,7 @@ void loop() {
 
     if (millis() - lastSensorRead > SENSOR_INTERVAL) {
         lastSensorRead = millis();
-        // temp and humidity test
+        // Temperature and humidity test
         readTempHumidity();
     }
 
