@@ -40,6 +40,9 @@ MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 unsigned long lastRfidReadTime = 0;
 const unsigned long RFID_COOLDOWN = 60000;  // 60 seconds
 
+int mood = 100;
+int lastMood = -1;
+
 // ============================  WiFi & MQTT functions  =======================================
 
 void connectWifi() {
@@ -303,15 +306,18 @@ void loop() {
     // test code for facial expressions
     int mood = random(0, 100);
 
-    if (mood < 50) {
-        sadFace();
-        sadSound();
-        client.publish("wio/mood", "sad");
-    }
-    else {
-        happyFace();
-        happySound();
-        client.publish("wio/mood", "happy");
+    if (mood != lastMood) {
+        lastMood = mood;
+
+        if (mood < 50) {
+            sadFace();
+            sadSound();
+        }
+        
+        else {
+            happyFace();
+            happySound();
+        }
     }
 
     // temp and humidity test
