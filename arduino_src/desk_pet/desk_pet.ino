@@ -154,6 +154,14 @@ void sadFace() {
 }
 
 void happySound() {
+    //TODO: Consider a different design:
+    // array of tones + array of durations
+    // startMelody(const int* notes, const int* durations, int length) to start playing a startMelody
+    // in loop(): updateMelody(), bool isPlaying
+    // in loop(): if (millis() - lastNoteTime >= currentDurations[melodyIndex])
+    //     if (melodyIndex >= melodyLength) isPlaying = false, noTone
+    //     lastNoteTime = millis()
+    //     play next tone
     tone(BUZZER, 1000);
     delay(80);
 
