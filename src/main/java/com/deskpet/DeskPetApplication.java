@@ -88,6 +88,32 @@ public class DeskPetApplication extends Application {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+
+        lastUpdate = System.currentTimeMillis();
+
+        Timeline fixedUpdate = new Timeline(
+                new KeyFrame(Duration.millis(1000), e -> {
+                    long now = System.currentTimeMillis();
+                    double delta = (now - lastUpdate) / 1000.0;
+                    lastUpdate = now;
+
+                    pet.update(delta);
+
+                    try {
+                        model.updateState(pet);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    try {
+                        happinessPublisher.publish(pet.getHappiess());
+                    } catch (MqttException ex) {
+                        ex.printStackTrace();
+                    }
+
+
+                })
+        )
         try {
             ComfortSystem comfortSystem = new ComfortSystem();
             comfortSubscriber = new ComfortSubscriber(comfortSystem);
