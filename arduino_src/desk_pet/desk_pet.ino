@@ -78,10 +78,11 @@ void connectWifi() {
 
 void connectMQTT() {
     while(!client.connected()) {
-        Serial.println("COnnecting to MQTT...");
+        Serial.println("Connecting to MQTT...");
 
         if(client.connect("WioTerminal")) {
             Serial.println("MQTT connected.");
+            client.subscribe("app/state/happiness");
         } else {
             Serial.println("MQTT Connection failed.");
             Serial.println(client.state());
