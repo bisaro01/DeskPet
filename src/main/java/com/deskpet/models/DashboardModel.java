@@ -1,5 +1,6 @@
 package com.deskpet.models;
 
+import com.deskpet.DatabaseHandler;
 import com.deskpet.HappinessSubscriber;
 import com.deskpet.domain.ComfortListener;
 import com.deskpet.domain.HungerListener;
@@ -15,6 +16,9 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
 
     private HappinessSubscriber happinessSubscriber;
 
+    private DatabaseHandler db;
+
+    public void setDbHandler(DatabaseHandler dbHandler) {db = dbHandler;}
     public void setHappinessSubscriber(HappinessSubscriber sub) {
         happinessSubscriber = sub;
     }

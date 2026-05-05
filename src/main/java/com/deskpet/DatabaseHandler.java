@@ -4,6 +4,7 @@ package com.deskpet;
 
 import com.deskpet.domain.PetDataProvider;
 import com.deskpet.domain.SensorDataProvider;
+import com.deskpet.models.Pet;
 
 import java.sql.*;
 import java.time.LocalDateTime;

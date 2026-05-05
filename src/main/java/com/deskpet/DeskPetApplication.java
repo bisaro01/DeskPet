@@ -26,16 +26,17 @@ public class DeskPetApplication extends Application {
     private HappinessPublisher happinessPublisher;
     private ComfortSubscriber comfortSubscriber;
     private HungerSubscriber hungerSubscriber;
+    private Pet pet;
 
     public DeskPetApplication() {
-//        try {
-//            db = Database.getConnection();
-//        } catch (java.sql.SQLException e) {
-//            System.out.println("Failed to create Database connection" + e.getMessage());
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        }
-//        dbHandler = new DatabaseHandler(db);
+        try {
+            db = Database.getConnection();
+        } catch (java.sql.SQLException e) {
+            System.out.println("Failed to create Database connection" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        dbHandler = new DatabaseHandler();
     }
 
     @Override
@@ -51,7 +52,7 @@ public class DeskPetApplication extends Application {
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
-                pet = new Pet(1, 80, 80, 80);
+                pet = new Pet(1, 80, 80);
             } else {
                 System.out.println("Loaded pet 1:");
                 System.out.println("Happiness: " + pet.getHappiness());
