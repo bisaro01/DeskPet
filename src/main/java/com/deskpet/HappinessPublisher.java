@@ -29,7 +29,7 @@ public class HappinessPublisher {
 
         MqttConnectOptions options = new MqttConnectOptions();
         options.setKeepAliveInterval(60); // Sets interval to 60 seconds
-        
+
         mqttClient.connect(options);
         System.out.println("Connected to MQTT broker!");
     }
@@ -42,9 +42,9 @@ public class HappinessPublisher {
 
             MqttMessage message = new MqttMessage(payload.getBytes()); // Creates an MQTT message
             mqttClient.publish(TOPIC, message); // Sends the message
-            
+
             System.out.println("Sent: happiness = " + happiness);
-            
+
             // Wait 2 seconds before sending next one
             try {
                 Thread.sleep(2000);
@@ -52,9 +52,24 @@ public class HappinessPublisher {
                 Thread.currentThread().interrupt();
             }
         }
-        
+
         // Disconnect once done
         mqttClient.disconnect();
         System.out.println("All messages sent. Disconnected.");
+    }
+
+    public void stop() throws MqttException {
+        try {
+            if (mqttClient != null && mqttClient.isConnected()) {
+                mqttClient.disconnect();
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void publish(int happiness) throws MqttException {
+        MqttMessage msg = new MqttMessage(Integer.toString(happiness).getBytes());
+        mqttClient.publish("app/state/happiness", msg);
     }
 }
