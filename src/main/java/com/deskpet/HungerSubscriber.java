@@ -15,10 +15,11 @@ public class HungerSubscriber implements MqttCallback {
 
     private HungerListener hungerListener;
     private HungerSystem hungerSystem;
+    private PetStateListener pet;
 
     // Constructor
-    public HungerSubscriber(HungerSystem hungerSystem) throws MqttException {
-        this.hungerSystem = hungerSystem;
+    public HungerSubscriber(PetStateListener pet) throws MqttException {
+        this.pet = pet;
 
         mqttClient = new MqttClient(BROKER, CLIENT_ID);
         mqttClient.setCallback(this);
@@ -51,12 +52,16 @@ public class HungerSubscriber implements MqttCallback {
     @Override
     public void messageArrived(String topic, MqttMessage message) {
         String payload = new String(message.getPayload());
-        System.out.println("Hunger = " + hungerSystem.getHunger() + "%");
-        System.out.println("RFID Tag = " + payload);
 
-        if (hungerSystem != null) {
-            hungerSystem.updateHunger(payload);
-        }
+        Platform.runLater(() -> {
+            pet.updateNeed(topic, payload);
+        });
+//        System.out.println("Hunger = " + hungerSystem.getHunger() + "%");
+//        System.out.println("RFID Tag = " + payload);
+//
+//        if (hungerSystem != null) {
+//            hungerSystem.updateHunger(payload);
+//        }
     }
 
     @Override
