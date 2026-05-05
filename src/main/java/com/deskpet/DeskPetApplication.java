@@ -80,7 +80,14 @@ public class DeskPetApplication extends Application {
            throw new RuntimeException(e);
        }
 
-
+        try {
+            hungerSubscriber = new HungerSubscriber(pet);
+            hungerSubscriber.start();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create HungerSubscriber" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         try {
             ComfortSystem comfortSystem = new ComfortSystem();
             comfortSubscriber = new ComfortSubscriber(comfortSystem);
