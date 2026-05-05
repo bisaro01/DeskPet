@@ -4,11 +4,11 @@ import com.deskpet.domain.PetDataProvider;
 import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.domain.PetStateListener;
 import com.deskpet.models.systems.ComfortSystem;
-// import com.deskpet.models.systems.HungerSystem;
+import com.deskpet.models.systems.HungerSystem;
 
 public class Pet implements PetDataProvider, PetStateListener {
     private final ComfortSystem comfortSystem;
-    // private final HungerSystem hungerSystem;
+    private final HungerSystem hungerSystem;
 
     private long petId;
     private int hunger;
@@ -22,7 +22,7 @@ public class Pet implements PetDataProvider, PetStateListener {
         //this.social = social;
         this.comfort = comfort;
         comfortSystem = new ComfortSystem();
-        // hungerSystem = new HungerSystem();
+        hungerSystem = new HungerSystem();
         calculateHappiness();
     }
 
@@ -118,8 +118,8 @@ public class Pet implements PetDataProvider, PetStateListener {
                 break;
 
             case "wio/events/food":
-                // hungerSystem.feed(value);
-                // hunger = (int)hungerSystem.getHunger();
+                hungerSystem.feed(value);
+                hunger = (int)hungerSystem.getHunger();
                 break;
         }
         calculateHappiness();
