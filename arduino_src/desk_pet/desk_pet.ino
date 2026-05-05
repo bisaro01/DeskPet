@@ -139,7 +139,7 @@ void sadFace() {
         tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
     }
 
-    // Cutt off bottom half of mouth
+    // Cut off bottom half of mouth
     tft.fillRect(
     mouthX - radius - 2,
     mouthY + 2,
@@ -148,14 +148,14 @@ void sadFace() {
     TFT_WHITE
     );
 
-    // eyes
+    // Eyes
     tft. fillCircle(130, 80, 8, TFT_BLACK);
     tft. fillCircle(200, 80, 8, TFT_BLACK);
 }
 
 void happySound() {
     //TODO: Consider a different design:
-    // array of tones + array of durations
+    // Array of tones + array of durations
     // startMelody(const int* notes, const int* durations, int length) to start playing a startMelody
     // in loop(): updateMelody(), bool isPlaying
     // in loop(): if (millis() - lastNoteTime >= currentDurations[melodyIndex])
@@ -193,7 +193,7 @@ void sadSound() {
     noTone(BUZZER);
 }
 
-// ===============================  sensor functions  ========================================
+// ===============================  SENSOR FUNCTIONS  ========================================
 
 void readTempHumidity() {
     /*
@@ -206,21 +206,21 @@ void readTempHumidity() {
         - publishes data to MQTT broke on topic "wio/humTemp"
     */
 
-    // defines array of size 2 for the readings and initialises both as 0
+    // Defines array of size 2 for the readings and initialises both as 0
     float tempHumVal[2] = {0};
 
-    // check if reading didnt fail read the values
+    // Check if reading didnt fail read the values
     if(!dht.readTempAndHumidity(tempHumVal)) {
         float humidity = tempHumVal[0];
         float temperature = tempHumVal[1];
 
-        // debugging terminal print
+        // Debugging terminal print
         // Serial.print(humidity);
         // Serial.print("%, ");
         // Serial.print(temperature);
         // Serial.println("C");
 
-        // publish readings to MQTT broker
+        // Publish readings to MQTT broker
         // String payload = String(humidity) + "," + String(temperature);
         String tempStr = String(temperature);
         String humStr = String(humidity);
@@ -228,7 +228,7 @@ void readTempHumidity() {
         client.publish("wio/sensors/humidity", humStr.c_str());
         // client.publish("wio/humTemp", payload.c_str());
     }
-    // otherwise debug on serial
+    // Otherwise debug on serial
     else {
         Serial.print("Failed to get humidity and temperature values.");
     }
@@ -302,31 +302,31 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 }
 
-// ==================================  set up stage  =========================================
-// main set up
+// ==================================  SET UP STAGE  =========================================
+// Main set up
 void setup() {
     // <<< PINS / HARDWARE >>>
     pinMode(BUZZER, OUTPUT);
 
 
-    // start serial (Arduino IDE terminal)
+    // Start serial (Arduino IDE terminal)
     Serial.begin(9600);
 
-    // begin graphics drawing
+    // Begin graphics drawing
     tft.begin();
     tft.setRotation(3);
-    // begin temp&hum sensor
+    // Begin temperature & humidity sensor
     dht.begin();
 
-    // begin RFID reader
+    // Begin RFID reader
     SPI.begin();
     rfid.PCD_Init();
 
     // <<< CONNECTIVITY >>>
-    // connect to WiFi
+    // Connect to WiFi
     connectWifi();
 
-    // connect MQTT
+    // Connect MQTT
     client.setServer(mqttServer, mqttPort);
     client.setCallback(callback);
 }
