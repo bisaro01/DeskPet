@@ -59,11 +59,12 @@ public class HungerSystem {
         if (hunger < 0) {hunger = 0.0;}
     }
 
-    /* Sets the listener and starts the automatic hunger decay loop. Hunger decreases every second. */
-    public void setHungerListener(HungerListener hungerListener) {
-        this.hungerListener = hungerListener;
-        scheduler.scheduleAtFixedRate(() -> {
-            decreaseHunger();
-        },0,1, TimeUnit.SECONDS);
+    public int applyDecay(double delta) {
+        hunger -= hunger_decrease * delta;
+
+        if (hunger > 100) {hunger = 100;}
+        if (hunger < 0) {hunger = 0.0;}
+
+        return (int)hunger;
     }
 }
