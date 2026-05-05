@@ -56,14 +56,14 @@ public class DeskPetApplication extends Application {
                 System.out.println("Loaded pet 1:");
                 System.out.println("Happiness: " + pet.getHappiness());
                 System.out.println("Hunger: " + pet.getHunger());
-                System.out.println("Comfort: " + pet. getComfort());
+                System.out.println("Comfort: " + pet.getComfort());
             }
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
 
-       try {
+        try {
             happinessPublisher = new HappinessPublisher();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             System.out.println("Failed to create HappinessPublisher" + e.getMessage());
@@ -71,14 +71,14 @@ public class DeskPetApplication extends Application {
             throw new RuntimeException(e);
         }
 
-       try {
-           comfortSubscriber = new ComfortSubscriber(pet);
-           comfortSubscriber.start();
-       } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-           System.out.println("Failed to create ComfortSubscriber" + e.getMessage());
-           e.printStackTrace();
-           throw new RuntimeException(e);
-       }
+        try {
+            comfortSubscriber = new ComfortSubscriber(pet);
+            comfortSubscriber.start();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create ComfortSubscriber" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
 
         try {
             hungerSubscriber = new HungerSubscriber(pet);
@@ -116,49 +116,41 @@ public class DeskPetApplication extends Application {
                     System.out.println("Comfort: " + pet.getComfort());
                     System.out.println("Hunger: " + pet.getHunger());
                 })
-        )
-        try {
-            ComfortSystem comfortSystem = new ComfortSystem();
-            comfortSubscriber = new ComfortSubscriber(comfortSystem);
-            comfortSubscriber.setComfortListener(model);
-            comfortSubscriber.start();
-        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            System.out.println("Failed to create ComfortSubscriber: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        );
 
-        try {
-            HungerSystem hungerSystem = new HungerSystem();
-            hungerSubscriber = new HungerSubscriber(hungerSystem);
-            hungerSystem.setHungerListener(model);
-            hungerSubscriber.start();
-        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            System.out.println("Failed to create HungerSubscriber: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+        fixedUpdate.setCycleCount(Animation.INDEFINITE);
+        fixedUpdate.play();
 
-        model.setHappinessSubscriber(subscriber);
         stage.setTitle("Desk Pet");
         stage.setScene(scene);
         stage.show();
-        stage.setOnCloseRequest(event -> {
-            if (subscriber != null) {
-                subscriber.stop();
+        stage.setOnCloseRequest(e -> {
+            if (happinessPublisher != null) {
+                try {
+                    happinessPublisher.stop();
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
             }
             if (hungerSubscriber != null) {
-                try { hungerSubscriber.stop();} catch (Exception e) {e.printStackTrace();}
+                try {
+                    hungerSubscriber.stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             if (comfortSubscriber != null) {
-                try { comfortSubscriber.stop();}  catch (Exception e) {e.printStackTrace();}
+                try {
+                    comfortSubscriber.stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             Platform.exit();
             System.exit(0);
         });
     }
-
-    public void run() {
-        Application.launch(this.getClass());
+        public void run)() {
+            Application.launch(this.getClass());
+        }
     }
-}
