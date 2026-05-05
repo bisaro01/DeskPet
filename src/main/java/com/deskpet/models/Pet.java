@@ -33,7 +33,7 @@ public class Pet implements PetDataProvider, PetStateListener {
 
 
     public void calculateHappiness() {
-        int happiness = (comfort - hunger) / 2;
+        int happiness = (comfort + hunger) / 2;
 
         if (happiness > 100) {
             this.happiness = 100;
@@ -120,6 +120,8 @@ public class Pet implements PetDataProvider, PetStateListener {
             case "wio/events/food":
                 hungerSystem.feed(value);
                 hunger = (int)hungerSystem.getHunger();
+                break;
+            default:
                 break;
         }
         calculateHappiness();
