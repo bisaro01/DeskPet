@@ -7,12 +7,14 @@
 
 // ==================================== CONSTANTS ==============================================
 // WiFi login
-// *** HIDE THESE IN LATER IMLEMENTATION ***
-const char* wifiName = "Bahnhof-511514";
-const char* password = "R6BXX52FMGFZTX";
+// *** HIDE THESE IN LATER IMPLEMENTATION ***
+
+// Moa's hotspot
+const char* wifiName = "OnePlusNord";
+const char* password = "hello123";
 
 // MQTT server
-const char* mqttServer = "192.168.1.126";
+const char* mqttServer = "172.29.73.248";
 const int mqttPort = 1883;
 
 // MQTT client instance
@@ -21,29 +23,32 @@ PubSubClient client(wifiClient);
 
 
 // <<< SENSOR TYPES >>>
-#define DHTTYPE DHT11       // humidity and temp specifying type DH11
+#define DHTTYPE DHT11       // Humidity and temperature specifying type DH11
 
 
 // <<< DEFINED PINS >>>
-#define BUZZER WIO_BUZZER   // inbuilt buzzer
-#define DHTPIN 2            // humidity and temp sensor pin D2 on WIO diagram
+#define BUZZER WIO_BUZZER   // Inbuilt buzzer
+#define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
 #define RFID_RST_PIN 0      // Change depending on physical build connections
 #define RFID_SS_PIN 1      // Change depending on physical build connections
 
 
 // <<< OTHER INSTANCES >>>
-TFT_eSPI tft;               // graphical drawing object
-DHT dht(DHTPIN, DHTTYPE);   // humidity and temp object
+TFT_eSPI tft;               // Graphical drawing object
+DHT dht(DHTPIN, DHTTYPE);   // Humidity and temperature object
 MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 
 // RFID cooldown
 unsigned long lastRfidReadTime = 0;
-const unsigned long RFID_COOLDOWN = 60000;  // 60 seconds
+const unsigned long RFID_COOLDOWN = 5000;  // 60 seconds
+
+unsigned long lastSensorRead = 0;
+const unsigned long SENSOR_INTERVAL = 2000;
 
 int mood = 100;
 int lastMood = -1;
 
-// ============================  WiFi & MQTT functions  =======================================
+// ============================  WiFi & MQTT FUNCTIONS  =======================================
 
 void connectWifi() {
     tft.fillScreen(TFT_WHITE);
@@ -51,16 +56,16 @@ void connectWifi() {
     tft.setTextSize(2);
     tft.drawString("Connecitng to WiFi...", 40, 100);
 
-    // beginn connection attempt
+    // Begin connection attempt
     WiFi.begin(wifiName, password);
 
-    // keep trying to connect every 5ms untill successfull
+    // Keep trying to connect every 5ms untill successfull
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.println(".");
     }
 
-    // display sucess message once connected on both serial and WIO
+    // Display sucess message once connected on both serial and WIO
     tft.fillScreen(TFT_WHITE);
     tft.drawString("WiFi connected.", 80, 100);
 
@@ -73,10 +78,11 @@ void connectWifi() {
 
 void connectMQTT() {
     while(!client.connected()) {
-        Serial.println("COnnecting to MQTT...");
+        Serial.println("Connecting to MQTT...");
 
         if(client.connect("WioTerminal")) {
             Serial.println("MQTT connected.");
+            client.subscribe("app/state/happiness");
         } else {
             Serial.println("MQTT Connection failed.");
             Serial.println(client.state());
@@ -87,25 +93,25 @@ void connectMQTT() {
     }
 }
 
-// ===============================  facial functions  =========================================
+// ===============================  FACIAL FUNCTIONS  =========================================
 
 void happyFace() {
-    // reset background
+    // Reset background
     tft.fillScreen(TFT_WHITE);
 
-    // mouth full circle pixel points
+    // Mouth full circle pixel points
     int mouthX = 165;
     int mouthY = 110;
     int radius = 25;
     int thickness = 6;
 
-    // draw illusion of thick smile by stacking multiple circles
-    // with decreasing radius
+    // Draw illusion of thick smile by stacking multiple circles
+    // With decreasing radius
     for(int i = 0; i < thickness; i++) {
         tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
     }
 
-    // cut off top half to make smile
+    // Cut off top half to make smile
     tft.fillRect(
     mouthX - radius - 2,
     mouthY - radius - 2,
@@ -114,16 +120,16 @@ void happyFace() {
     TFT_WHITE
     );
 
-    // eyes
+    // Eyes
     tft.fillCircle(130, 80, 8, TFT_BLACK);
     tft.fillCircle(200, 80, 8, TFT_BLACK);
 }
 
 void sadFace() {
-    // reset background
+    // Reset background
     tft.fillScreen(TFT_WHITE);
 
-    // full cirlce mouth pixel points
+    // Full cirlce mouth pixel points
     int mouthX = 165;
     int mouthY = 130;
     int radius = 25;
@@ -133,7 +139,7 @@ void sadFace() {
         tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
     }
 
-    // Cutt off bottom half of mouth
+    // Cut off bottom half of mouth
     tft.fillRect(
     mouthX - radius - 2,
     mouthY + 2,
@@ -142,12 +148,20 @@ void sadFace() {
     TFT_WHITE
     );
 
-    // eyes
+    // Eyes
     tft. fillCircle(130, 80, 8, TFT_BLACK);
     tft. fillCircle(200, 80, 8, TFT_BLACK);
 }
 
 void happySound() {
+    //TODO: Consider a different design:
+    // Array of tones + array of durations
+    // startMelody(const int* notes, const int* durations, int length) to start playing a startMelody
+    // in loop(): updateMelody(), bool isPlaying
+    // in loop(): if (millis() - lastNoteTime >= currentDurations[melodyIndex])
+    //     if (melodyIndex >= melodyLength) isPlaying = false, noTone
+    //     lastNoteTime = millis()
+    //     play next tone
     tone(BUZZER, 1000);
     delay(80);
 
@@ -179,7 +193,7 @@ void sadSound() {
     noTone(BUZZER);
 }
 
-// ===============================  sensor functions  ========================================
+// ===============================  SENSOR FUNCTIONS  ========================================
 
 void readTempHumidity() {
     /*
@@ -192,25 +206,29 @@ void readTempHumidity() {
         - publishes data to MQTT broke on topic "wio/humTemp"
     */
 
-    // defines array of size 2 for the readings and initialises both as 0
+    // Defines array of size 2 for the readings and initialises both as 0
     float tempHumVal[2] = {0};
 
-    // check if reading didnt fail read the values
+    // Check if reading didnt fail read the values
     if(!dht.readTempAndHumidity(tempHumVal)) {
         float humidity = tempHumVal[0];
         float temperature = tempHumVal[1];
 
-        // debugging terminal print
+        // Debugging terminal print
         // Serial.print(humidity);
         // Serial.print("%, ");
         // Serial.print(temperature);
         // Serial.println("C");
 
-        // publish readings to MQTT broker
-        String payload = String(humidity) + "," + String(temperature);
-        client.publish("wio/humTemp", payload.c_str());
+        // Publish readings to MQTT broker
+        // String payload = String(humidity) + "," + String(temperature);
+        String tempStr = String(temperature);
+        String humStr = String(humidity);
+        client.publish("wio/sensors/temperature", tempStr.c_str());
+        client.publish("wio/sensors/humidity", humStr.c_str());
+        // client.publish("wio/humTemp", payload.c_str());
     }
-    // othervise debug on serial
+    // Otherwise debug on serial
     else {
         Serial.print("Failed to get humidity and temperature values.");
     }
@@ -253,11 +271,11 @@ void readRfidTag() {
     uid.toUpperCase();
 
     // Debugging
-    //Serial.print("RFID UID: ");
-    //Serial.println(uid);
+    Serial.print("RFID UID: ");
+    Serial.println(uid);
 
     // Publish reading to MQTT
-    client.publish("wio/rfid", uid.c_str());
+    client.publish("wio/events/food", uid.c_str());
 
     // Time last read, for cooldown
     lastRfidReadTime = millis();
@@ -267,44 +285,65 @@ void readRfidTag() {
     rfid.PCD_StopCrypto1();
 }
 
-// ==================================  set up stage  =========================================
-// main set up
+void callback(char* topic, byte* payload, unsigned int length) {
+    String message = "";
+
+    for (int i = 0; i < length; i++) {
+        message += (char)payload[i];
+    }
+
+    Serial.print("Message received on topic: ");
+    Serial.println(topic);
+    Serial.print("payload: ");
+    Serial.println(message);
+
+    if (strcmp(topic, "app/state/happiness") == 0) {
+        mood = message.toInt();
+    }
+}
+
+// ==================================  SET UP STAGE  =========================================
+// Main set up
 void setup() {
     // <<< PINS / HARDWARE >>>
     pinMode(BUZZER, OUTPUT);
 
 
-    // start serial (Arduino IDE terminal)
+    // Start serial (Arduino IDE terminal)
     Serial.begin(9600);
 
-    // begin graphics drawing
+    // Begin graphics drawing
     tft.begin();
     tft.setRotation(3);
-    // begin temp&hum sensor
+    // Begin temperature & humidity sensor
     dht.begin();
 
-    // begin RFID reader
+    // Begin RFID reader
     SPI.begin();
     rfid.PCD_Init();
 
     // <<< CONNECTIVITY >>>
-    // connect to WiFi
+    // Connect to WiFi
     connectWifi();
 
-    // connect MQTT
+    // Connect MQTT
     client.setServer(mqttServer, mqttPort);
+    client.setCallback(callback);
 }
 
-// ===================================  main loop =========================================
+// ===================================  MAIN LOOP =========================================
 void loop() {
-    // maintains MQTT connection on very iteration of main loop
+    // Maintains MQTT connection on every iteration of main loop
     if(!client.connected()) {
+        tft.drawString("MQTT: OFF", 10, 10);
         connectMQTT();
+    } else {
+        tft.drawString("MQTT: ON", 10, 10);
     }
     client.loop();
 
-    // test code for facial expressions
-    int mood = random(0, 100);
+    // Test code for facial expressions
+    // int mood = random(0, 100);
 
     if (mood != lastMood) {
         lastMood = mood;
@@ -313,18 +352,20 @@ void loop() {
             sadFace();
             sadSound();
         }
-        
         else {
             happyFace();
             happySound();
         }
     }
 
-    // temp and humidity test
-    readTempHumidity();
+    if (millis() - lastSensorRead > SENSOR_INTERVAL) {
+        lastSensorRead = millis();
+        // Temperature and humidity test
+        readTempHumidity();
+    }
 
     // RFID scanner function
     readRfidTag();
 
-    delay(1000);
+    delay(50);
 }
