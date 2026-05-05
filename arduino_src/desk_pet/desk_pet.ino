@@ -14,7 +14,7 @@ const char* wifiName = "OnePlusNord";
 const char* password = "hello123";
 
 // MQTT server
-const char* mqttServer = "192.168.1.126";
+const char* mqttServer = "172.29.73.248";
 const int mqttPort = 1883;
 
 // MQTT client instance
