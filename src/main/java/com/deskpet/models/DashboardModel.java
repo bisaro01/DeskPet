@@ -1,5 +1,7 @@
 package com.deskpet.models;
 
+import java.sql.SQLException;
+
 import com.deskpet.DatabaseHandler;
 import com.deskpet.domain.ComfortListener;
 import com.deskpet.domain.HappinessListener;
