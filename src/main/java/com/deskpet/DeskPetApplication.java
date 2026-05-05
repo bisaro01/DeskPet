@@ -1,33 +1,42 @@
 package com.deskpet;
 
 import com.deskpet.controllers.DashboardController;
+import com.deskpet.models.Pet;
 import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.models.DashboardModel;
 import com.deskpet.models.systems.HungerSystem;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
     private final Connection db;
-    private HappinessSubscriber subscriber;
-//  private HappinessPublisher publisher;
+    private final DatabaseHandler dbHandler;
+    private HappinessPublisher happinessPublisher;
     private ComfortSubscriber comfortSubscriber;
     private HungerSubscriber hungerSubscriber;
+    private Pet pet;
 
     public DeskPetApplication() {
-        try{
+        try {
             db = Database.getConnection();
         } catch (java.sql.SQLException e) {
             System.out.println("Failed to create Database connection" + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        dbHandler = new DatabaseHandler();
     }
 
     @Override
@@ -35,68 +44,113 @@ public class DeskPetApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(DeskPetApplication.class.getResource("/com/deskpet/views/dashboardView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         DashboardController controller = fxmlLoader.getController();
+        controller.setModelDbHandler(dbHandler);
         DashboardModel model = controller.getModel();
 
         try {
-            subscriber = new HappinessSubscriber();
-            subscriber.setHappinessListener(controller.getModel());
-            subscriber.start();
-        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            System.out.println("Failed to create HappinessSubscriber: " + e.getMessage());
+            pet = dbHandler.loadPet(1);
+
+            if (pet == null) {
+                System.out.println("DB error: unable to load pet. Using demo pet.");
+                pet = new Pet(1, 80, 80);
+            } else {
+                System.out.println("Loaded pet 1:");
+                System.out.println("Happiness: " + pet.getHappiness());
+                System.out.println("Hunger: " + pet.getHunger());
+                System.out.println("Comfort: " + pet.getComfort());
+            }
+        } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
 
-//        try {
-//            publisher = new HappinessPublisher();
-//        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-//            System.out.println("Failed to create HappinessPublisher" + e.getMessage());
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        }
-
-        // added the comfort subscriber system
         try {
-            ComfortSystem comfortSystem = new ComfortSystem();
-            comfortSubscriber = new ComfortSubscriber(comfortSystem);
-            comfortSubscriber.setComfortListener(model);
+            happinessPublisher = new HappinessPublisher();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create HappinessPublisher" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        try {
+            comfortSubscriber = new ComfortSubscriber(pet);
             comfortSubscriber.start();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            System.out.println("Failed to create ComfortSubscriber: " + e.getMessage());
+            System.out.println("Failed to create ComfortSubscriber" + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException(e);
         }
 
         try {
-            HungerSystem hungerSystem = new HungerSystem();
-            hungerSubscriber = new HungerSubscriber(hungerSystem);
-            hungerSystem.setHungerListener(model);
+            hungerSubscriber = new HungerSubscriber(pet);
             hungerSubscriber.start();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            System.out.println("Failed to create HungerSubscriber: " + e.getMessage());
+            System.out.println("Failed to create HungerSubscriber" + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException(e);
         }
 
-        model.setHappinessSubscriber(subscriber);
+        lastUpdate = System.currentTimeMillis();
+
+        Timeline fixedUpdate = new Timeline(
+                new KeyFrame(Duration.millis(1000), e -> {
+                    long now = System.currentTimeMillis();
+                    double delta = (now - lastUpdate) / 1000.0;
+                    lastUpdate = now;
+
+                    pet.update(delta);
+
+                    try {
+                        model.updateState(pet);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    try {
+                        happinessPublisher.publish(pet.getHappiess());
+                    } catch (MqttException ex) {
+                        ex.printStackTrace();
+                    }
+
+                    System.out.println("----------------------------------");
+                    System.out.println("Happiness: " + pet.getHappiness());
+                    System.out.println("Comfort: " + pet.getComfort());
+                    System.out.println("Hunger: " + pet.getHunger());
+                })
+        );
+
+        fixedUpdate.setCycleCount(Animation.INDEFINITE);
+        fixedUpdate.play();
+
         stage.setTitle("Desk Pet");
         stage.setScene(scene);
         stage.show();
-        stage.setOnCloseRequest(event -> {
-            if (subscriber != null) {
-                subscriber.stop();
+        stage.setOnCloseRequest(e -> {
+            if (happinessPublisher != null) {
+                try {
+                    happinessPublisher.stop();
+                } catch (MqttException e) {
+                    e.printStackTrace();
+                }
             }
             if (hungerSubscriber != null) {
-                try { hungerSubscriber.stop();} catch (Exception e) {e.printStackTrace();}
+                try {
+                    hungerSubscriber.stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             if (comfortSubscriber != null) {
-                try { comfortSubscriber.stop();}  catch (Exception e) {e.printStackTrace();}
+                try {
+                    comfortSubscriber.stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             Platform.exit();
             System.exit(0);
         });
     }
-
     public void run() {
         Application.launch(this.getClass());
     }
