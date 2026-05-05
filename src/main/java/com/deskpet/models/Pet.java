@@ -26,6 +26,12 @@ public class Pet implements PetDataProvider, PetStateListener {
         calculateHappiness();
     }
 
+    public void applyDecay(double delta) {
+        comfort = comfortSystem.applyDecay(delta);
+        hunger = hungerSystem.applyDecay(delta);
+    }
+
+
     public void calculateHappiness() {
         int happiness = (social + comfort - hunger) / 3;
 
