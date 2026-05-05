@@ -271,11 +271,11 @@ void readRfidTag() {
     uid.toUpperCase();
 
     // Debugging
-    //Serial.print("RFID UID: ");
-    //Serial.println(uid);
+    Serial.print("RFID UID: ");
+    Serial.println(uid);
 
     // Publish reading to MQTT
-    client.publish("wio/rfid", uid.c_str());
+    client.publish("wio/events/food", uid.c_str());
 
     // Time last read, for cooldown
     lastRfidReadTime = millis();
@@ -283,6 +283,23 @@ void readRfidTag() {
     // Ends communication with current tag
     rfid.PICC_HaltA();
     rfid.PCD_StopCrypto1();
+}
+
+void callback(char* topic, byte* payload, unsigned int length) {
+    String message = "";
+
+    for (int i = 0; i < length; i++) {
+        message += (char)payload[i];
+    }
+
+    Serial.print("Message received on topic: ");
+    Serial.println(topic);
+    Serial.print("payload: ");
+    Serial.println(message);
+
+    if (strcmp(topic, "app/state/happiness") == 0) {
+        mood = message.toInt();
+    }
 }
 
 // ==================================  set up stage  =========================================
