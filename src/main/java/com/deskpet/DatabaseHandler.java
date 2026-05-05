@@ -81,7 +81,7 @@ public class DatabaseHandler {
         try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, pet.getHunger());
-            statement.setInt(2, pet.getSocial());
+            statement.setInt(2, 100); // TODO: Change back to pet.getSocial(); in sprint 2
             statement.setInt(3, pet.getComfort());
             statement.setInt(4, pet.getHappiness());
             statement.setLong(5, pet.getPetId());
@@ -93,30 +93,30 @@ public class DatabaseHandler {
     /*
     Assumes Pet has a constructor: Pet(long petId, int hunger, int social, int comfort)
     */
-//    public Pet loadPet(long petId) throws SQLException {
-//        String sql = """
-//                SELECT hunger, social, comfort, happiness
-//                FROM pet_state
-//                WHERE pet_id = ?
-//                """;
-//
-//        try (Connection connection = Database.getConnection();
-//            PreparedStatement statement = connection.prepareStatement(sql)) {
-//
-//            statement.setLong(1, petId);
-//
-//            try (ResultSet resultSet = statement.executeQuery()) {
-//                if (resultSet.next()) {
-//                    int hunger = resultSet.getInt("hunger");
-//                    int social = resultSet.getInt("social");
-//                    int comfort = resultSet.getInt("comfort");
-//
-//                    return new Pet(petId, hunger, social, comfort);
-//                }
-//            }
-//        }
-//        throw new SQLException("No pet_state found for pet_id = " + petId);
-//    }
+    public Pet loadPet(long petId) throws SQLException {
+        String sql = """
+                SELECT hunger, comfort 
+                FROM pet_state
+                WHERE pet_id = ?
+                """;
+
+        try (Connection connection = Database.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int hunger = resultSet.getInt("hunger");
+                    // int social = resultSet.getInt("social"); TODO: Add back in sprint 2
+                    int comfort = resultSet.getInt("comfort");
+
+                    return new Pet(petId, hunger, comfort);
+                }
+            }
+        }
+        throw new SQLException("No pet_state found for pet_id = " + petId);
+    }
 
     // Get food_id from RFID tag.
     public long getFoodIdFromTag(String rfidTag) throws SQLException {

@@ -28,14 +28,14 @@ public class DeskPetApplication extends Application {
     private HungerSubscriber hungerSubscriber;
 
     public DeskPetApplication() {
-        try{
-            db = Database.getConnection();
-        } catch (java.sql.SQLException e) {
-            System.out.println("Failed to create Database connection" + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-        dbHandler = new DatabaseHandler(db);
+//        try {
+//            db = Database.getConnection();
+//        } catch (java.sql.SQLException e) {
+//            System.out.println("Failed to create Database connection" + e.getMessage());
+//            e.printStackTrace();
+//            throw new RuntimeException(e);
+//        }
+//        dbHandler = new DatabaseHandler(db);
     }
 
     @Override
@@ -150,7 +150,7 @@ public class DeskPetApplication extends Application {
             System.exit(0);
         });
     }
-        public void run)() {
-            Application.launch(this.getClass());
-        }
+    public void run() {
+        Application.launch(this.getClass());
     }
+}
