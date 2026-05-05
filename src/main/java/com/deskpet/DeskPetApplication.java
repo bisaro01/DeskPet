@@ -28,6 +28,8 @@ public class DeskPetApplication extends Application {
     private HungerSubscriber hungerSubscriber;
     private Pet pet;
 
+    private long lastUpdate;
+
     public DeskPetApplication() {
         try {
             db = Database.getConnection();
@@ -107,7 +109,7 @@ public class DeskPetApplication extends Application {
                     }
 
                     try {
-                        happinessPublisher.publish(pet.getHappiess());
+                        happinessPublisher.publish(pet.getHappiness());
                     } catch (MqttException ex) {
                         ex.printStackTrace();
                     }
@@ -125,7 +127,7 @@ public class DeskPetApplication extends Application {
         stage.setTitle("Desk Pet");
         stage.setScene(scene);
         stage.show();
-        stage.setOnCloseRequest(e -> {
+        stage.setOnCloseRequest(event -> {
             if (happinessPublisher != null) {
                 try {
                     happinessPublisher.stop();
