@@ -28,6 +28,8 @@ public class DeskPetApplication extends Application {
     private HungerSubscriber hungerSubscriber;
     private Pet pet;
 
+    private long lastUpdate;
+
     public DeskPetApplication() {
         try {
             db = Database.getConnection();
