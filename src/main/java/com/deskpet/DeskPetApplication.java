@@ -63,25 +63,24 @@ public class DeskPetApplication extends Application {
             throw new RuntimeException(e);
         }
 
-        /*try {
-            subscriber = new HappinessSubscriber();
-            subscriber.setHappinessListener(controller.getModel());
-            subscriber.start();
+       try {
+            happinessPublisher = new HappinessPublisher();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-            System.out.println("Failed to create HappinessSubscriber: " + e.getMessage());
+            System.out.println("Failed to create HappinessPublisher" + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException(e);
-        } */
+        }
 
-//        try {
-//            publisher = new HappinessPublisher();
-//        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
-//            System.out.println("Failed to create HappinessPublisher" + e.getMessage());
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        }
+       try {
+           comfortSubscriber = new ComfortSubscriber(pet);
+           comfortSubscriber.start();
+       } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+           System.out.println("Failed to create ComfortSubscriber" + e.getMessage());
+           e.printStackTrace();
+           throw new RuntimeException(e);
+       }
 
-        // added the comfort subscriber system
+
         try {
             ComfortSystem comfortSystem = new ComfortSystem();
             comfortSubscriber = new ComfortSubscriber(comfortSystem);
