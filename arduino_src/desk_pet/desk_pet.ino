@@ -7,9 +7,11 @@
 
 // ==================================== CONSTANTS ==============================================
 // WiFi login
-// *** HIDE THESE IN LATER IMLEMENTATION ***
-const char* wifiName = "Bahnhof-511514";
-const char* password = "R6BXX52FMGFZTX";
+// *** HIDE THESE IN LATER IMPLEMENTATION ***
+
+// Moa's hotspot
+const char* wifiName = "OnePlusNord";
+const char* password = "hello123";
 
 // MQTT server
 const char* mqttServer = "192.168.1.126";
