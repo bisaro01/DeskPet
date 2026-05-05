@@ -28,7 +28,7 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     public void applyDecay(double delta) {
         comfort = comfortSystem.applyDecay(delta);
-        // hunger = hungerSystem.applyDecay(delta);
+        hunger = hungerSystem.applyDecay(delta);
     }
 
 
