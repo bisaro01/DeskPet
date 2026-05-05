@@ -40,7 +40,10 @@ MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 
 // RFID cooldown
 unsigned long lastRfidReadTime = 0;
-const unsigned long RFID_COOLDOWN = 60000;  // 60 seconds
+const unsigned long RFID_COOLDOWN = 5000;  // 60 seconds
+
+unsigned long lastSensorRead = 0;
+const unsigned long SENSOR_INTERVAL = 2000;
 
 int mood = 100;
 int lastMood = -1;
