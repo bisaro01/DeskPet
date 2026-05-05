@@ -2,8 +2,10 @@ package com.deskpet;
 
 // talking directly to the dashboard through the comfortListener same as Happiness system
 import com.deskpet.domain.ComfortListener;
+import com.deskpet.domain.PetStateListener;
 import com.deskpet.models.systems.ComfortSystem;
 
+import javafx.application.Platform;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -16,18 +18,19 @@ public class ComfortSubscriber implements MqttCallback {
     private IMqttClient MqttClient;
     private final static String BROKER = "tcp://localhost:1883";
     private final static String CLIENT_ID = "comfort-subscriber";
-    private final static String TOPIC = "deskpet/comfort";
+    private final static String TEMP_TOPIC = "wio/sensors/temperature";
+    private final static String HUM_TOPIC = "wio/sensors/humidity";
 
     // talking directly to the dashboard through the comfortListener same as Happiness system
     private ComfortSystem comfortSystem;
     private ComfortListener comfortListener;
+    private PetStateListener pet;
 
 
     // Constructor
-    public ComfortSubscriber(ComfortSystem comfortSystem) throws  MqttException {
+    public ComfortSubscriber(PetStateListener pet) throws  MqttException {
         // talking directly to the dashboard through the comfortListener same as Happiness system
-        this.comfortSystem = comfortSystem;
-
+        this.pet = pet;
 
         MqttClient = new MqttClient(BROKER, CLIENT_ID);
         MqttClient.setCallback(this);
@@ -40,14 +43,10 @@ public class ComfortSubscriber implements MqttCallback {
         System.out.println("Connected to MQTT broker.");
     }
 
-    public void setComfortListener(ComfortListener listener) {
-        comfortListener = listener;
-    }
-
-
     // ComfortSubscriber start and stop MQTT broker connection methods
     public void start() throws MqttException {
-        MqttClient.subscribe(TOPIC);
+        MqttClient.subscribe(TEMP_TOPIC);
+        MqttClient.subscribe(HUM_TOPIC);
 
         // Debugging lines
         // System.out.println("Listening to: " + TOPIC);
@@ -67,7 +66,6 @@ public class ComfortSubscriber implements MqttCallback {
     }
 
 
-
     // Mandatory MqttCallback abstract methods
     @Override
     public void connectionLost(Throwable cause) {
@@ -78,26 +76,9 @@ public class ComfortSubscriber implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         String payload = new String(message.getPayload());
 
-        // Payload will be a string e.g. ("50.0, 21.0")
-        String[] sensorReading = payload.split(",");
-        if (sensorReading.length == 2) {
-            float humidity = Float.parseFloat(sensorReading[0]);
-            float temperature = Float.parseFloat(sensorReading[1]);
-
-            // for debugging when we run Gradle
-            System.out.printf("Humidity: %.1f%% | Temp: %.1fC%n", humidity, temperature);
-
-            // pass the readings to the comfort system to calculate the value
-            comfortSystem.updateComfort((double)humidity, (double)temperature);
-
-            // for debugging when we run Gradle
-            System.out.printf("Comfort: %.1f%%%n", comfortSystem.getComfort());
-
-            // pass the comfort value to the dashboard
-            if (comfortListener != null) {
-                comfortListener.updateComfort(comfortSystem.getComfort());
-            }
-        }
+        Platform.runLater(() -> {
+            pet.updateNeed(topic, payload);
+        });
     }
 
     @Override

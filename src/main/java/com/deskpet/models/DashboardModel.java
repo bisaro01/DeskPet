@@ -1,9 +1,12 @@
 package com.deskpet.models;
 
-import com.deskpet.HappinessSubscriber;
+import java.sql.SQLException;
+
+import com.deskpet.DatabaseHandler;
 import com.deskpet.domain.ComfortListener;
-import com.deskpet.domain.HungerListener;
 import com.deskpet.domain.HappinessListener;
+import com.deskpet.domain.HungerListener;
+
 import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
@@ -13,10 +16,10 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
     private final FloatProperty hunger = new SimpleFloatProperty(1);
     private final FloatProperty comfort = new SimpleFloatProperty(1);
 
-    private HappinessSubscriber happinessSubscriber;
+    private DatabaseHandler db;
 
-    public void setHappinessSubscriber(HappinessSubscriber sub) {
-        happinessSubscriber = sub;
+    public void setDbHandler(DatabaseHandler dbHandler) {
+        db = dbHandler;
     }
 
     public float getHappiness() {
@@ -38,10 +41,12 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
     public float getHunger() {
         return hunger.get();
     }
+
     public void setHunger(float value) {
         hunger.set(Math.clamp(value, 0.0f, 1.0f));
         setHappiness();
     }
+
     public FloatProperty hungerProperty() {
         return hunger;
     }
@@ -49,10 +54,12 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
     public float getComfort() {
         return comfort.get();
     }
+
     public void setComfort(float value) {
         comfort.set(Math.clamp(value, 0.0f, 1.0f));
         setHappiness();
     }
+
     public FloatProperty comfortProperty() {
         return comfort;
     }
@@ -79,5 +86,13 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
             hunger.set(Math.clamp((float)(value / 100.0F), 0.0f, 1.0f));
             System.out.println("hunger: " + hunger);
         });
+    }
+
+    public void updateState(Pet pet) throws SQLException {
+        hunger.set(Math.clamp(pet.getHunger() / 100.0f, 0.0f, 1.0f));
+        comfort.set(Math.clamp(pet.getComfort() / 100.0f, 0.0f, 1.0f));
+        happiness.set(Math.clamp(pet.getHappiness() / 100.0f, 0.0f, 1.0f));
+
+        db.updatePetState(pet);
     }
 }

@@ -3,37 +3,37 @@ package com.deskpet.models;
 import com.deskpet.domain.PetDataProvider;
 import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.domain.PetStateListener;
-// import com.deskpet.models.systems.ComfortSystem;
+import com.deskpet.models.systems.ComfortSystem;
 // import com.deskpet.models.systems.HungerSystem;
 
 public class Pet implements PetDataProvider, PetStateListener {
-    // private final ComfortSystem comfortSystem;
+    private final ComfortSystem comfortSystem;
     // private final HungerSystem hungerSystem;
 
     private long petId;
     private int hunger;
-    private int social;
+    //private int social;
     private int comfort;
     private int happiness;
 
-    public Pet(long petId, int hunger, int social, int comfort) {
+    public Pet(long petId, int hunger, int comfort) {
         this.petId = petId;
         this.hunger = hunger;
-        this.social = social;
+        //this.social = social;
         this.comfort = comfort;
-        // comfortSystem = new ComfortSystem();
+        comfortSystem = new ComfortSystem();
         // hungerSystem = new HungerSystem();
         calculateHappiness();
     }
 
     public void applyDecay(double delta) {
-        // comfort = comfortSystem.applyDecay(delta);
+        comfort = comfortSystem.applyDecay(delta);
         // hunger = hungerSystem.applyDecay(delta);
     }
 
 
     public void calculateHappiness() {
-        int happiness = (social + comfort - hunger) / 3;
+        int happiness = (comfort - hunger) / 2;
 
         if (happiness > 100) {
             this.happiness = 100;
@@ -55,10 +55,10 @@ public class Pet implements PetDataProvider, PetStateListener {
         return hunger;
     }
 
-    @Override
-    public int getSocial() {
-        return social;
-    }
+    //@Override
+    //public int getSocial() {
+//        return social;
+//    }
 
     @Override
     public int getComfort() {
@@ -82,16 +82,16 @@ public class Pet implements PetDataProvider, PetStateListener {
         calculateHappiness();
     }
 
-    public void setSocial(int social) {
-        if (social > 100) {
-            this.social = 100;
-        } else if (social < 0) {
-            this.social = 0;
-        } else {
-            this.social = social;
-        }
-        calculateHappiness();
-    }
+//    public void setSocial(int social) {
+//        if (social > 100) {
+//            this.social = 100;
+//        } else if (social < 0) {
+//            this.social = 0;
+//        } else {
+//            this.social = social;
+//        }
+//        calculateHappiness();
+//    }
 
     public void setComfort(int comfort) {
         if (comfort > 100) {
@@ -109,12 +109,12 @@ public class Pet implements PetDataProvider, PetStateListener {
         switch (topic) {
             case "wio/sensors/temperature":
                 float temp = Float.parseFloat(value);
-                // comfortSystem.updateTemperature(temp);
+                comfortSystem.updateTemperature(temp);
                 break;
 
             case "wio/sensors/humidity":
                 float hum = Float.parseFloat(value);
-                // comfortSystem.updateHumidity(hum);
+                comfortSystem.updateHumidity(hum);
                 break;
 
             case "wio/events/food":

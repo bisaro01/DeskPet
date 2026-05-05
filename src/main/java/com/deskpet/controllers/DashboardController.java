@@ -1,5 +1,6 @@
 package com.deskpet.controllers;
 
+import com.deskpet.DatabaseHandler;
 import com.deskpet.models.DashboardModel;
 import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
@@ -27,6 +28,8 @@ public class DashboardController {
     public DashboardModel getModel() {
         return model;
     }
+
+    public void setModelDbHandler(DatabaseHandler dbHandler) {model.setDbHandler(dbHandler);}
 
     public void bindProgressBarWithColor(ProgressBar progressBar, FloatProperty property) {
         progressBar.progressProperty().bind(property);
