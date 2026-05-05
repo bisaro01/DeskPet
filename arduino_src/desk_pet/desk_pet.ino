@@ -96,22 +96,22 @@ void connectMQTT() {
 // ===============================  facial functions  =========================================
 
 void happyFace() {
-    // reset background
+    // Reset background
     tft.fillScreen(TFT_WHITE);
 
-    // mouth full circle pixel points
+    // Mouth full circle pixel points
     int mouthX = 165;
     int mouthY = 110;
     int radius = 25;
     int thickness = 6;
 
-    // draw illusion of thick smile by stacking multiple circles
-    // with decreasing radius
+    // Draw illusion of thick smile by stacking multiple circles
+    // With decreasing radius
     for(int i = 0; i < thickness; i++) {
         tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
     }
 
-    // cut off top half to make smile
+    // Cut off top half to make smile
     tft.fillRect(
     mouthX - radius - 2,
     mouthY - radius - 2,
@@ -120,16 +120,16 @@ void happyFace() {
     TFT_WHITE
     );
 
-    // eyes
+    // Eyes
     tft.fillCircle(130, 80, 8, TFT_BLACK);
     tft.fillCircle(200, 80, 8, TFT_BLACK);
 }
 
 void sadFace() {
-    // reset background
+    // Reset background
     tft.fillScreen(TFT_WHITE);
 
-    // full cirlce mouth pixel points
+    // Full cirlce mouth pixel points
     int mouthX = 165;
     int mouthY = 130;
     int radius = 25;
