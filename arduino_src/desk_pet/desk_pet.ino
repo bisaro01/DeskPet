@@ -328,18 +328,22 @@ void setup() {
 
     // connect MQTT
     client.setServer(mqttServer, mqttPort);
+    client.setCallback(callback);
 }
 
 // ===================================  main loop =========================================
 void loop() {
     // maintains MQTT connection on very iteration of main loop
     if(!client.connected()) {
+        tft.drawString("MQTT: OFF", 10, 10);
         connectMQTT();
+    } else {
+        tft.drawString("MQTT: ON", 10, 10);
     }
     client.loop();
 
     // test code for facial expressions
-    int mood = random(0, 100);
+    // int mood = random(0, 100);
 
     if (mood != lastMood) {
         lastMood = mood;
@@ -348,18 +352,20 @@ void loop() {
             sadFace();
             sadSound();
         }
-        
         else {
             happyFace();
             happySound();
         }
     }
 
-    // temp and humidity test
-    readTempHumidity();
+    if (millis() - lastSensorRead > SENSOR_INTERVAL) {
+        lastSensorRead = millis();
+        // temp and humidity test
+        readTempHumidity();
+    }
 
     // RFID scanner function
     readRfidTag();
 
-    delay(1000);
+    delay(50);
 }
