@@ -39,10 +39,12 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
     public float getHunger() {
         return hunger.get();
     }
+
     public void setHunger(float value) {
         hunger.set(Math.clamp(value, 0.0f, 1.0f));
         setHappiness();
     }
+
     public FloatProperty hungerProperty() {
         return hunger;
     }
@@ -50,10 +52,12 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
     public float getComfort() {
         return comfort.get();
     }
+
     public void setComfort(float value) {
         comfort.set(Math.clamp(value, 0.0f, 1.0f));
         setHappiness();
     }
+    
     public FloatProperty comfortProperty() {
         return comfort;
     }
