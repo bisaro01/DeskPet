@@ -1,8 +1,15 @@
 package com.deskpet.models;
 
 import com.deskpet.domain.PetDataProvider;
+import com.deskpet.models.systems.ComfortSystem;
+import com.deskpet.domain.PetStateListener;
+import com.deskpet.models.systems.ComfortSystem;
+import com.deskpet.models.systems.HungerSystem;
 
-public class Pet implements PetDataProvider {
+public class Pet implements PetDataProvider, PetStateListener {
+    private final ComfortSystem comfortSystem;
+    private final HungerSystem hungerSystem;
+
     private long petId;
     private int hunger;
     private int social;
@@ -14,6 +21,8 @@ public class Pet implements PetDataProvider {
         this.hunger = hunger;
         this.social = social;
         this.comfort = comfort;
+        comfortSystem = new ComfortSystem();
+        hungerSystem = new HungerSystem();
         calculateHappiness();
     }
 
