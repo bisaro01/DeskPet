@@ -116,7 +116,7 @@ public class Pet implements PetDataProvider, PetStateListener {
                 float hum = Float.parseFloat(value);
                 comfortSystem.updateHumidity(hum);
                 break;
-                
+
             case "wio/events/food":
                 hungerSystem.feed(value);
                 hunger = (int)hungerSystem.getHunger();
@@ -124,3 +124,9 @@ public class Pet implements PetDataProvider, PetStateListener {
         }
         calculateHappiness();
     }
+
+    public void update(double delta) {
+        applyDecay(delta);
+        calculateHappiness();
+    }
+}
