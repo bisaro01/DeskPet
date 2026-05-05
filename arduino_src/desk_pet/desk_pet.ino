@@ -306,6 +306,20 @@ void loop() {
     // test code for facial expressions
     int mood = random(0, 100);
 
+    if (mood != lastMood) {
+        lastMood = mood;
+
+        if (mood < 50) {
+            sadFace();
+            sadSound();
+        }
+        
+        else {
+            happyFace();
+            happySound();
+        }
+    }
+
     // temp and humidity test
     readTempHumidity();
 
