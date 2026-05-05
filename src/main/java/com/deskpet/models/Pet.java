@@ -109,12 +109,12 @@ public class Pet implements PetDataProvider, PetStateListener {
         switch (topic) {
             case "wio/sensors/temperature":
                 float temp = Float.parseFloat(value);
-                // comfortSystem.updateTemperature(temp);
+                comfortSystem.updateTemperature(temp);
                 break;
 
             case "wio/sensors/humidity":
                 float hum = Float.parseFloat(value);
-                // comfortSystem.updateHumidity(hum);
+                comfortSystem.updateHumidity(hum);
                 break;
 
             case "wio/events/food":
