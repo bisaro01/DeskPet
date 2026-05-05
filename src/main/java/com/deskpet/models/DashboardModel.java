@@ -1,10 +1,10 @@
 package com.deskpet.models;
 
 import com.deskpet.DatabaseHandler;
-import com.deskpet.HappinessSubscriber;
 import com.deskpet.domain.ComfortListener;
-import com.deskpet.domain.HungerListener;
 import com.deskpet.domain.HappinessListener;
+import com.deskpet.domain.HungerListener;
+
 import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
@@ -14,13 +14,10 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
     private final FloatProperty hunger = new SimpleFloatProperty(1);
     private final FloatProperty comfort = new SimpleFloatProperty(1);
 
-    private HappinessSubscriber happinessSubscriber;
-
     private DatabaseHandler db;
 
-    public void setDbHandler(DatabaseHandler dbHandler) {db = dbHandler;}
-    public void setHappinessSubscriber(HappinessSubscriber sub) {
-        happinessSubscriber = sub;
+    public void setDbHandler(DatabaseHandler dbHandler) {
+        db = dbHandler;
     }
 
     public float getHappiness() {
