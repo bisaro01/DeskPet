@@ -221,10 +221,14 @@ void readTempHumidity() {
         // Serial.println("C");
 
         // publish readings to MQTT broker
-        String payload = String(humidity) + "," + String(temperature);
-        client.publish("wio/humTemp", payload.c_str());
+        // String payload = String(humidity) + "," + String(temperature);
+        String tempStr = String(temperature);
+        String humStr = String(humidity);
+        client.publish("wio/sensors/temperature", tempStr.c_str());
+        client.publish("wio/sensors/humidity", humStr.c_str());
+        // client.publish("wio/humTemp", payload.c_str());
     }
-    // othervise debug on serial
+    // otherwise debug on serial
     else {
         Serial.print("Failed to get humidity and temperature values.");
     }
