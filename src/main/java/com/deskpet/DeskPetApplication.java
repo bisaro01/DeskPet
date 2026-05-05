@@ -1,21 +1,29 @@
 package com.deskpet;
 
 import com.deskpet.controllers.DashboardController;
+import com.deskpet.models.Pet;
 import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.models.DashboardModel;
 import com.deskpet.models.systems.HungerSystem;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
     private final Connection db;
-    private HappinessPublisher publisher;
+    private final DatabaseHandler dbHandler;
+    private HappinessPublisher happinessPublisher;
     private ComfortSubscriber comfortSubscriber;
     private HungerSubscriber hungerSubscriber;
 
