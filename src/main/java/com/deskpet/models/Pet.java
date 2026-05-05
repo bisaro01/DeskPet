@@ -103,4 +103,24 @@ public class Pet implements PetDataProvider, PetStateListener {
         }
         calculateHappiness();
     }
-}
+
+    @Override
+    public void updateNeed(String topic, String value) {
+        switch (topic) {
+            case "wio/sensors/temperature":
+                float temp = Float.parseFloat(value);
+                comfortSystem.updateTemperature(temp);
+                break;
+
+            case "wio/sensors/humidity":
+                float hum = Float.parseFloat(value);
+                comfortSystem.updateHumidity(hum);
+                break;
+                
+            case "wio/events/food":
+                hungerSystem.feed(value);
+                hunger = (int)hungerSystem.getHunger();
+                break;
+        }
+        calculateHappiness();
+    }
