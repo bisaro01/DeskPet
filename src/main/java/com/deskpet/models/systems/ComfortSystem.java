@@ -14,8 +14,8 @@ public class ComfortSystem {
 
 
     // Values for comfort calculations
-    private static final double COMFORT_INCREASE = 0.5;
-    private static final double COMFORT_DECREASE = 1.0;
+    private static final double COMFORT_INCREASE = 1.0;
+    private static final double COMFORT_DECREASE = 5.0;
 
     private double comfort = 100.0;
 
