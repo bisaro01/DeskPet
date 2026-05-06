@@ -1,9 +1,4 @@
-package com.deskpet.models;
-
-import com.deskpet.domain.PetDataProvider;
-import com.deskpet.models.systems.ComfortSystem;
-import com.deskpet.domain.PetStateListener;
-import com.deskpet.models.systems.HungerSystem;
+package com.deskpet.domain;
 
 public class Pet implements PetDataProvider, PetStateListener {
     private final ComfortSystem comfortSystem;

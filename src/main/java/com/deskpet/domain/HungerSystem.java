@@ -1,9 +1,8 @@
-package com.deskpet.models.systems;
+package com.deskpet.domain;
 
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class HungerSystem {
     // Values for calculating hunger

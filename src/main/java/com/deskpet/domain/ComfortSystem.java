@@ -1,4 +1,4 @@
-package com.deskpet.models.systems;
+package com.deskpet.domain;
 
 public class ComfortSystem {
     /*
