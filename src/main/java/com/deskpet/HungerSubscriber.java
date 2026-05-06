@@ -1,8 +1,6 @@
 package com.deskpet;
 
-import com.deskpet.domain.HungerListener;
 import com.deskpet.domain.PetStateListener;
-import com.deskpet.models.systems.HungerSystem;
 import javafx.application.Platform;
 import org.eclipse.paho.client.mqttv3.*;
 
@@ -13,8 +11,6 @@ public class HungerSubscriber implements MqttCallback {
     private static final String CLIENT_ID = "hunger-subscriber";
     private static final String TOPIC = "wio/events/food"; //Changed to rfid_tag topic for testing purposes
 
-    private HungerListener hungerListener;
-    private HungerSystem hungerSystem;
     private PetStateListener pet;
 
     // Constructor
@@ -29,10 +25,6 @@ public class HungerSubscriber implements MqttCallback {
         options.setAutomaticReconnect(true);
 
         mqttClient.connect(options);
-    }
-
-    public void setHungerListener(HungerListener listener) {
-        hungerListener = listener;
     }
 
     public void start() throws MqttException {
