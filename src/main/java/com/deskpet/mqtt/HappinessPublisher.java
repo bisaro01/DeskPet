@@ -1,4 +1,4 @@
-package com.deskpet;
+package com.deskpet.mqtt;
 
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;

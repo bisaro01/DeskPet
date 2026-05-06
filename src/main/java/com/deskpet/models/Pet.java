@@ -3,7 +3,6 @@ package com.deskpet.models;
 import com.deskpet.domain.PetDataProvider;
 import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.domain.PetStateListener;
-import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.models.systems.HungerSystem;
 
 public class Pet implements PetDataProvider, PetStateListener {

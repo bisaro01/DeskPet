@@ -14,8 +14,8 @@ public class ComfortSystem {
 
 
     // Values for comfort calculations
-    private static final double COMFORT_INCREASE = 0.5;
-    private static final double COMFORT_DECREASE = 1.0;
+    private static final double COMFORT_INCREASE = 1.0;
+    private static final double COMFORT_DECREASE = 5.0;
 
     private double comfort = 100.0;
 
@@ -68,27 +68,6 @@ public class ComfortSystem {
     }
 
 
-    // Method for calculating comfort levels
-    public void updateComfort(double humidity, double temperature) {
-        // Logic for humidity comfort calculation
-        if (humidity >= minHumidity && humidity <= maxHumidity) {
-            comfort += COMFORT_INCREASE;
-        } else {
-            comfort -= COMFORT_DECREASE;
-        }
-
-        // Logic for temperature comfort calculation
-        if (temperature >= minTemp && temperature <= maxTemp) {
-            comfort += COMFORT_INCREASE;
-        } else {
-            comfort -= COMFORT_DECREASE;
-        }
-
-        // stop comfort from going outside bounds 0-100
-        if (comfort > 100) {comfort = 100;}
-        if (comfort < 0) {comfort = 0;}
-    }
-
     public void updateTemperature(float currentTemp) {
         temperature = currentTemp;
     }
@@ -97,6 +76,7 @@ public class ComfortSystem {
         humidity = currentHumidity;
     }
 
+    // Method for calculating comfort levels and applying decay
     public int applyDecay(double delta) {
         if (temperature < minTemp) {
             comfort -= (COMFORT_DECREASE / 60.0) * (minTemp - temperature) * delta;
