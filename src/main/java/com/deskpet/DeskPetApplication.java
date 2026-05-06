@@ -88,7 +88,7 @@ public class DeskPetApplication extends Application {
         lastUpdate = System.currentTimeMillis();
 
         Timeline fixedUpdate = new Timeline(
-                new KeyFrame(Duration.millis(1000), e -> {
+                new KeyFrame(Duration.millis(3000), e -> {
                     long now = System.currentTimeMillis();
                     double delta = (now - lastUpdate) / 1000.0;
                     lastUpdate = now;
