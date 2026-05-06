@@ -9,7 +9,7 @@ cd ~
 echo "Installing Arduino CLI"
 apt-get install curl -y
 curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh | sh
-export PATH=$PATH:/root/bin
+export PATH=$PATH:/var/lib/gitlab-runner/bin
 echo "Arduino CLI version:"
 arduino-cli version
 
