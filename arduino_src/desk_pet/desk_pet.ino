@@ -297,8 +297,8 @@ void readRfidTag() {
     lastRfidReadTime = millis();
 
     // Ends communication with current tag
-    rfid.PICC_HaltA();
-    rfid.PCD_StopCrypto1();
+    // rfid.PICC_HaltA();
+    // rfid.PCD_StopCrypto1();
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
