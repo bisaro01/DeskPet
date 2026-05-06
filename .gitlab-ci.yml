@@ -50,4 +50,5 @@ build-wio:
   script:
     - chmod +x arduino_src/arduino-setup.sh
     - ./arduino_src/arduino-setup.sh
+    - export PATH="$PATH:/var/lib/gitlab-runner/bin"
     - arduino-cli compile --fqbn Seeeduino:samd:seeed_wio_terminal arduino_src/desk_pet
