@@ -4,7 +4,9 @@ package com.deskpet;
 
 import com.deskpet.domain.PetDataProvider;
 import com.deskpet.models.Pet;
+import com.deskpet.Database;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.time.LocalDateTime;
 
@@ -18,6 +20,15 @@ Assumes SensorData has following functions:
 - getHumidity(), returns double
  */
 public class DatabaseHandler {
+    Connection connection;
+    public DatabaseHandler() {
+        try {
+            connection = Database.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Updates the current pet_state.
     /* Assumes Class Pet exists.
     Validation must occur externally.
@@ -35,7 +46,7 @@ public class DatabaseHandler {
                 WHERE pet_id = ?
                 """;
 
-        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, pet.getHunger());
             statement.setInt(2, 100); // TODO: Change back to pet.getSocial(); in sprint 2
@@ -57,7 +68,7 @@ public class DatabaseHandler {
                 WHERE pet_id = ?
                 """;
 
-        try (Connection connection = Database.getConnection();
+        try (
             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, petId);

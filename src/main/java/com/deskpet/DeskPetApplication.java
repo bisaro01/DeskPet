@@ -22,7 +22,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
-    private final Connection db;
     private final DatabaseHandler dbHandler;
     private HappinessPublisher happinessPublisher;
     private ComfortSubscriber comfortSubscriber;
@@ -32,13 +31,6 @@ public class DeskPetApplication extends Application {
     private long lastUpdate;
 
     public DeskPetApplication() {
-        try {
-            db = Database.getConnection();
-        } catch (java.sql.SQLException e) {
-            System.out.println("Failed to create Database connection" + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
         dbHandler = new DatabaseHandler();
     }
 
