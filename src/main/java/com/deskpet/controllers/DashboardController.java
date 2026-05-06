@@ -1,15 +1,13 @@
 package com.deskpet.controllers;
 
-import com.deskpet.DatabaseHandler;
+import com.deskpet.data.DatabaseHandler;
 import com.deskpet.models.DashboardModel;
-import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ProgressBar;
 import javafx.beans.binding.Bindings;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class DashboardController {
     @FXML

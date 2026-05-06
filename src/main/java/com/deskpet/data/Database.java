@@ -1,4 +1,4 @@
-package com.deskpet;
+package com.deskpet.data;
 
 import java.io.FileInputStream;
 import java.io.IOException;

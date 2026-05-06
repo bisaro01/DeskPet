@@ -1,7 +1,8 @@
 package com.deskpet;
 
 import com.deskpet.controllers.DashboardController;
-import com.deskpet.models.Pet;
+import com.deskpet.data.DatabaseHandler;
+import com.deskpet.domain.Pet;
 import com.deskpet.models.DashboardModel;
 import com.deskpet.mqtt.ComfortSubscriber;
 import com.deskpet.mqtt.HappinessPublisher;
@@ -18,7 +19,6 @@ import javafx.util.Duration;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
