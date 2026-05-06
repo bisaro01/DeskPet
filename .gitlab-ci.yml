@@ -3,6 +3,7 @@ image: eclipse-temurin:21
 stages:
   - build
   - test
+  - build-wio
 
 variables:
   GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
@@ -39,4 +40,14 @@ build:
       - build/
   script:
     # build project
+    - chmod +x gradlew
     - ./gradlew build --no-daemon --no-configuration-cache
+
+build-wio:
+  stage: build-wio
+  tags:
+    - shell
+  script:
+    - chmod +x arduino_src/arduino-setup.sh
+    - ./arduino_src/arduino-setup.sh
+    - arduino-cli compile --fqbn Seeeduino:samd:seeed_wio_terminal arduino_src/desk_pet
