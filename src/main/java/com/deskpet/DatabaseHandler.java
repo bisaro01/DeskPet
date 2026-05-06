@@ -3,9 +3,10 @@ package com.deskpet;
 // Assumes following classes exists: SensorData, Pet
 
 import com.deskpet.domain.PetDataProvider;
-import com.deskpet.domain.SensorDataProvider;
 import com.deskpet.models.Pet;
+import com.deskpet.Database;
 
+import javax.xml.crypto.Data;
 import java.sql.*;
 import java.time.LocalDateTime;
 
@@ -19,46 +20,12 @@ Assumes SensorData has following functions:
 - getHumidity(), returns double
  */
 public class DatabaseHandler {
-    // Inserts all sensor values
-    public void insertSensorData(SensorDataProvider sensorData) throws SQLException {
-        String sql = """
-                INSERT INTO sensor_data (pet_id, sensor_type, value, recorded_at)
-                VALUES (?, ?, ?, ?)
-                """;
-        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            // Writes temperature values into the database.
-            statement.setLong(1, sensorData.getPetId());
-            statement.setString(2, "TEMPERATURE");
-            statement.setDouble(3, sensorData.getTemperature());
-            statement.setTimestamp(4, Timestamp.valueOf(sensorData.getRecordedAt().toLocalDateTime()));
-            statement.executeUpdate();
-
-            // Writes humidity values into the database.
-            statement.setLong(1, sensorData.getPetId());
-            statement.setString(2, "HUMIDITY");
-            statement.setDouble(3, sensorData.getHumidity());
-            statement.setTimestamp(4, Timestamp.valueOf(sensorData.getRecordedAt().toLocalDateTime()));
-            statement.executeUpdate();
-
-            //TODO: Write noise values into the database (Version 2)
-            //TODO: Write movement values into the database (Version 2)
-        }
-    }
-
-    // Inserts a feeding event.
-
-    public void insertFeedingEvent(long petId, long foodId, LocalDateTime fedAt) throws SQLException {
-        String sql = """
-                INSERT INTO feeding_log (pet_id, food_id, fed_at)
-                VALUES (?, ?, ?)
-                """;
-        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setLong(1, petId);
-            statement.setLong(2, foodId);
-            statement.setTimestamp(3, Timestamp.valueOf(fedAt));
-            statement.executeUpdate();
+    Connection connection;
+    public DatabaseHandler() {
+        try {
+            connection = Database.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
@@ -79,7 +46,7 @@ public class DatabaseHandler {
                 WHERE pet_id = ?
                 """;
 
-        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, pet.getHunger());
             statement.setInt(2, 100); // TODO: Change back to pet.getSocial(); in sprint 2
@@ -101,7 +68,7 @@ public class DatabaseHandler {
                 WHERE pet_id = ?
                 """;
 
-        try (Connection connection = Database.getConnection();
+        try (
             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, petId);
@@ -117,26 +84,5 @@ public class DatabaseHandler {
             }
         }
         throw new SQLException("No pet_state found for pet_id = " + petId);
-    }
-
-    // Get food_id from RFID tag.
-    public long getFoodIdFromTag(String rfidTag) throws SQLException {
-        String sql = """
-                SELECT food_id
-                FROM food
-                WHERE rfid_tag = ?
-                """;
-
-        try (Connection connection = Database.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setString(1, rfidTag);
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return resultSet.getLong("food_id");
-                }
-            }
-        }
-        throw new SQLException("No food found for RFID tag: " + rfidTag);
     }
 }
