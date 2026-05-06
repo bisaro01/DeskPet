@@ -40,13 +40,16 @@ MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 
 // RFID cooldown
 unsigned long lastRfidReadTime = 0;
-const unsigned long RFID_COOLDOWN = 5000;  // 60 seconds
+const unsigned long RFID_COOLDOWN = 5000;  // 5 second
 
 unsigned long lastSensorRead = 0;
 const unsigned long SENSOR_INTERVAL = 2000;
 
 int mood = 100;
-int lastMood = -1;
+int lastMood = -1; // 0 = sad, 1 = happy
+
+unsigned long lastMqttReconnectAttempt = 0;
+const unsigned long MQTT_RETRY_INTERVAL = 1000;
 
 // ============================  WiFi & MQTT FUNCTIONS  =======================================
 
@@ -77,21 +80,34 @@ void connectWifi() {
 }
 
 void connectMQTT() {
-    while(!client.connected()) {
-        Serial.println("Connecting to MQTT...");
+    // Already connected
+    if (client.connected()) {
+        return;
+    }
 
-        if(client.connect("WioTerminal")) {
-            Serial.println("MQTT connected.");
-            client.subscribe("app/state/happiness");
-        } else {
-            Serial.println("MQTT Connection failed.");
-            Serial.println(client.state());
-            Serial.println("Retrying in 1 second");
+    // Retry only once per second
+    if (millis() - lastMqttReconnectAttempt < MQTT_RETRY_INTERVAL) {
+        return;
+    }
 
-            delay(1000);
-        }
+    lastMqttReconnectAttempt = millis();
+
+    Serial.println("Connecting to MQTT...");
+
+    // Unique client ID
+    String clientId = "WioTerminal-" + String(random(0xffff), HEX);
+
+    if (client.connect(clientId.c_str())) {
+        Serial.println("MQTT connected.");
+
+        client.subscribe("app/state/happiness");
+    }
+    else {
+        Serial.print("MQTT Connection failed. State: ");
+        Serial.println(client.state());
     }
 }
+
 
 // ===============================  FACIAL FUNCTIONS  =========================================
 
@@ -329,6 +345,9 @@ void setup() {
     // Connect MQTT
     client.setServer(mqttServer, mqttPort);
     client.setCallback(callback);
+
+    client.setKeepAlive(15);
+    client.setSocketTimeout(3);
 }
 
 // ===================================  MAIN LOOP =========================================
@@ -339,24 +358,25 @@ void loop() {
         connectMQTT();
     } else {
         tft.drawString("MQTT: ON", 10, 10);
+        client.loop();
     }
-    client.loop();
 
     // Test code for facial expressions
     // int mood = random(0, 100);
 
-    if (mood != lastMood) {
-        lastMood = mood;
+   int currentMood = (mood < 50) ? 0 : 1;
 
-        if (mood < 50) {
-            sadFace();
-            sadSound();
-        }
-        else {
-            happyFace();
-            happySound();
-        }
-    }
+   if (currentMood != lastMood) {
+       lastMood = currentMood;
+
+       if (currentMood == 0) {
+           sadFace();
+           sadSound();
+       } else {
+           happyFace();
+           happySound();
+       }
+   }
 
     if (millis() - lastSensorRead > SENSOR_INTERVAL) {
         lastSensorRead = millis();
@@ -367,5 +387,5 @@ void loop() {
     // RFID scanner function
     readRfidTag();
 
-    delay(50);
+    delay(10);
 }
