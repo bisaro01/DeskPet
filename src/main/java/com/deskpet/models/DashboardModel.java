@@ -1,8 +1,8 @@
 package com.deskpet.models;
 
 import java.sql.SQLException;
-import com.deskpet.DatabaseHandler;
-import javafx.application.Platform;
+import com.deskpet.data.DatabaseHandler;
+import com.deskpet.domain.Pet;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 

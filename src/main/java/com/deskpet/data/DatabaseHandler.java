@@ -1,14 +1,11 @@
-package com.deskpet;
+package com.deskpet.data;
 // Imports might have to change depending on file structure
 // Assumes following classes exists: SensorData, Pet
 
 import com.deskpet.domain.PetDataProvider;
-import com.deskpet.models.Pet;
-import com.deskpet.Database;
+import com.deskpet.domain.Pet;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
-import java.time.LocalDateTime;
 
 // Handles database interactions.
 /* Assumes Class SensorData exists.
