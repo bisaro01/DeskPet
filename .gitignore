@@ -28,3 +28,7 @@ src/main/resources/config.properties
 .venv
 
 .lck
+
+# subscriber files
+./happiness-subscriber-123-tcplocalhost1883
+./happiness-subscriber-tcplocalhost1883
