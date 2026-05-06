@@ -2,9 +2,10 @@ package com.deskpet;
 
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.models.Pet;
-import com.deskpet.models.systems.ComfortSystem;
 import com.deskpet.models.DashboardModel;
-import com.deskpet.models.systems.HungerSystem;
+import com.deskpet.mqtt.ComfortSubscriber;
+import com.deskpet.mqtt.HappinessPublisher;
+import com.deskpet.mqtt.HungerSubscriber;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

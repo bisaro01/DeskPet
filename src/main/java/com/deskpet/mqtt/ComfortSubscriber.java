@@ -1,4 +1,4 @@
-package com.deskpet;
+package com.deskpet.mqtt;
 
 // talking directly to the dashboard through the comfortListener same as Happiness system
 import com.deskpet.domain.PetStateListener;

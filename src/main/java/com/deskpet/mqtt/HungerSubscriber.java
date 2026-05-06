@@ -1,4 +1,4 @@
-package com.deskpet;
+package com.deskpet.mqtt;
 
 import com.deskpet.domain.PetStateListener;
 import javafx.application.Platform;
