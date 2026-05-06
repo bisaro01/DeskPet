@@ -14,13 +14,13 @@ client = mqtt.Client()
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with code:", rc)
-    client.subscribe("deskpet/#")
+    client.subscribe("app/state/happiness")
 
 def on_message(client, userdata, msg):
     topic = msg.topic
     payload = msg.payload.decode()
 
-    if topic == "deskpet/happiness":
+    if topic == "app/state/happiness":
         try:
             state["happiness"] = float(payload)
             print("Happiness updated from app:", state["happiness"])
@@ -50,11 +50,9 @@ def loop():
         # Sends signals at random that a rfid tag has been registered
         value = random.randint(0, 100)
         if value < 10:
-            client.publish("deskpet/rfid_tag", state["rfid_tag"])
-
-        client.publish("deskpet/happiness", state["happiness"])
-        client.publish("deskpet/hunger", state["hunger"])
-        client.publish("deskpet/comfort", f"{state["humidity"]},{state["temp"]}")
+            client.publish("wio/events/food", state["rfid_tag"])
+        client.publish("wio/sensors/temperature", state["temp"])
+        client.publish("wio/sensors/humidity", state["humidity"])
 
         print(f"MOCK PET: hunger={state['hunger']:.2f}")
         print(f"MOCK PET: happiness={state['happiness']:.2f}")
