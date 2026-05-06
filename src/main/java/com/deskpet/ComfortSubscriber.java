@@ -1,9 +1,7 @@
 package com.deskpet;
 
 // talking directly to the dashboard through the comfortListener same as Happiness system
-import com.deskpet.domain.ComfortListener;
 import com.deskpet.domain.PetStateListener;
-import com.deskpet.models.systems.ComfortSystem;
 
 import javafx.application.Platform;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -21,9 +19,8 @@ public class ComfortSubscriber implements MqttCallback {
     private final static String TEMP_TOPIC = "wio/sensors/temperature";
     private final static String HUM_TOPIC = "wio/sensors/humidity";
 
-    // talking directly to the dashboard through the comfortListener same as Happiness system
-    private ComfortSystem comfortSystem;
-    private ComfortListener comfortListener;
+
+    // talking directly to the dashboard through the PetStateListener
     private PetStateListener pet;
 
 

@@ -1,17 +1,12 @@
 package com.deskpet.models;
 
 import java.sql.SQLException;
-
 import com.deskpet.DatabaseHandler;
-import com.deskpet.domain.ComfortListener;
-import com.deskpet.domain.HappinessListener;
-import com.deskpet.domain.HungerListener;
-
 import javafx.application.Platform;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 
-public class DashboardModel implements HappinessListener, ComfortListener, HungerListener {
+public class DashboardModel {
     private final FloatProperty happiness = new SimpleFloatProperty(1);
     private final FloatProperty hunger = new SimpleFloatProperty(1);
     private final FloatProperty comfort = new SimpleFloatProperty(1);
@@ -62,30 +57,6 @@ public class DashboardModel implements HappinessListener, ComfortListener, Hunge
 
     public FloatProperty comfortProperty() {
         return comfort;
-    }
-
-    @Override
-    public void updateHappiness(double value) {
-        Platform.runLater(() -> {
-            happiness.set(Math.clamp((float)(value / 100.0), 0.0f, 1.0f));
-            System.out.println("model: " + happiness);
-        });
-    }
-
-    @Override
-    public void updateComfort(double value) {
-        Platform.runLater(() -> {
-            comfort.set(Math.clamp((float) (value / 100.0F), 0.0F, 1.0F));
-            System.out.println("comfort: " + comfort);
-        });
-    }
-
-    @Override
-    public void updateHunger(double value) {
-        Platform.runLater(() -> {
-            hunger.set(Math.clamp((float)(value / 100.0F), 0.0f, 1.0f));
-            System.out.println("hunger: " + hunger);
-        });
     }
 
     public void updateState(Pet pet) throws SQLException {
