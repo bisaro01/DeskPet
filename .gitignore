@@ -29,6 +29,7 @@ src/main/resources/config.properties
 
 .lck
 
-# subscriber files
-./happiness-subscriber-123-tcplocalhost1883
-./happiness-subscriber-tcplocalhost1883
+# MQTT runtime artifacts
+happiness-subscriber-*
+comfort-subscriber-*
+hunger-subscriber-*
