@@ -323,6 +323,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 }
 
+void readPirSensor() {
+    int pirState = digitalRead(PIRPIN);
+
+    // Trigger a publish only if motion detected
+    if(pirState == HIGH) {
+
+        // Reduce spam reading
+        if(millis() - lastPirRead > PIR_INTERVAL) {
+            client.publish("wio/sensors/movement", "1");
+            lastPirRead = millis();
+        }
+    }
+}
 // ==================================  SET UP STAGE  =========================================
 // Main set up
 void setup() {
@@ -392,6 +405,7 @@ void loop() {
 
     // RFID scanner function
     readRfidTag();
+    readPirSensor()
 
     delay(10);
 }
