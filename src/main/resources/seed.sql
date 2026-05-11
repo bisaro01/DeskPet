@@ -12,7 +12,7 @@ VALUES (1, 'Fish', '2A:88:64:06', 40),
        (2, 'Cookie', '9C:DA:6C:06', 40);
 
 INSERT INTO pet_food_preferences (pet_id, liked_food, disliked_food)
-VALUES (1, 1, 2)
+VALUES (1, 1, 2);
 
 INSERT INTO sensor_data (sensor_data_id, pet_id, sensor_type, value, recorded_at)
 VALUES (1, 1, 'TEMPERATURE', 21.5, CURRENT_TIMESTAMP - INTERVAL '20 minutes'),
