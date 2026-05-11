@@ -12,6 +12,7 @@ import com.deskpet.models.DashboardModel;
 import com.deskpet.mqtt.ComfortSubscriber;
 import com.deskpet.mqtt.HappinessPublisher;
 import com.deskpet.mqtt.HungerSubscriber;
+import com.deskpet.mqtt.SocialSubscriber;
 
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -27,6 +28,7 @@ public class DeskPetApplication extends Application {
     private final DatabaseHandler dbHandler;
     private HappinessPublisher happinessPublisher;
     private ComfortSubscriber comfortSubscriber;
+    private SocialSubscriber socialSubscriber;
     private HungerSubscriber hungerSubscriber;
     private Pet pet;
 
@@ -55,6 +57,7 @@ public class DeskPetApplication extends Application {
                 System.out.println("Happiness: " + pet.getHappiness());
                 System.out.println("Hunger: " + pet.getHunger());
                 System.out.println("Comfort: " + pet.getComfort());
+                System.out.println("Social: " + pet.getSocial());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -87,6 +90,15 @@ public class DeskPetApplication extends Application {
             throw new RuntimeException(e);
         }
 
+        try {
+            socialSubscriber = new SocialSubscriber(pet);
+            socialSubscriber.start();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create SocialSubscriber" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
         lastUpdate = System.currentTimeMillis();
 
         Timeline fixedUpdate = new Timeline(
@@ -112,6 +124,7 @@ public class DeskPetApplication extends Application {
                     System.out.println("----------------------------------");
                     System.out.println("Happiness: " + pet.getHappiness());
                     System.out.println("Comfort: " + pet.getComfort());
+                    System.out.println("Social: " + pet.getSocial());
                     System.out.println("Hunger: " + pet.getHunger());
                 })
         );
@@ -140,6 +153,13 @@ public class DeskPetApplication extends Application {
             if (comfortSubscriber != null) {
                 try {
                     comfortSubscriber.stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (socialSubscriber != null) {
+                try {
+                    socialSubscriber.stop();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

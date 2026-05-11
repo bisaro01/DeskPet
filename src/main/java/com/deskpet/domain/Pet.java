@@ -119,7 +119,7 @@ public class Pet implements PetDataProvider, PetStateListener {
                 hunger = (int)hungerSystem.getHunger();
                 break;
             case "wio/sensors/sound":  
-                int soundDecibels = Integer.parseInt(value);
+                int soundDecibels = Integer.parseInt(value);  
                 socialSystem.updateSocial(soundDecibels);
                 social = (int)socialSystem.getSocial();
                 break;

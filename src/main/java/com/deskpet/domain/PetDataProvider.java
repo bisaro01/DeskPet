@@ -13,7 +13,7 @@ Assumes Pet has following functions:
 public interface PetDataProvider {
     int getHunger();
 
-    //int getSocial();
+    int getSocial();
 
     int getComfort();
 

@@ -63,22 +63,20 @@ public class DatabaseHandler {
     */
     public Pet loadPet(long petId) throws SQLException {
         String sql = """
-                SELECT hunger, comfort 
+                SELECT hunger, social, comfort 
                 FROM pet_state
                 WHERE pet_id = ?
                 """;
 
-        try (
-            PreparedStatement statement = connection.prepareStatement(sql)) {
-
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, petId);
-
+            
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     int hunger = resultSet.getInt("hunger");
-                    int social = resultSet.getInt("social"); 
+                    int social = resultSet.getInt("social");   
                     int comfort = resultSet.getInt("comfort");
-
+                    
                     return new Pet(petId, hunger, social, comfort);
                 }
             }
