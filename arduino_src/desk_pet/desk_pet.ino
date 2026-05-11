@@ -31,6 +31,8 @@ PubSubClient client(wifiClient);
 #define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
 #define RFID_RST_PIN 0      // Change depending on physical build connections
 #define RFID_SS_PIN 1      // Change depending on physical build connections
+#define SOUND_SENSOR_PIN A0  
+#define NOISE_INTERVAL 3000   // Sends noise level every 3 seconds
 
 
 // <<< OTHER INSTANCES >>>
