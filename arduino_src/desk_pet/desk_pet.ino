@@ -35,17 +35,18 @@ PubSubClient client(wifiClient);
 
 
 // <<< OTHER INSTANCES >>>
-TFT_eSPI tft;               // Graphical drawing object
-DHT dht(DHTPIN, DHTTYPE);   // Humidity and temperature object
+TFT_eSPI tft;                               // Graphical drawing object
+DHT dht(DHTPIN, DHTTYPE);                   // Humidity and temperature object
 MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 
 // RFID cooldown
 unsigned long lastRfidReadTime = 0;
-const unsigned long RFID_COOLDOWN = 5000;  // 5 second
+const unsigned long RFID_COOLDOWN = 5000;   // 5 second
 
 // PIR cooldown
-unsigned long lastPirRead = 0;
-const unsigned long PIR_INTERVAL = 3000;    // 3 second
+int lastPirState = LOW;
+unsigned long lastPirEvent = 0;
+const unsigned long PIR_COOLDOWN = 3000;    // 3 second
 
 unsigned long lastSensorRead = 0;
 const unsigned long SENSOR_INTERVAL = 2000;
@@ -324,17 +325,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 void readPirSensor() {
-    int pirState = digitalRead(PIRPIN);
+    int currentPirState = digitalRead(PIRPIN);
 
-    // Trigger a publish only if motion detected
-    if(pirState == HIGH) {
+    // Trigger a publish only if state changes
+    if(currentPirState == HIGH && lastPirState == LOW) {
 
-        // Reduce spam reading
-        if(millis() - lastPirRead > PIR_INTERVAL) {
+        // Reduce MQTT spam
+        if(millis() - lastPirEvent > PIR_COOLDOWN) {
             client.publish("wio/sensors/movement", "1");
-            lastPirRead = millis();
+            lastPirEvent = millis();
         }
     }
+    lastPirState = currentPirState;
 }
 // ==================================  SET UP STAGE  =========================================
 // Main set up
