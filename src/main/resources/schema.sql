@@ -4,12 +4,6 @@ CREATE TABLE IF NOT EXISTS pet (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
-CREATE TABLE IF NOT EXISTS pet_preferences (
-    pet_id BIGINT PRIMARY KEY REFERENCES pet(pet_id),
-    liked_food VARCHAR(50),
-    disliked_food VARCHAR(50)
-)
-
 CREATE TABLE IF NOT EXISTS pet_state (
     pet_id BIGINT PRIMARY KEY REFERENCES pet(pet_id),
     hunger INTEGER NOT NULL CHECK (hunger BETWEEN 0 AND 100),
@@ -34,6 +28,12 @@ CREATE TABLE IF NOT EXISTS food (
     rfid_tag VARCHAR(100) UNIQUE NOT NULL,
     hunger_gain INTEGER DEFAULT 40
     );
+
+CREATE TABLE IF NOT EXISTS pet_food_preferences (
+    pet_id BIGINT PRIMARY KEY REFERENCES pet(pet_id),
+    liked_food REFERENCES food(food_id),
+    disliked_food REFERENCES food(food_id)
+    )
 
 CREATE TABLE IF NOT EXISTS feeding_log (
     feeding_id BIGSERIAL PRIMARY KEY,

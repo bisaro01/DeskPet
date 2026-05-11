@@ -4,15 +4,15 @@ TRUNCATE TABLE feeding_log, sensor_data, pet_state, food, pet RESTART IDENTITY C
 INSERT INTO pet (pet_id, name, created_at)
 VALUES (1, 'Bob', CURRENT_TIMESTAMP);
 
-INSERT INTO pet_food_preferences (pet_id, liked_food, disliked_food)
-VALUES (1, 'Fish', 'Cookie')
-
 INSERT INTO pet_state (pet_id, hunger, social, comfort, happiness, updated_at)
 VALUES (1, 80, 75, 85, 80, CURRENT_TIMESTAMP);
 
 INSERT INTO food (food_id, name, rfid_tag, hunger_gain)
 VALUES (1, 'Fish', '2A:88:64:06', 40),
        (2, 'Cookie', '9C:DA:6C:06', 40);
+
+INSERT INTO pet_food_preferences (pet_id, liked_food, disliked_food)
+VALUES (1, 1, 2)
 
 INSERT INTO sensor_data (sensor_data_id, pet_id, sensor_type, value, recorded_at)
 VALUES (1, 1, 'TEMPERATURE', 21.5, CURRENT_TIMESTAMP - INTERVAL '20 minutes'),
