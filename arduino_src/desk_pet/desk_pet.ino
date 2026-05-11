@@ -407,6 +407,7 @@ void loop() {
 
     // RFID scanner function
     readRfidTag();
+    // PIR motion function
     readPirSensor()
 
     delay(10);
