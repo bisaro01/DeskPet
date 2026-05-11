@@ -103,4 +103,23 @@ public class DatabaseHandler {
         }
         throw new SQLException("No hunger gain found for rfid_tag = " + rfidTag);
     }
+
+    public void appendFeedingLog(long petId, long foodId) throws SQLException {
+        String sql = """
+                INSERT INTO feeding_log(pet_id, food_id, fed_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP)
+            """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+            statement.setLong(2, foodId);
+
+            int rowsAffected = statement.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new SQLException("No feeding log found for pet_id = " + petId);
+            }
+        }
+    }
 }
