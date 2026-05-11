@@ -2,10 +2,13 @@ package com.deskpet.data;
 // Imports might have to change depending on file structure
 // Assumes following classes exists: SensorData, Pet
 
-import com.deskpet.domain.PetDataProvider;
-import com.deskpet.domain.Pet;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-import java.sql.*;
+import com.deskpet.domain.Pet;
+import com.deskpet.domain.PetDataProvider;
 
 // Handles database interactions.
 /* Assumes Class SensorData exists.
@@ -73,10 +76,10 @@ public class DatabaseHandler {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     int hunger = resultSet.getInt("hunger");
-                    // int social = resultSet.getInt("social"); TODO: Add back in sprint 2
+                    int social = resultSet.getInt("social"); 
                     int comfort = resultSet.getInt("comfort");
 
-                    return new Pet(petId, hunger, comfort);
+                    return new Pet(petId, hunger, social, comfort);
                 }
             }
         }

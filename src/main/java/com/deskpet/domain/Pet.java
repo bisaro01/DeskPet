@@ -52,7 +52,7 @@ public class Pet implements PetDataProvider, PetStateListener {
         return hunger;
     }
 
-    @Override
+    // @Override
     public int getSocial() {
        return social;
    }
@@ -119,7 +119,8 @@ public class Pet implements PetDataProvider, PetStateListener {
                 hunger = (int)hungerSystem.getHunger();
                 break;
             case "wio/sensors/sound":  
-                socialSystem.updateSocial(value);  
+                int soundDecibels = Integer.parseInt(value);
+                socialSystem.updateSocial(soundDecibels);
                 social = (int)socialSystem.getSocial();
                 break;
             default:

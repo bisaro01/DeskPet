@@ -1,5 +1,10 @@
 package com.deskpet;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.data.DatabaseHandler;
 import com.deskpet.domain.Pet;
@@ -7,6 +12,7 @@ import com.deskpet.models.DashboardModel;
 import com.deskpet.mqtt.ComfortSubscriber;
 import com.deskpet.mqtt.HappinessPublisher;
 import com.deskpet.mqtt.HungerSubscriber;
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -16,10 +22,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
     private final DatabaseHandler dbHandler;
@@ -47,7 +49,7 @@ public class DeskPetApplication extends Application {
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
-                pet = new Pet(1, 80, 80);
+                pet = new Pet(1, 80, 80, 80);
             } else {
                 System.out.println("Loaded pet 1:");
                 System.out.println("Happiness: " + pet.getHappiness());

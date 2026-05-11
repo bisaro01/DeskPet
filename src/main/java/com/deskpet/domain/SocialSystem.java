@@ -52,14 +52,12 @@ public class SocialSystem {
     }
     
     public void updateSocial(int noiseDecibels) {
-        int noiseDecibels = Integer.parseInt(noiseDecibels);  
-
         if (noiseDecibels > soundThreshold) {
             double increase = ((noiseDecibels - soundThreshold) / 10.0) * soundIncreasePer10Db;
             setSocial(social + increase);  
             lastSoundTime = System.currentTimeMillis();
             
-            System.out.println("Sound detected.");
+            System.out.println("Sound detected (" + noiseDecibels + "dB).");
         }
 }
     
