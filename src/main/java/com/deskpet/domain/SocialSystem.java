@@ -52,11 +52,25 @@ public class SocialSystem {
     }
     
     public void updateSocial(int noiseDecibels) {
-        if (noiseDecibels > soundThreshold) { // Checks if sound is loud enough
-            double increase = ((noiseDecibels - soundThreshold) / 10.0) * soundIncreasePer10Db;
-            social += increase;
-            lastSoundTime = System.currentTimeMillis();
-            
-            System.out.println("Sound detected.");
-        }
+    if (noiseDecibels > soundThreshold) {
+        double increase = ((noiseDecibels - soundThreshold) / 10.0) * soundIncreasePer10Db;
+        setSocial(social + increase);  
+        lastSoundTime = System.currentTimeMillis();
+        
+        System.out.println("Sound detected.");
     }
+}
+    
+    public int applyDecay(double delta) {
+        long currentTime = System.currentTimeMillis();
+        double minutesSinceSound = (currentTime - lastSoundTime) / 60000.0;
+        
+        // Start decaying after 30 seconds of no sound
+        if (minutesSinceSound > 0.5) {
+            double decay = decayRatePerMinute * (delta / 60.0);
+            social -= decay;
+        }
+        
+        return (int)social;
+    }
+}
