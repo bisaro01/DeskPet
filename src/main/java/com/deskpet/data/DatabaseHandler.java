@@ -76,7 +76,7 @@ public class DatabaseHandler {
                     // int social = resultSet.getInt("social"); TODO: Add back in sprint 2
                     int comfort = resultSet.getInt("comfort");
 
-                    return new Pet(petId, hunger, comfort);
+                    return new Pet(petId, hunger, comfort, this);
                 }
             }
         }
