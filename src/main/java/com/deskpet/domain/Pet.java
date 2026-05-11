@@ -1,5 +1,7 @@
 package com.deskpet.domain;
 
+import com.deskpet.data.DatabaseHandler;
+
 public class Pet implements PetDataProvider, PetStateListener {
     private final ComfortSystem comfortSystem;
     private final HungerSystem hungerSystem;
@@ -10,13 +12,13 @@ public class Pet implements PetDataProvider, PetStateListener {
     private int comfort;
     private int happiness;
 
-    public Pet(long petId, int hunger, int comfort) {
+    public Pet(long petId, int hunger, int comfort, DatabaseHandler dbHandler) {
         this.petId = petId;
         this.hunger = hunger;
         //this.social = social;
         this.comfort = comfort;
         comfortSystem = new ComfortSystem();
-        hungerSystem = new HungerSystem();
+        hungerSystem = new HungerSystem(dbHandler);
         calculateHappiness();
     }
 

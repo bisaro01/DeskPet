@@ -1,12 +1,15 @@
 package com.deskpet.domain;
 
+import java.sql.SQLException;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import com.deskpet.data.DatabaseHandler;
 
 public class HungerSystem {
     // Values for calculating hunger
     private double hunger = 100.0;
+    private DatabaseHandler dbHandler;
 
     // How much hunger decreases per second (-0.4 per minute, 0.4/60.0)
     private static final double hunger_decrease = 1.0; // For demo purposes
@@ -23,6 +26,10 @@ public class HungerSystem {
             "9C:DA:6C:06",
             "2A:88:64:06");
 
+    public HungerSystem(DatabaseHandler dbHandler) {
+        this.dbHandler = dbHandler;
+    }
+
     // Returns current hunger value
     public double getHunger() {
         return hunger;
@@ -31,7 +38,12 @@ public class HungerSystem {
     public void feed(String rfidTag) {
 
         if (foodTags.contains(rfidTag)) {
-            hunger += hunger_increase;
+            try {
+                double hunger_increase = dbHandler.getHungerGain(rfidTag);
+                hunger += hunger_increase;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         if (hunger > 100) {hunger = 100;}
