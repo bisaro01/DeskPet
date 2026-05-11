@@ -52,14 +52,19 @@ public class SocialSystem {
     }
     
     public void updateSocial(int noiseDecibels) {
-        if (noiseDecibels > soundThreshold) {
-            double increase = ((noiseDecibels - soundThreshold) / 10.0) * soundIncreasePer10Db;
-            setSocial(social + increase);
-            lastSoundTime = System.currentTimeMillis();
-            
-            System.out.println("Sound detected (" + noiseDecibels + "dB)");
-        }
+    if (noiseDecibels >= 30 && noiseDecibels <= 100) {
+        double increase = 1.0;  // +1 social per minute of acceptable noise
+        setSocial(social + increase);
+        lastSoundTime = System.currentTimeMillis();
+        System.out.println("Sound: (" + noiseDecibels + "dB). Social +");
+    } 
+    else if (noiseDecibels > 100) {
+        double decrease = ((noiseDecibels - 100) / 10.0) * 1.5;  
+        setSocial(social - decrease);
+        lastSoundTime = System.currentTimeMillis();
+        System.out.println("Too loud (" + noiseDecibels + "dB)! Social -");
     }
+}
     
     public int applyDecay(double delta) {
         long currentTime = System.currentTimeMillis();
