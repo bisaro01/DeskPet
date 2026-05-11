@@ -30,7 +30,8 @@ PubSubClient client(wifiClient);
 #define BUZZER WIO_BUZZER   // Inbuilt buzzer
 #define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
 #define RFID_RST_PIN 0      // Change depending on physical build connections
-#define RFID_SS_PIN 1      // Change depending on physical build connections
+#define RFID_SS_PIN 1       // Change depending on physical build connections
+#define PIRPIN 3            // PIR motion sensor pin D3 on WIO diagram
 
 
 // <<< OTHER INSTANCES >>>
@@ -41,6 +42,10 @@ MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 // RFID cooldown
 unsigned long lastRfidReadTime = 0;
 const unsigned long RFID_COOLDOWN = 5000;  // 5 second
+
+// PIR cooldown
+unsigned long lastPirRead = 0;
+const unsigned long PIR_INTERVAL = 3000;    // 3 second
 
 unsigned long lastSensorRead = 0;
 const unsigned long SENSOR_INTERVAL = 2000;
@@ -323,6 +328,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void setup() {
     // <<< PINS / HARDWARE >>>
     pinMode(BUZZER, OUTPUT);
+    pinMode(PIRPIN, INPUT);
 
 
     // Start serial (Arduino IDE terminal)
@@ -364,19 +370,19 @@ void loop() {
     // Test code for facial expressions
     // int mood = random(0, 100);
 
-   int currentMood = (mood < 50) ? 0 : 1;
+    int currentMood = (mood < 50) ? 0 : 1;
 
-   if (currentMood != lastMood) {
-       lastMood = currentMood;
+    if (currentMood != lastMood) {
+        lastMood = currentMood;
 
-       if (currentMood == 0) {
-           sadFace();
-           sadSound();
-       } else {
-           happyFace();
-           happySound();
-       }
-   }
+        if (currentMood == 0) {
+            sadFace();
+            sadSound();
+        } else {
+            happyFace();
+            happySound();
+        }
+    }
 
     if (millis() - lastSensorRead > SENSOR_INTERVAL) {
         lastSensorRead = millis();
