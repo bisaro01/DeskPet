@@ -8,9 +8,6 @@ public class SocialSystem {
     private double social = 100.0;
     private long lastSoundTime = System.currentTimeMillis();
 
-    // movement tracking
-    private long lastMovementTime = System.currentTimeMillis();
-
     
     public SocialSystem() {
         social = 100.0;
@@ -55,10 +52,6 @@ public class SocialSystem {
         this.decayRatePerMinute = value;
     }
 
-    public void onMovement() {
-        lastMovementTime = System.currentTimeMillis();
-    }
-
     public void updateSocial(int noiseDecibels) {
         if (noiseDecibels > soundThreshold) {
             double increase = ((noiseDecibels - soundThreshold) / 10.0) * soundIncreasePer10Db;
@@ -72,16 +65,11 @@ public class SocialSystem {
     public int applyDecay(double delta) {
         long currentTime = System.currentTimeMillis();
         double minutesSinceSound = (currentTime - lastSoundTime) / 60000.0;
-        double minutesSinceMovement = (currentTime - lastMovementTime) / 60000.0;
         
         // Start decaying after 30 seconds of no sound
         if (minutesSinceSound > 0.5) {
             double decay = decayRatePerMinute * (delta / 60.0);
             social -= decay;
-        }
-
-        if (minutesSinceMovement < 1.0) {
-            social += delta / 60.0;
         }
 
         if (social > 100) {social = 100;}

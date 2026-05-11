@@ -54,8 +54,8 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     // @Override
     public int getSocial() {
-       return social;
-   }
+        return social;
+    }
 
     @Override
     public int getComfort() {
@@ -79,16 +79,16 @@ public class Pet implements PetDataProvider, PetStateListener {
         calculateHappiness();
     }
 
-   public void setSocial(int social) {
-       if (social > 100) {
-           this.social = 100;
-       } else if (social < 0) {
-           this.social = 0;
-       } else {
-           this.social = social;
-       }
-       calculateHappiness();
-   }
+    public void setSocial(int social) {
+        if (social > 100) {
+            this.social = 100;
+        } else if (social < 0) {
+            this.social = 0;
+        } else {
+            this.social = social;
+        }
+        calculateHappiness();
+    }
 
     public void setComfort(int comfort) {
         if (comfort > 100) {
@@ -118,6 +118,7 @@ public class Pet implements PetDataProvider, PetStateListener {
                 hungerSystem.feed(value);
                 hunger = (int)hungerSystem.getHunger();
                 break;
+
             case "wio/sensors/sound":  
                 int soundDecibels = Integer.parseInt(value);  
                 socialSystem.updateSocial(soundDecibels);
