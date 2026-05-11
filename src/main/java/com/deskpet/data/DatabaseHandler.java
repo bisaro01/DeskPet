@@ -104,6 +104,27 @@ public class DatabaseHandler {
         throw new SQLException("No hunger gain found for rfid_tag = " + rfidTag);
     }
 
+    public Long getFoodId(String rfidTag) throws SQLException {
+        String sql = """
+                SELECT rfid_tag, food_id
+                FROM food
+                WHERE rfid_tag = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, rfidTag);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    long food_id = resultSet.getLong("food_id");
+                    return food_id;
+                }
+            }
+        }
+        throw new SQLException("No food id found for rfid_tag = " + rfidTag);
+    }
+
     public void appendFeedingLog(long petId, long foodId) throws SQLException {
         String sql = """
                 INSERT INTO feeding_log(pet_id, food_id, fed_at)

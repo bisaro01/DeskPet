@@ -114,7 +114,7 @@ public class Pet implements PetDataProvider, PetStateListener {
                 break;
 
             case "wio/events/food":
-                hungerSystem.feed(value);
+                hungerSystem.feed(value, petId);
                 hunger = (int)hungerSystem.getHunger();
                 break;
             default:
