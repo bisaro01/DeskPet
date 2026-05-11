@@ -54,6 +54,12 @@ def loop():
         client.publish("wio/sensors/temperature", state["temp"])
         client.publish("wio/sensors/humidity", state["humidity"])
 
+        # MOTION simulation (PIR)
+        motion_chance = random.randint(0, 100)
+        if motion_chance < 30:  # ~30% chance per loop
+            print("MOCK: motion detected")
+            client.publish("wio/sensors/motion", "1")
+
         print(f"MOCK PET: hunger={state['hunger']:.2f}")
         print(f"MOCK PET: happiness={state['happiness']:.2f}")
         print(f"MOCK PET: humidty={state['humidity']:.2f}, temp={state['temp']:.2f}")

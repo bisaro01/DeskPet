@@ -49,7 +49,7 @@ public class DatabaseHandler {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, pet.getHunger());
-            statement.setInt(2, 100); // TODO: Change back to pet.getSocial(); in sprint 2
+            statement.setInt(2, pet.getSocial());
             statement.setInt(3, pet.getComfort());
             statement.setInt(4, pet.getHappiness());
             statement.setLong(5, pet.getPetId());

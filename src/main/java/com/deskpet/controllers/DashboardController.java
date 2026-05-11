@@ -16,6 +16,8 @@ public class DashboardController {
     private ProgressBar hungerBar;
     @FXML
     private ProgressBar comfortBar;
+    @FXML
+    private ProgressBar socialBar;
 
     // Creates a background scheduler that can run tasks later or repeatedly
     private final ScheduledExecutorService scheduler =
@@ -54,5 +56,7 @@ public class DashboardController {
         bindProgressBarWithColor(hungerBar, model.hungerProperty());
 
         bindProgressBarWithColor(comfortBar, model.comfortProperty());
+
+        bindProgressBarWithColor(socialBar, model.socialProperty());
     }
 }
