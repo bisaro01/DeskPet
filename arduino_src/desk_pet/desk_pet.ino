@@ -31,8 +31,7 @@ PubSubClient client(wifiClient);
 #define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
 #define RFID_RST_PIN 0      // Change depending on physical build connections
 #define RFID_SS_PIN 1      // Change depending on physical build connections
-#define SOUND_SENSOR_PIN A0 // Sound sensor
-const char* mqttNoiseTopic = "wio/sensors/noise";
+#define SOUND_SENSOR_PIN A0 // Sound sensor pin A0
 
 
 // <<< OTHER INSTANCES >>>
@@ -54,9 +53,9 @@ unsigned long lastMqttReconnectAttempt = 0;
 const unsigned long MQTT_RETRY_INTERVAL = 1000;
 
 // Noise levels
-int previousNoiseDecibels = -1;  // Start with no previous value
-unsigned long lastNoiseReadTime = 0;
-const unsigned long NOISE_READ_INTERVAL = 1000;  // Read every second
+int previousNoiseDecibels = 0; // Last noise value
+unsigned long lastNoiseReadTime = 0; // Last time noise was read
+const unsigned long NOISE_READ_INTERVAL = 3000;  // Read noise level every 3 seconds
 
 // ============================  WiFi & MQTT FUNCTIONS  =======================================
 
@@ -309,20 +308,21 @@ void readRfidTag() {
 }
 
 void readNoiseLevel() {
-    // Read raw sound value (0-1023)
-    int rawSoundValue = analogRead(SOUND_SENSOR_PIN);
+    const char* mqttNoiseTopic = "wio/sensors/noise";
+    int rawSoundValue = analogRead(SOUND_SENSOR_PIN); // Read raw sound value (0-1023)
     
     // Map raw value (0-1023) to around 40-100 dB 
     int noiseDecibels = map(rawSoundValue, 0, 1023, 40, 100);
     
-    // Publish if decibel change is more than 3dB 
-    if (abs(noiseDecibels - previousNoiseDecibels) > 3) {
-        previousNoiseDecibels = noiseDecibels;
-        client.publish(mqttNoiseTopic, String(noiseDecibels).c_str());
-        
-        Serial.print("Noise level: ");
-        Serial.print(noiseDecibels);
-        Serial.println(" dB");
+    // Ignore readings that happen at the extremes (0-10 and 1013-1023)
+    if (rawSoundValue > 10 && rawSoundValue < 1013) { 
+        if (abs(noiseDecibels - previousNoiseDecibels) > 3) {
+            previousNoiseDecibels = noiseDecibels;
+            client.publish(mqttNoiseTopic, String(noiseDecibels).c_str());
+            Serial.print("Noise level: ");
+            Serial.print(noiseDecibels);
+            Serial.println(" dB");
+        }
     }
 }
 
@@ -407,6 +407,12 @@ void loop() {
         lastSensorRead = millis();
         // Temperature and humidity test
         readTempHumidity();
+    }
+
+    // Read noise sensor 
+    if (millis() - lastNoiseReadTime > NOISE_READ_INTERVAL) {
+        lastNoiseReadTime = millis();
+        readNoiseLevel();
     }
 
     // RFID scanner function
