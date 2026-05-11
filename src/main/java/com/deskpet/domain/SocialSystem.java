@@ -50,3 +50,13 @@ public class SocialSystem {
     public void setDecayRatePerMinute(double value) {
         this.decayRatePerMinute = value;
     }
+    
+    public void updateSocial(int noiseDecibels) {
+        if (noiseDecibels > soundThreshold) { // Checks if sound is loud enough
+            double increase = ((noiseDecibels - soundThreshold) / 10.0) * soundIncreasePer10Db;
+            social += increase;
+            lastSoundTime = System.currentTimeMillis();
+            
+            System.out.println("Sound detected.");
+        }
+    }
