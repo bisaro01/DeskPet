@@ -12,7 +12,7 @@ public class HungerSystem {
     private static final double hunger_decrease = 1.0; // For demo purposes
 
     // How much hunger increases when valid RFID tag is read
-    private static final double hunger_increase = 40.0;
+    //private static final double hunger_increase = 40.0;
 
 
     // Scheduler to repeatedly decrease hunger over time
@@ -29,6 +29,7 @@ public class HungerSystem {
     }
 
     public void feed(String rfidTag) {
+
         if (foodTags.contains(rfidTag)) {
             hunger += hunger_increase;
         }

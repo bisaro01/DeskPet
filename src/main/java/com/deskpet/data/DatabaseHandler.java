@@ -82,4 +82,25 @@ public class DatabaseHandler {
         }
         throw new SQLException("No pet_state found for pet_id = " + petId);
     }
+
+    public Double getHungerGain(String rfidTag) throws SQLException {
+        String sql = """
+                SELECT rfid_tag, hunger_gain
+                FROM food
+                WHERE rfid_tag = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, rfidTag);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    double hunger_gain = resultSet.getDouble("hunger_gain");
+                    return hunger_gain;
+                }
+            }
+        }
+        throw new SQLException("No hunger gain found for rfid_tag = " + rfidTag);
+    }
 }
