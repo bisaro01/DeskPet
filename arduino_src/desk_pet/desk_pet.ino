@@ -59,7 +59,7 @@ unsigned long lastMqttReconnectAttempt = 0;
 const unsigned long MQTT_RETRY_INTERVAL = 1000;
 
 // Noise levels
-int previousNoiseDecibels = 0; // Last noise value
+int previousNoiseDecibels = -1; 
 unsigned long lastNoiseReadTime = 0; // Last time noise was read
 const unsigned long NOISE_READ_INTERVAL = 3000;  // Read noise level every 3 seconds
 
@@ -314,7 +314,7 @@ void readRfidTag() {
 }
 
 void readNoiseLevel() {
-    const char* mqttNoiseTopic = "wio/sensors/noise";
+    const char* mqttNoiseTopic = "wio/sensors/sound";
     int rawSoundValue = analogRead(SOUND_SENSOR_PIN); // Read raw sound value (0-1023)
 
     // Map raw value (0-1023) to around 40-100 dB
@@ -439,7 +439,7 @@ void loop() {
     // RFID scanner function
     readRfidTag();
     // PIR motion function
-    readPirSensor()
+    readPirSensor();
 
     delay(10);
 }
