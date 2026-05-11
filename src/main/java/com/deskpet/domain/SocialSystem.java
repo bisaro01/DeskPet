@@ -2,7 +2,7 @@ package com.deskpet.domain;
 
 public class SocialSystem {
     private double soundIncreasePer10Db = 1.5;
-    private double decayRatePerMinute = 2.0;
+    private double decayRatePerMinute = 60.0;
     private double soundThreshold = 40.0;
     
     private double social = 100.0;
@@ -60,6 +60,11 @@ public class SocialSystem {
             
             System.out.println("Sound detected (" + noiseDecibels + "dB)");
         }
+    }
+
+    public void onMovement() {
+        setSocial(social + 10);
+        System.out.println("Movement detected");
     }
     
     public int applyDecay(double delta) {

@@ -124,6 +124,13 @@ public class Pet implements PetDataProvider, PetStateListener {
                 socialSystem.updateSocial(soundDecibels);
                 social = (int)socialSystem.getSocial();
                 break;
+
+            case "wio/sensors/motion":
+                if (value.equals("1")) {
+                    socialSystem.onMovement();
+                }
+                break;
+            
             default:
                 break;
         }
