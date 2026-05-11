@@ -46,15 +46,19 @@ public class SocialSubscriber implements MqttCallback {
         }
     }
 
-
+    // Mandatory MqttCallback abstract methods
     @Override
     public void connectionLost(Throwable cause) {
-
+        System.out.println("Connection lost: " + cause.getMessage());
     }
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
+        String payload = new String(message.getPayload());
 
+        Platform.runLater(() -> {
+            pet.updateNeed(topic, payload);
+        });
     }
 
     @Override
