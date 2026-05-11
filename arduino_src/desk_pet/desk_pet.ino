@@ -31,7 +31,7 @@ PubSubClient client(wifiClient);
 #define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
 #define RFID_RST_PIN 0      // Change depending on physical build connections
 #define RFID_SS_PIN 1       // Change depending on physical build connections
-#define SOUND_SENSOR_PIN A0 // Sound sensor pin A0
+#define SOUND_SENSOR_PIN A3 // Sound sensor pin A3
 #define PIRPIN 3            // PIR motion sensor pin D3 on WIO diagram
 
 
