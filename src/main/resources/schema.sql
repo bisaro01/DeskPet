@@ -4,6 +4,12 @@ CREATE TABLE IF NOT EXISTS pet (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
+CREATE TABLE IF NOT EXISTS pet_preferences (
+    pet_id BIGINT PRIMARY KEY REFERENCES pet(pet_id),
+    liked_food VARCHAR(50),
+    disliked_food VARCHAR(50)
+)
+
 CREATE TABLE IF NOT EXISTS pet_state (
     pet_id BIGINT PRIMARY KEY REFERENCES pet(pet_id),
     hunger INTEGER NOT NULL CHECK (hunger BETWEEN 0 AND 100),
