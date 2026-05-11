@@ -357,7 +357,7 @@ void readPirSensor() {
 
         // Reduce MQTT spam
         if(millis() - lastPirEvent > PIR_COOLDOWN) {
-            client.publish("wio/sensors/movement", "1");
+            client.publish("wio/sensors/motion", "1");
             lastPirEvent = millis();
         }
     }
