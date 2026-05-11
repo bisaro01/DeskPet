@@ -29,6 +29,23 @@ public class SocialSubscriber implements MqttCallback {
         System.out.println("Connected to MQTT broker.");
     }
 
+    // SocialSubscriber start and stop MQTT broker connection methods
+    public void start() throws MqttException {
+        MqttClient.subscribe(MOTION_TOPIC);
+        MqttClient.subscribe(SOUND_TOPIC);
+    }
+
+    public void stop() throws MqttException {
+        try {
+            if (MqttClient != null && MqttClient.isConnected()) {
+                MqttClient.disconnect();
+                // System.out.println("MQTT disconnected.");
+            }
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void connectionLost(Throwable cause) {
