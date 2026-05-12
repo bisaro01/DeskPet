@@ -107,6 +107,14 @@ public class DeskPetApplication extends Application {
                     double delta = (now - lastUpdate) / 1000.0;
                     lastUpdate = now;
 
+                    if (pet.wasMotionDetected()) {
+                        try {
+                            dbHandler.logSensorData(pet.getPetId(), "MOVEMENT", 1);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+
                     pet.update(delta);
 
                     try {

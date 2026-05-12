@@ -42,6 +42,25 @@ public class DatabaseHandler {
         }
     }
 
+    // reading historical movement data for displaying
+    public java.time.LocalDateTime getLastMovementTime(long petId) throws SQLException {
+        String sql = """
+            SELECT recorded_at FROM sensor_data
+            WHERE pet_id = ? AND sensor_type = 'MOVEMENT'
+            ORDER BY recorded_at DESC
+            LIMIT 1
+            """;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getTimestamp("recorded_at").toLocalDateTime();
+                }
+            }
+        }
+        return null;
+    }
+
     // Updates the current pet_state.
     /* Assumes Class Pet exists.
     Validation must occur externally.

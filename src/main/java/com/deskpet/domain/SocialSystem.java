@@ -59,6 +59,10 @@ public class SocialSystem {
         this.decayRatePerMinute = value;
     }
 
+    public boolean isMovementActive() {
+        return movementActive;
+    }
+
     public void onMovement() {
         lastMovementTime = System.currentTimeMillis();
         movementActive = true;
