@@ -21,6 +21,12 @@ public class Pet implements PetDataProvider, PetStateListener {
         comfortSystem = new ComfortSystem();
         hungerSystem = new HungerSystem(dbHandler);
         socialSystem = new SocialSystem();
+
+        // read and load previous states fom the DB
+        comfortSystem.setComfort(comfort);
+        hungerSystem.setHunger(hunger);
+        socialSystem.setSocial(social);
+        
         calculateHappiness();
     }
 
@@ -110,7 +116,7 @@ public class Pet implements PetDataProvider, PetStateListener {
     public double getHumidity() {
         return comfortSystem.getHumidity();
     }
-    
+
     public boolean wasMotionDetected() {
         return socialSystem.isMovementActive();
     }

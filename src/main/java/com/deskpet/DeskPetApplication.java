@@ -61,6 +61,9 @@ public class DeskPetApplication extends Application {
                 System.out.println("Comfort: " + pet.getComfort());
                 System.out.println("Social: " + pet.getSocial());
             }
+
+            model.updateState(pet);
+
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
