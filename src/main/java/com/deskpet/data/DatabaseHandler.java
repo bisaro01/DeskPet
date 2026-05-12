@@ -77,7 +77,8 @@ public class DatabaseHandler {
     // Load current pet_state and settings (initial load).
     public Pet loadPet(long petId) throws SQLException {
         String sql = """
-                SELECT 
+                SELECT
+                    p.name,
                     ps.hunger,
                     ps.social,
                     ps.comfort,
@@ -89,6 +90,7 @@ public class DatabaseHandler {
                     pset.noise_max
                 FROM pet_state ps
                 JOIN pet_settings pset ON ps.pet_id = pset.pet_id
+                JOIN pet p ON ps.pet_id = p.pet_id
                 WHERE ps.pet_id = ?
                 """;
 
@@ -101,7 +103,9 @@ public class DatabaseHandler {
                     int social = resultSet.getInt("social");
                     int comfort = resultSet.getInt("comfort");
 
-                    Pet pet = new Pet(petId, hunger, social, comfort, this);
+                    String name = resultSet.getString("name");
+
+                    Pet pet = new Pet(petId, name, hunger, social, comfort, this);
 
                     pet.setTemperatureSettings(resultSet.getInt("temp_min"), resultSet.getInt("temp_max"));
 

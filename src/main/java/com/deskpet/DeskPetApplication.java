@@ -24,6 +24,7 @@ import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
     private DashboardModel model;
+    private DashboardController controller;
     private final DatabaseHandler dbHandler;
     private HappinessPublisher happinessPublisher;
     private ComfortSubscriber comfortSubscriber;
@@ -41,7 +42,7 @@ public class DeskPetApplication extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(DeskPetApplication.class.getResource("/com/deskpet/views/dashboardView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        DashboardController controller = fxmlLoader.getController();
+        controller = fxmlLoader.getController();
         controller.setApp(this);
         controller.setModelDbHandler(dbHandler);
         model = controller.getModel();
@@ -52,7 +53,7 @@ public class DeskPetApplication extends Application {
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
-                pet = new Pet(1, 80, 80, 80, dbHandler);
+                pet = new Pet(1, "Bob", 80, 80, 80, dbHandler);
             } else {
                 System.out.println("Loaded pet " + pet.getPetId() + ":");
                 System.out.println("Happiness: " + pet.getHappiness());
@@ -64,6 +65,8 @@ public class DeskPetApplication extends Application {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+
+        controller.setActivePetName(pet.getName());
 
         try {
             happinessPublisher = new HappinessPublisher();
@@ -219,6 +222,8 @@ public class DeskPetApplication extends Application {
             dbHandler.updatePetState(pet);
 
             pet = dbHandler.loadPet(petId);
+
+            controller.setActivePetName(pet.getName());
 
             comfortSubscriber.setPet(pet);
             hungerSubscriber.setPet(pet);

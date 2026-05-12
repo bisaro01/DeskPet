@@ -8,13 +8,15 @@ public class Pet implements PetDataProvider, PetStateListener {
     private final SocialSystem socialSystem;
 
     private long petId;
+    private String name;
     private int hunger;
     private int social;
     private int comfort;
     private int happiness;
 
-    public Pet(long petId, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
+    public Pet(long petId, String name, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
         this.petId = petId;
+        this.name = name;
         this.hunger = hunger;
         this.social = social;
         this.comfort = comfort;
@@ -48,6 +50,8 @@ public class Pet implements PetDataProvider, PetStateListener {
     public long getPetId() {
         return petId;
     }
+
+    public String getName() { return name; }
 
     @Override
     public int getHunger() {
