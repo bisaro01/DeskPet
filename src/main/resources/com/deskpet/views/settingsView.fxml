@@ -45,21 +45,27 @@
     <GridPane hgap="10" vgap="10">
         <Label text="Temp min:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
         <TextField fx:id="tempMinField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <Label fx:id="currentTempMinLabel" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
 
         <Label text="Temp max:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
         <TextField fx:id="tempMaxField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Label fx:id="currentTempMaxLabel" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
 
         <Label text="Humidity min:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
         <TextField fx:id="humidityMinField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <Label fx:id="currentHumidityMinLabel" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
 
         <Label text="Humidity max:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
         <TextField fx:id="humidityMaxField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <Label fx:id="currentHumidityMaxLabel" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
 
         <Label text="Noise min:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
         <TextField fx:id="noiseMinField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <Label fx:id="currentNoiseMinLabel" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
 
         <Label text="Noise max:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
         <TextField fx:id="noiseMaxField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+        <Label fx:id="currentNoiseMaxLabel" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
     </GridPane>
 
     <Button text="Save Settings"

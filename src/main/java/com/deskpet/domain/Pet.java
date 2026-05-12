@@ -73,6 +73,30 @@ public class Pet implements PetDataProvider, PetStateListener {
         return happiness;
     }
 
+    public double getMinTemp() {
+        return comfortSystem.getMinTemp();
+    }
+
+    public double getMaxTemp() {
+        return comfortSystem.getMaxTemp();
+    }
+
+    public double getMinHumidity() {
+        return comfortSystem.getMinHumidity();
+    }
+
+    public double getMaxHumidity() {
+        return comfortSystem.getMaxHumidity();
+    }
+
+    public double getMinNoise() {
+        return socialSystem.getMinSoundThreshold();
+    }
+
+    public double getMaxNoise() {
+        return socialSystem.getMaxSoundThreshold();
+    }
+
 // Setters
     public void setHunger(int hunger) {
         if (hunger > 100) {

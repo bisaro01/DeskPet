@@ -42,6 +42,24 @@ public class SettingsController {
     @FXML
     private Label messageLabel;
 
+    @FXML
+    private Label currentTempMinLabel;
+
+    @FXML
+    private Label currentTempMaxLabel;
+
+    @FXML
+    private Label currentHumidityMinLabel;
+
+    @FXML
+    private Label currentHumidityMaxLabel;
+
+    @FXML
+    private Label currentNoiseMinLabel;
+
+    @FXML
+    private Label currentNoiseMaxLabel;
+
     public void setApp(DeskPetApplication app) {
         this.app = app;
     }
@@ -53,6 +71,7 @@ public class SettingsController {
 
     public void setCurrentPet(Pet currentPet) {
         this.currentPet = currentPet;
+        updateCurrentSettingsLabels();
     }
 
     private void loadPets() {
@@ -62,6 +81,16 @@ public class SettingsController {
             messageLabel.setText("Could not load pets.");
             e.printStackTrace();
         }
+    }
+
+    private int getNewOrCurrentValue(TextField field, double currentValue) {
+        String text = field.getText().trim();
+
+        if (text.isEmpty()) {
+            return (int) currentValue;
+        }
+
+        return Integer.parseInt(text);
     }
 
     @FXML
@@ -99,7 +128,18 @@ public class SettingsController {
         app.switchPet(petId);
         currentPet = app.getCurrentPet();
 
+        updateCurrentSettingsLabels();
+
         messageLabel.setText("Loaded pet " + petId);
+    }
+
+    private void updateCurrentSettingsLabels() {
+        currentTempMinLabel.setText(String.valueOf((int) currentPet.getMinTemp()));
+        currentTempMaxLabel.setText(String.valueOf((int) currentPet.getMaxTemp()));
+        currentHumidityMinLabel.setText(String.valueOf((int) currentPet.getMinHumidity()));
+        currentHumidityMaxLabel.setText(String.valueOf((int) currentPet.getMaxHumidity()));
+        currentNoiseMinLabel.setText(String.valueOf((int) currentPet.getMinNoise()));
+        currentNoiseMaxLabel.setText(String.valueOf((int) currentPet.getMaxNoise()));
     }
 
     @FXML
@@ -110,26 +150,27 @@ public class SettingsController {
         }
 
         try {
-            int tempMin = Integer.parseInt(tempMinField.getText());
-            int tempMax = Integer.parseInt(tempMaxField.getText());
-            int humidityMin = Integer.parseInt(humidityMinField.getText());
-            int humidityMax = Integer.parseInt(humidityMaxField.getText());
-            int noiseMin = Integer.parseInt(noiseMinField.getText());
-            int noiseMax = Integer.parseInt(noiseMaxField.getText());
+            int tempMin = getNewOrCurrentValue(tempMinField, currentPet.getMinTemp());
+            int tempMax = getNewOrCurrentValue(tempMaxField, currentPet.getMaxTemp());
+            int humidityMin = getNewOrCurrentValue(humidityMinField, currentPet.getMinHumidity());
+            int humidityMax = getNewOrCurrentValue(humidityMaxField, currentPet.getMaxHumidity());
+            int noiseMin = getNewOrCurrentValue(noiseMinField, currentPet.getMinNoise());
+            int noiseMax = getNewOrCurrentValue(noiseMaxField, currentPet.getMaxNoise());
 
-            dbHandler.updatePetSettings(
-                    currentPet.getPetId(),
-                    tempMin,
-                    tempMax,
-                    humidityMin,
-                    humidityMax,
-                    noiseMin,
-                    noiseMax
-            );
+            dbHandler.updatePetSettings(currentPet.getPetId(), tempMin, tempMax, humidityMin, humidityMax, noiseMin, noiseMax);
 
             currentPet.setTemperatureSettings(tempMin, tempMax);
             currentPet.setHumiditySettings(humidityMin, humidityMax);
             currentPet.setNoiseSettings(noiseMin, noiseMax);
+
+            updateCurrentSettingsLabels();
+
+            tempMinField.clear();
+            tempMaxField.clear();
+            humidityMinField.clear();
+            humidityMaxField.clear();
+            noiseMinField.clear();
+            noiseMaxField.clear();
 
             messageLabel.setText("Settings saved.");
 
@@ -139,5 +180,6 @@ public class SettingsController {
             messageLabel.setText("Could not save settings.");
             e.printStackTrace();
         }
+
     }
 }
