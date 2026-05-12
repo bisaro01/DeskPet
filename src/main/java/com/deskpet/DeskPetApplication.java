@@ -1,10 +1,5 @@
 package com.deskpet;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import org.eclipse.paho.client.mqttv3.MqttException;
-
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.data.DatabaseHandler;
 import com.deskpet.domain.Pet;
@@ -13,7 +8,6 @@ import com.deskpet.mqtt.ComfortSubscriber;
 import com.deskpet.mqtt.HappinessPublisher;
 import com.deskpet.mqtt.HungerSubscriber;
 import com.deskpet.mqtt.SocialSubscriber;
-
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -23,6 +17,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
     private DashboardModel model;
@@ -44,6 +42,7 @@ public class DeskPetApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(DeskPetApplication.class.getResource("/com/deskpet/views/dashboardView.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         DashboardController controller = fxmlLoader.getController();
+        controller.setApp(this);
         controller.setModelDbHandler(dbHandler);
         model = controller.getModel();
 
@@ -103,50 +102,45 @@ public class DeskPetApplication extends Application {
 
         lastUpdate = System.currentTimeMillis();
 
-        Timeline fixedUpdate = new Timeline(
-            new KeyFrame(Duration.millis(3000), e -> {
-                long now = System.currentTimeMillis();
-                double delta = (now - lastUpdate) / 1000.0;
-                lastUpdate = now;
+        Timeline fixedUpdate = new Timeline(new KeyFrame(Duration.millis(3000), e -> {
+            long now = System.currentTimeMillis();
+            double delta = (now - lastUpdate) / 1000.0;
+            lastUpdate = now;
 
-                    if (pet.wasMotionDetected()) {
-                        try {
-                            dbHandler.logSensorData(pet.getPetId(), "MOVEMENT", 1);
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-
-
-                    else if (pet.wasNoiseDetected()) {
-                        try {
-                            dbHandler.logSensorData(pet.getPetId(), "NOISE", 1);
-                        } catch (SQLException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-
-                pet.update(delta);
-
+            if (pet.wasMotionDetected()) {
                 try {
-                    model.updateState(pet);
+                    dbHandler.logSensorData(pet.getPetId(), "MOVEMENT", 1);
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
-
+            } else if (pet.wasNoiseDetected()) {
                 try {
-                    happinessPublisher.publish(pet.getHappiness());
-                } catch (MqttException ex) {
+                    dbHandler.logSensorData(pet.getPetId(), "NOISE", 1);
+                } catch (SQLException ex) {
                     ex.printStackTrace();
                 }
+            }
 
-                    System.out.println("----------------------------------");
-                    System.out.println("Happiness: " + pet.getHappiness());
-                    System.out.println("Comfort: " + pet.getComfort());
-                    System.out.println("Social: " + pet.getSocial());
-                    System.out.println("Hunger: " + pet.getHunger());
-                })
-        );
+            pet.update(delta);
+
+            try {
+                model.updateState(pet);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            try {
+                happinessPublisher.publish(pet.getHappiness());
+            } catch (MqttException ex) {
+                ex.printStackTrace();
+            }
+
+            System.out.println("----------------------------------");
+            System.out.println("Happiness: " + pet.getHappiness());
+            System.out.println("Comfort: " + pet.getComfort());
+            System.out.println("Social: " + pet.getSocial());
+            System.out.println("Hunger: " + pet.getHunger());
+        }));
 
         fixedUpdate.setCycleCount(Animation.INDEFINITE);
         fixedUpdate.play();
@@ -192,6 +186,31 @@ public class DeskPetApplication extends Application {
             Platform.exit();
             System.exit(0);
         });
+    }
+
+    public void openSettingsWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(DeskPetApplication.class.getResource("/com/deskpet/views/settingsView.fxml"));
+
+            Scene scene = new Scene(loader.load());
+
+            com.deskpet.controllers.SettingsController controller = loader.getController();
+            controller.setApp(this);
+            controller.setDbHandler(dbHandler);
+            controller.setCurrentPet(pet);
+
+            Stage settingsStage = new Stage();
+            settingsStage.setTitle("Desk Pet Settings");
+            settingsStage.setScene(scene);
+            settingsStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Pet getCurrentPet() {
+        return pet;
     }
 
     // Load a new pet
