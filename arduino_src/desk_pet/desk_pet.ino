@@ -30,17 +30,24 @@ PubSubClient client(wifiClient);
 #define BUZZER WIO_BUZZER   // Inbuilt buzzer
 #define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
 #define RFID_RST_PIN 0      // Change depending on physical build connections
-#define RFID_SS_PIN 1      // Change depending on physical build connections
+#define RFID_SS_PIN 1       // Change depending on physical build connections
+#define SOUND_SENSOR_PIN A3 // Sound sensor pin A3
+#define PIRPIN 3            // PIR motion sensor pin D3 on WIO diagram
 
 
 // <<< OTHER INSTANCES >>>
-TFT_eSPI tft;               // Graphical drawing object
-DHT dht(DHTPIN, DHTTYPE);   // Humidity and temperature object
+TFT_eSPI tft;                               // Graphical drawing object
+DHT dht(DHTPIN, DHTTYPE);                   // Humidity and temperature object
 MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 
 // RFID cooldown
 unsigned long lastRfidReadTime = 0;
-const unsigned long RFID_COOLDOWN = 5000;  // 5 second
+const unsigned long RFID_COOLDOWN = 5000;   // 5 second
+
+// PIR cooldown
+int lastPirState = LOW;
+unsigned long lastPirEvent = 0;
+const unsigned long PIR_COOLDOWN = 3000;    // 3 second
 
 unsigned long lastSensorRead = 0;
 const unsigned long SENSOR_INTERVAL = 2000;
@@ -50,6 +57,11 @@ int lastMood = -1; // 0 = sad, 1 = happy
 
 unsigned long lastMqttReconnectAttempt = 0;
 const unsigned long MQTT_RETRY_INTERVAL = 1000;
+
+// Noise levels
+int previousNoiseDecibels = -1; 
+unsigned long lastNoiseReadTime = 0; // Last time noise was read
+const unsigned long NOISE_READ_INTERVAL = 3000;  // Read noise level every 3 seconds
 
 // ============================  WiFi & MQTT FUNCTIONS  =======================================
 
@@ -301,6 +313,25 @@ void readRfidTag() {
     // rfid.PCD_StopCrypto1();
 }
 
+void readNoiseLevel() {
+    const char* mqttNoiseTopic = "wio/sensors/sound";
+    int rawSoundValue = analogRead(SOUND_SENSOR_PIN); // Read raw sound value (0-1023)
+
+    // Map raw value (0-1023) to around 40-100 dB
+    int noiseDecibels = map(rawSoundValue, 0, 1023, 40, 100);
+
+    // Ignore readings that happen at the extremes (0-10 and 1013-1023)
+    if (rawSoundValue > 10 && rawSoundValue < 1013) {
+        if (abs(noiseDecibels - previousNoiseDecibels) > 3) {
+            previousNoiseDecibels = noiseDecibels;
+            client.publish(mqttNoiseTopic, String(noiseDecibels).c_str());
+            Serial.print("Noise level: ");
+            Serial.print(noiseDecibels);
+            Serial.println(" dB");
+        }
+    }
+}
+
 void callback(char* topic, byte* payload, unsigned int length) {
     String message = "";
 
@@ -318,11 +349,26 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 }
 
+void readPirSensor() {
+    int currentPirState = digitalRead(PIRPIN);
+
+    // Trigger a publish only if state changes
+    if(currentPirState == HIGH && lastPirState == LOW) {
+
+        // Reduce MQTT spam
+        if(millis() - lastPirEvent > PIR_COOLDOWN) {
+            client.publish("wio/sensors/motion", "1");
+            lastPirEvent = millis();
+        }
+    }
+    lastPirState = currentPirState;
+}
 // ==================================  SET UP STAGE  =========================================
 // Main set up
 void setup() {
     // <<< PINS / HARDWARE >>>
     pinMode(BUZZER, OUTPUT);
+    pinMode(PIRPIN, INPUT);
 
 
     // Start serial (Arduino IDE terminal)
@@ -364,19 +410,19 @@ void loop() {
     // Test code for facial expressions
     // int mood = random(0, 100);
 
-   int currentMood = (mood < 50) ? 0 : 1;
+    int currentMood = (mood < 50) ? 0 : 1;
 
-   if (currentMood != lastMood) {
-       lastMood = currentMood;
+    if (currentMood != lastMood) {
+        lastMood = currentMood;
 
-       if (currentMood == 0) {
-           sadFace();
-           sadSound();
-       } else {
-           happyFace();
-           happySound();
-       }
-   }
+        if (currentMood == 0) {
+            sadFace();
+            sadSound();
+        } else {
+            happyFace();
+            happySound();
+        }
+    }
 
     if (millis() - lastSensorRead > SENSOR_INTERVAL) {
         lastSensorRead = millis();
@@ -384,8 +430,16 @@ void loop() {
         readTempHumidity();
     }
 
+    // Read noise sensor
+    if (millis() - lastNoiseReadTime > NOISE_READ_INTERVAL) {
+        lastNoiseReadTime = millis();
+        readNoiseLevel();
+    }
+
     // RFID scanner function
     readRfidTag();
+    // PIR motion function
+    readPirSensor();
 
     delay(10);
 }

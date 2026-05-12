@@ -1,5 +1,10 @@
 package com.deskpet;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.data.DatabaseHandler;
 import com.deskpet.domain.Pet;
@@ -7,6 +12,8 @@ import com.deskpet.models.DashboardModel;
 import com.deskpet.mqtt.ComfortSubscriber;
 import com.deskpet.mqtt.HappinessPublisher;
 import com.deskpet.mqtt.HungerSubscriber;
+import com.deskpet.mqtt.SocialSubscriber;
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -16,15 +23,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
     private final DatabaseHandler dbHandler;
     private HappinessPublisher happinessPublisher;
     private ComfortSubscriber comfortSubscriber;
+    private SocialSubscriber socialSubscriber;
     private HungerSubscriber hungerSubscriber;
     private Pet pet;
 
@@ -47,12 +51,13 @@ public class DeskPetApplication extends Application {
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
-                pet = new Pet(1, 80, 80, dbHandler);
+                pet = new Pet(1, 80, 80, 80, dbHandler);
             } else {
                 System.out.println("Loaded pet 1:");
                 System.out.println("Happiness: " + pet.getHappiness());
                 System.out.println("Hunger: " + pet.getHunger());
                 System.out.println("Comfort: " + pet.getComfort());
+                System.out.println("Social: " + pet.getSocial());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,6 +90,15 @@ public class DeskPetApplication extends Application {
             throw new RuntimeException(e);
         }
 
+        try {
+            socialSubscriber = new SocialSubscriber(pet);
+            socialSubscriber.start();
+        } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
+            System.out.println("Failed to create SocialSubscriber" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
         lastUpdate = System.currentTimeMillis();
 
         Timeline fixedUpdate = new Timeline(
@@ -92,6 +106,23 @@ public class DeskPetApplication extends Application {
                 long now = System.currentTimeMillis();
                 double delta = (now - lastUpdate) / 1000.0;
                 lastUpdate = now;
+
+                    if (pet.wasMotionDetected()) {
+                        try {
+                            dbHandler.logSensorData(pet.getPetId(), "MOVEMENT", 1);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+
+
+                    else if (pet.wasNoiseDetected()) {
+                        try {
+                            dbHandler.logSensorData(pet.getPetId(), "NOISE", 1);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
 
                 pet.update(delta);
 
@@ -107,11 +138,12 @@ public class DeskPetApplication extends Application {
                     ex.printStackTrace();
                 }
 
-                System.out.println("----------------------------------");
-                System.out.println("Happiness: " + pet.getHappiness());
-                System.out.println("Comfort: " + pet.getComfort());
-                System.out.println("Hunger: " + pet.getHunger());
-            })
+                    System.out.println("----------------------------------");
+                    System.out.println("Happiness: " + pet.getHappiness());
+                    System.out.println("Comfort: " + pet.getComfort());
+                    System.out.println("Social: " + pet.getSocial());
+                    System.out.println("Hunger: " + pet.getHunger());
+                })
         );
 
         fixedUpdate.setCycleCount(Animation.INDEFINITE);
@@ -138,6 +170,13 @@ public class DeskPetApplication extends Application {
             if (comfortSubscriber != null) {
                 try {
                     comfortSubscriber.stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (socialSubscriber != null) {
+                try {
+                    socialSubscriber.stop();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
