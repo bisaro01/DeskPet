@@ -2,12 +2,11 @@ package com.deskpet.domain;
 
 public class SocialSystem {
     private double soundIncreasePer10Db = 1.5;
-    private double decayRatePerMinute = 60.0;
+    private double decayRatePerMinute = 2.0;
     private double soundThreshold = 40.0;
     
     private double social = 100.0;
     private long lastSoundTime = System.currentTimeMillis();
-
     
     public SocialSystem() {
         social = 100.0;
@@ -53,12 +52,17 @@ public class SocialSystem {
     }
 
     public void updateSocial(int noiseDecibels) {
-        if (noiseDecibels > soundThreshold) {
-            double increase = ((noiseDecibels - soundThreshold) / 10.0) * soundIncreasePer10Db;
+        if (noiseDecibels >= 30 && noiseDecibels <= 100) { // Nice sound level
+            double increase = 1.0;
             setSocial(social + increase);
             lastSoundTime = System.currentTimeMillis();
-            
-            System.out.println("Sound detected (" + noiseDecibels + "dB)");
+            System.out.println("Sound level okay(" + noiseDecibels + "dB). Social +");
+        }
+        else if (noiseDecibels > 100) { // Too loud
+            double decrease = ((noiseDecibels - 100) / 10.0) * 1.5;
+            setSocial(social - decrease);
+            lastSoundTime = System.currentTimeMillis();
+            System.out.println("Environment is too loud! (" + noiseDecibels + "dB)! Social -");
         }
     }
 
@@ -66,20 +70,20 @@ public class SocialSystem {
         setSocial(social + 10);
         System.out.println("Movement detected");
     }
-    
+
     public int applyDecay(double delta) {
         long currentTime = System.currentTimeMillis();
         double minutesSinceSound = (currentTime - lastSoundTime) / 60000.0;
         
-        // Start decaying after 30 seconds of no sound
+        // Only apply decay if low sound detected for at least 30 seconds
         if (minutesSinceSound > 0.5) {
-            double decay = decayRatePerMinute * (delta / 60.0);
-            social -= decay;
+            double decay = 0.3 * (delta / 60.0);
+            setSocial(social - decay);
         }
 
         if (social > 100) {social = 100;}
         if (social < 0) {social = 0;}
-        
+
         return (int)social;
     }
 }
