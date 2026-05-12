@@ -25,6 +25,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class DeskPetApplication extends Application {
+    private DashboardModel model;
     private final DatabaseHandler dbHandler;
     private HappinessPublisher happinessPublisher;
     private ComfortSubscriber comfortSubscriber;
@@ -44,7 +45,7 @@ public class DeskPetApplication extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         DashboardController controller = fxmlLoader.getController();
         controller.setModelDbHandler(dbHandler);
-        DashboardModel model = controller.getModel();
+        model = controller.getModel();
 
         try {
             long firstPetId = dbHandler.getFirstPetId();
@@ -54,7 +55,7 @@ public class DeskPetApplication extends Application {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
                 pet = new Pet(1, 80, 80, 80, dbHandler);
             } else {
-                System.out.println("Loaded pet 1:");
+                System.out.println("Loaded pet " + pet.getPetId() + ":");
                 System.out.println("Happiness: " + pet.getHappiness());
                 System.out.println("Hunger: " + pet.getHunger());
                 System.out.println("Comfort: " + pet.getComfort());
@@ -154,6 +155,12 @@ public class DeskPetApplication extends Application {
         stage.setScene(scene);
         stage.show();
         stage.setOnCloseRequest(event -> {
+            try {
+                dbHandler.updatePetState(pet);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
             if (happinessPublisher != null) {
                 try {
                     happinessPublisher.stop();
@@ -186,6 +193,29 @@ public class DeskPetApplication extends Application {
             System.exit(0);
         });
     }
+
+    // Load a new pet
+    public void switchPet(long petId) {
+        try {
+            dbHandler.updatePetState(pet);
+
+            pet = dbHandler.loadPet(petId);
+
+            comfortSubscriber.setPet(pet);
+            hungerSubscriber.setPet(pet);
+            socialSubscriber.setPet(pet);
+
+            model.updateState(pet);
+
+            lastUpdate = System.currentTimeMillis();
+
+            System.out.println("Switched to pet " + petId);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void run() {
         Application.launch(this.getClass());
     }

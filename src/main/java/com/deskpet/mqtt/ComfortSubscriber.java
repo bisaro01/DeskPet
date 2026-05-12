@@ -40,6 +40,10 @@ public class ComfortSubscriber implements MqttCallback {
         System.out.println("Connected to MQTT broker.");
     }
 
+    public void setPet(PetStateListener pet) {
+        this.pet = pet;
+    }
+
     // ComfortSubscriber start and stop MQTT broker connection methods
     public void start() throws MqttException {
         MqttClient.subscribe(TEMP_TOPIC);
