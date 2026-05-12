@@ -95,25 +95,53 @@ public class DatabaseHandler {
     */
     public Pet loadPet(long petId) throws SQLException {
         String sql = """
-                SELECT hunger, social, comfort 
-                FROM pet_state
-                WHERE pet_id = ?
-                """;
+        SELECT 
+            ps.hunger,
+            ps.social,
+            ps.comfort,
+            pset.temp_min,
+            pset.temp_max,
+            pset.humidity_min,
+            pset.humidity_max,
+            pset.noise_min,
+            pset.noise_max
+        FROM pet_state ps
+        JOIN pet_settings pset ON ps.pet_id = pset.pet_id
+        WHERE ps.pet_id = ?
+        """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, petId);
-            
+
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     int hunger = resultSet.getInt("hunger");
-                    int social = resultSet.getInt("social");   
+                    int social = resultSet.getInt("social");
                     int comfort = resultSet.getInt("comfort");
-                    
-                    return new Pet(petId, hunger, social, comfort, this);
+
+                    Pet pet = new Pet(petId, hunger, social, comfort, this);
+
+                    pet.setTemperatureSettings(
+                            resultSet.getInt("temp_min"),
+                            resultSet.getInt("temp_max")
+                    );
+
+                    pet.setHumiditySettings(
+                            resultSet.getInt("humidity_min"),
+                            resultSet.getInt("humidity_max")
+                    );
+
+                    pet.setNoiseSettings(
+                            resultSet.getInt("noise_min"),
+                            resultSet.getInt("noise_max")
+                    );
+
+                    return pet;
                 }
             }
         }
-        throw new SQLException("No pet_state found for pet_id = " + petId);
+
+        throw new SQLException("No pet found for pet_id = " + petId);
     }
 
     public Double getHungerGain(String rfidTag) throws SQLException {

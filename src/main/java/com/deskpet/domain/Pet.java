@@ -111,6 +111,21 @@ public class Pet implements PetDataProvider, PetStateListener {
         return socialSystem.wasNoiseDetected();
     }
 
+    public void setTemperatureSettings(int minTemp, int maxTemp) {
+        comfortSystem.setMinTemp(minTemp);
+        comfortSystem.setMaxTemp(maxTemp);
+    }
+
+    public void setHumiditySettings(int minHumidity, int maxHumidity) {
+        comfortSystem.setMinHumidity(minHumidity);
+        comfortSystem.setMaxHumidity(maxHumidity);
+    }
+
+    public void setNoiseSettings(int minNoise, int maxNoise) {
+        socialSystem.setMinSoundThreshold(minNoise);
+        socialSystem.setMaxSoundThreshold(maxNoise);
+    }
+
     @Override
     public void updateNeed(String topic, String value) {
         switch (topic) {
