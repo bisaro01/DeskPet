@@ -83,11 +83,6 @@ public class SocialSystem {
             System.out.println("Environment is too loud! (" + noiseDecibels + "dB)! Social -");
         }
     }
-
-    public void onMovement() {
-        setSocial(social + 10);
-        System.out.println("Movement detected");
-    }
     
     public int applyDecay(double delta) {
         long currentTime = System.currentTimeMillis();
