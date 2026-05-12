@@ -47,7 +47,8 @@ public class DeskPetApplication extends Application {
         DashboardModel model = controller.getModel();
 
         try {
-            pet = dbHandler.loadPet(1);
+            long firstPetId = dbHandler.getFirstPetId();
+            pet = dbHandler.loadPet(firstPetId);
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
