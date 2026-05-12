@@ -8,6 +8,7 @@ state = {
     "temp": 24.0,
     "humidity": 48.0,
     "rfid_tag": "9C:DA:6C:06",
+    #"rfid_tag": "2A:88:64:06"
     "motion_active": False,
     "last_motion_time": 0,
 }

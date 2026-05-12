@@ -1,5 +1,7 @@
 package com.deskpet.domain;
 
+import com.deskpet.data.DatabaseHandler;
+
 public class Pet implements PetDataProvider, PetStateListener {
     private final ComfortSystem comfortSystem;
     private final HungerSystem hungerSystem;
@@ -11,13 +13,13 @@ public class Pet implements PetDataProvider, PetStateListener {
     private int comfort;
     private int happiness;
 
-    public Pet(long petId, int hunger, int social, int comfort) {
+    public Pet(long petId, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
         this.petId = petId;
         this.hunger = hunger;
         this.social = social;
         this.comfort = comfort;
         comfortSystem = new ComfortSystem();
-        hungerSystem = new HungerSystem();
+        hungerSystem = new HungerSystem(dbHandler);
         socialSystem = new SocialSystem();
         calculateHappiness();
     }
@@ -123,7 +125,7 @@ public class Pet implements PetDataProvider, PetStateListener {
                 break;
 
             case "wio/events/food":
-                hungerSystem.feed(value);
+                hungerSystem.feed(value, petId);
                 hunger = (int)hungerSystem.getHunger();
                 break;
 

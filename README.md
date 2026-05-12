@@ -82,7 +82,7 @@ In a terminal:
 2. Set up database:<br>
    From project root
      ```bash
-     sh scr/main/scripts/db-setup.sh
+     sh src/main/scripts/db-setup.sh
      ```
 
 3. Build the project:

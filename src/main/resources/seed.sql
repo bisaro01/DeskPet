@@ -1,5 +1,5 @@
 -- Reset all demo data so everyone gets the same database state
-TRUNCATE TABLE feeding_log, sensor_data, pet_state, food, pet RESTART IDENTITY CASCADE;
+TRUNCATE TABLE feeding_log, sensor_data, pet_state, food, pet, pet_food_preferences RESTART IDENTITY CASCADE;
 
 INSERT INTO pet (pet_id, name, created_at)
 VALUES (1, 'Bob', CURRENT_TIMESTAMP);
@@ -7,10 +7,12 @@ VALUES (1, 'Bob', CURRENT_TIMESTAMP);
 INSERT INTO pet_state (pet_id, hunger, social, comfort, happiness, updated_at)
 VALUES (1, 80, 75, 85, 80, CURRENT_TIMESTAMP);
 
--- TODO: Replace TAG002 with the actual tag UID
 INSERT INTO food (food_id, name, rfid_tag, hunger_gain)
-VALUES (1, 'Fish', '2A:88:64:06', 40),
-       (2, 'Cookie', '9C:DA:6C:06', 40);
+VALUES (1, 'Fish', '2A:88:64:06', 60),
+       (2, 'Cookie', '9C:DA:6C:06', 20);
+
+INSERT INTO pet_food_preferences (pet_id, liked_food, disliked_food)
+VALUES (1, 1, 2);
 
 INSERT INTO sensor_data (sensor_data_id, pet_id, sensor_type, value, recorded_at)
 VALUES (1, 1, 'TEMPERATURE', 21.5, CURRENT_TIMESTAMP - INTERVAL '20 minutes'),
@@ -28,6 +30,6 @@ VALUES (1, 1, 'TEMPERATURE', 21.5, CURRENT_TIMESTAMP - INTERVAL '20 minutes'),
        (10, 1, 'MOVEMENT', 1, CURRENT_TIMESTAMP - INTERVAL '3 minutes'),
        (11, 1, 'MOVEMENT', 1, CURRENT_TIMESTAMP - INTERVAL '1 minute');
 
-INSERT INTO feeding_log (feeding_id, pet_id, food_id, fed_at)
-VALUES (1, 1, 1, CURRENT_TIMESTAMP - INTERVAL '2 hours'),
-       (2, 1, 2, CURRENT_TIMESTAMP - INTERVAL '30 minutes');
+INSERT INTO feeding_log (pet_id, food_id, fed_at)
+VALUES (1, 1, CURRENT_TIMESTAMP - INTERVAL '2 hours'),
+       (1, 2, CURRENT_TIMESTAMP - INTERVAL '30 minutes');
