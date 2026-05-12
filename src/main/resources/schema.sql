@@ -29,6 +29,12 @@ CREATE TABLE IF NOT EXISTS food (
     hunger_gain INTEGER DEFAULT 40
     );
 
+CREATE TABLE IF NOT EXISTS pet_food_preferences (
+    pet_id BIGSERIAL PRIMARY KEY REFERENCES pet(pet_id),
+    liked_food BIGSERIAL REFERENCES food(food_id),
+    disliked_food BIGSERIAL REFERENCES food(food_id)
+    );
+
 CREATE TABLE IF NOT EXISTS feeding_log (
     feeding_id BIGSERIAL PRIMARY KEY,
     pet_id BIGINT NOT NULL REFERENCES pet(pet_id),

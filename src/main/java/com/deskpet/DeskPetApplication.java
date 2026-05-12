@@ -47,7 +47,7 @@ public class DeskPetApplication extends Application {
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
-                pet = new Pet(1, 80, 80);
+                pet = new Pet(1, 80, 80, dbHandler);
             } else {
                 System.out.println("Loaded pet 1:");
                 System.out.println("Happiness: " + pet.getHappiness());
@@ -88,30 +88,30 @@ public class DeskPetApplication extends Application {
         lastUpdate = System.currentTimeMillis();
 
         Timeline fixedUpdate = new Timeline(
-                new KeyFrame(Duration.millis(3000), e -> {
-                    long now = System.currentTimeMillis();
-                    double delta = (now - lastUpdate) / 1000.0;
-                    lastUpdate = now;
+            new KeyFrame(Duration.millis(3000), e -> {
+                long now = System.currentTimeMillis();
+                double delta = (now - lastUpdate) / 1000.0;
+                lastUpdate = now;
 
-                    pet.update(delta);
+                pet.update(delta);
 
-                    try {
-                        model.updateState(pet);
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
+                try {
+                    model.updateState(pet);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
 
-                    try {
-                        happinessPublisher.publish(pet.getHappiness());
-                    } catch (MqttException ex) {
-                        ex.printStackTrace();
-                    }
+                try {
+                    happinessPublisher.publish(pet.getHappiness());
+                } catch (MqttException ex) {
+                    ex.printStackTrace();
+                }
 
-                    System.out.println("----------------------------------");
-                    System.out.println("Happiness: " + pet.getHappiness());
-                    System.out.println("Comfort: " + pet.getComfort());
-                    System.out.println("Hunger: " + pet.getHunger());
-                })
+                System.out.println("----------------------------------");
+                System.out.println("Happiness: " + pet.getHappiness());
+                System.out.println("Comfort: " + pet.getComfort());
+                System.out.println("Hunger: " + pet.getHunger());
+            })
         );
 
         fixedUpdate.setCycleCount(Animation.INDEFINITE);

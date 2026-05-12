@@ -76,10 +76,71 @@ public class DatabaseHandler {
                     // int social = resultSet.getInt("social"); TODO: Add back in sprint 2
                     int comfort = resultSet.getInt("comfort");
 
-                    return new Pet(petId, hunger, comfort);
+                    return new Pet(petId, hunger, comfort, this);
                 }
             }
         }
         throw new SQLException("No pet_state found for pet_id = " + petId);
+    }
+
+    public Double getHungerGain(String rfidTag) throws SQLException {
+        String sql = """
+                SELECT rfid_tag, hunger_gain
+                FROM food
+                WHERE rfid_tag = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, rfidTag);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    double hunger_gain = resultSet.getDouble("hunger_gain");
+                    return hunger_gain;
+                }
+            }
+        }
+        throw new SQLException("No hunger gain found for rfid_tag = " + rfidTag);
+    }
+
+    public Long getFoodId(String rfidTag) throws SQLException {
+        String sql = """
+                SELECT rfid_tag, food_id
+                FROM food
+                WHERE rfid_tag = ?
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, rfidTag);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    long food_id = resultSet.getLong("food_id");
+                    return food_id;
+                }
+            }
+        }
+        throw new SQLException("No food id found for rfid_tag = " + rfidTag);
+    }
+
+    public void appendFeedingLog(long petId, long foodId) throws SQLException {
+        String sql = """
+                INSERT INTO feeding_log(pet_id, food_id, fed_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP)
+            """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+            statement.setLong(2, foodId);
+
+            int rowsAffected = statement.executeUpdate();
+
+            if (rowsAffected == 0) {
+                throw new SQLException("No feeding log found for pet_id = " + petId);
+            }
+        }
     }
 }
