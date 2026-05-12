@@ -63,6 +63,5 @@ public class SocialSubscriber implements MqttCallback {
 
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {
-
     }
 }
