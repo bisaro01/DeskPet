@@ -73,9 +73,18 @@ public class ComfortSubscriber implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         String payload = new String(message.getPayload());
 
-        Platform.runLater(() -> {
-            pet.updateNeed(topic, payload);
-        });
+        switch (topic) {
+            case TEMP_TOPIC:
+                Platform.runLater(() -> {
+                    pet.updateTemperature(Float.parseFloat(payload));
+                });
+                break;
+            case HUM_TOPIC:
+                Platform.runLater(() -> {
+                    pet.updateHumidity(Float.parseFloat(payload));
+                });
+                break;
+        }
     }
 
     @Override

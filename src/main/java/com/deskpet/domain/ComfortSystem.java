@@ -19,7 +19,8 @@ public class ComfortSystem {
 
     private double comfort = 100.0;
 
-    public ComfortSystem() {
+    public ComfortSystem(double comfort) {
+        this.comfort = comfort;
         temperature = 23.0;
         humidity = 40.0;
     }

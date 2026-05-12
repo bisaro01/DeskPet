@@ -56,9 +56,20 @@ public class SocialSubscriber implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) throws Exception {
         String payload = new String(message.getPayload());
 
-        Platform.runLater(() -> {
-            pet.updateNeed(topic, payload);
-        });
+        switch (topic) {
+            case MOTION_TOPIC:
+                if (payload.equals("1")) {
+                    Platform.runLater(() -> {
+                        pet.registerMovement();
+                    });
+                }
+                break;
+            case SOUND_TOPIC:
+                Platform.runLater(() -> {
+                    pet.registerNoise(Integer.parseInt(payload));
+                });
+                break;
+        }
     }
 
     @Override

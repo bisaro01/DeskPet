@@ -17,8 +17,8 @@ public class SocialSystem {
     private boolean noiseDetected = false;
     private static final double SOCIAL_INCREASE = 1.0;  // +1 when movement or sound within bounds
 
-    public SocialSystem() {
-        social = 100.0;
+    public SocialSystem(double social) {
+        this.social = social;
     }
 
     // Getters and setters
