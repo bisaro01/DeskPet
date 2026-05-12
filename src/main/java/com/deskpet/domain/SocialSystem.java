@@ -1,7 +1,5 @@
 package com.deskpet.domain;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
-
 public class SocialSystem {
     private double soundIncreasePer10Db = 1.5;
     private double decayRatePerMinute = 2.0;
@@ -15,10 +13,8 @@ public class SocialSystem {
     private long lastMovementTime = 0;
     private static final double MOVEMENT_TIMEOUT = 30000.0; // If no movement for 30 time out
 
-    // Default Social increase and decay over time
+    // Default Social increase over time
     private static final double SOCIAL_INCREASE = 1.0;  // +1 when movement or sound within bounds
-    private static final double SOCIAL_DECAY = 2.0;     // default decay rate
-
 
     public SocialSystem() {
         social = 100.0;

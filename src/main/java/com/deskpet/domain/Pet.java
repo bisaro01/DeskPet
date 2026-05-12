@@ -128,6 +128,7 @@ public class Pet implements PetDataProvider, PetStateListener {
             case "wio/sensors/motion":
                 if (value.equals("1")) {
                     socialSystem.onMovement();
+                    social = (int)socialSystem.getSocial();
                 }
                 break;
             
