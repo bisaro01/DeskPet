@@ -103,6 +103,14 @@ public class Pet implements PetDataProvider, PetStateListener {
         calculateHappiness();
     }
 
+    // Methods to get the last temperature and humidity readings for the DB
+    public double getTemperature() {
+        return comfortSystem.getTemperature();
+    }
+    public double getHumidity() {
+        return comfortSystem.getHumidity();
+    }
+    
     public boolean wasMotionDetected() {
         return socialSystem.isMovementActive();
     }
