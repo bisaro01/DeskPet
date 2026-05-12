@@ -29,6 +29,19 @@ public class DatabaseHandler {
         }
     }
 
+    public void logSensorData(long petId, String sensorType, double value) throws SQLException {
+        String sql = """
+            INSERT INTO sensor_data (pet_id, sensor_type, value)
+            VALUES (?, ?, ?)
+            """;
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            statement.setString(2, sensorType);
+            statement.setDouble(3, value);
+            statement.executeUpdate();
+        }
+    }
+
     // Updates the current pet_state.
     /* Assumes Class Pet exists.
     Validation must occur externally.
