@@ -32,7 +32,7 @@ PubSubClient client(wifiClient);
 #define RFID_RST_PIN 0      // Change depending on physical build connections
 #define RFID_SS_PIN 1       // Change depending on physical build connections
 #define SOUND_SENSOR_PIN A3 // Sound sensor pin A3
-#define PIRPIN 3            // PIR motion sensor pin D3 on WIO diagram
+#define PIRPIN 4            // PIR motion sensor pin D3 on WIO diagram
 
 
 // <<< OTHER INSTANCES >>>
@@ -69,7 +69,7 @@ void connectWifi() {
     tft.fillScreen(TFT_WHITE);
     tft.setTextColor(TFT_BLACK);
     tft.setTextSize(2);
-    tft.drawString("Connecitng to WiFi...", 40, 100);
+    tft.drawString("Connecting to WiFi...", 40, 100);
 
     // Begin connection attempt
     WiFi.begin(wifiName, password);
@@ -357,6 +357,7 @@ void readPirSensor() {
 
         // Reduce MQTT spam
         if(millis() - lastPirEvent > PIR_COOLDOWN) {
+            Serial.println("Movement detected");
             client.publish("wio/sensors/motion", "1");
             lastPirEvent = millis();
         }
