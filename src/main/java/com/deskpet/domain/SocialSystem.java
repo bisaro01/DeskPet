@@ -21,7 +21,14 @@ public class SocialSystem {
         this.social = social;
     }
 
-    // Getters and setters
+    public boolean getMovementActive() {
+        return movementActive;
+    }
+
+    public boolean getNoiseDetected() {
+        return noiseDetected;
+    }
+
     public double getSocial() {
         return social;
     }
@@ -93,7 +100,7 @@ public class SocialSystem {
         }
     }
     
-    public int applyDecay(double delta) {
+    public void applyDecay(double delta) {
         long currentTime = System.currentTimeMillis();
         double minutesSinceSound = (currentTime - lastSoundTime) / 60000.0;
 
@@ -114,7 +121,9 @@ public class SocialSystem {
 
         if (social > 100) {social = 100;}
         if (social < 0) {social = 0;}
+    }
 
-        return (int)social;
+    public boolean isLonely() {
+        return social < 50;
     }
 }

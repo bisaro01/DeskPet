@@ -56,4 +56,8 @@ public class HungerSystem {
         if (hunger > 100) {hunger = 100;}
         if (hunger < 0) {hunger = 0.0;}
     }
+
+    public boolean isHungry() {
+        return hunger < 50;
+    }
 }

@@ -3,6 +3,8 @@ package com.deskpet;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import com.deskpet.domain.PetDisplayMapper;
+import com.deskpet.domain.PetDisplayState;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import com.deskpet.controllers.DashboardController;
@@ -30,6 +32,7 @@ public class DeskPetApplication extends Application {
     private ComfortSubscriber comfortSubscriber;
     private SocialSubscriber socialSubscriber;
     private HungerSubscriber hungerSubscriber;
+    private PetDisplayMapper displayMapper;
     private Pet pet;
 
     private long lastUpdate;
@@ -45,6 +48,8 @@ public class DeskPetApplication extends Application {
         DashboardController controller = fxmlLoader.getController();
         controller.setModelDbHandler(dbHandler);
         DashboardModel model = controller.getModel();
+
+        displayMapper = new PetDisplayMapper();
 
         try {
             pet = dbHandler.loadPet(1);
@@ -100,6 +105,7 @@ public class DeskPetApplication extends Application {
         }
 
         lastUpdate = System.currentTimeMillis();
+        PetDisplayState lastPublishedState;
 
         Timeline fixedUpdate = new Timeline(
             new KeyFrame(Duration.millis(3000), e -> {
@@ -132,7 +138,10 @@ public class DeskPetApplication extends Application {
                     ex.printStackTrace();
                 }
 
+                PetDisplayState currentPetState = displayMapper.map(pet);
+
                 try {
+                    // TODO(Mark): publish currentPetState instead of happiness. Maybe rename publisher. Refactor WIO sketch.
                     happinessPublisher.publish(pet.getHappiness());
                 } catch (MqttException ex) {
                     ex.printStackTrace();

@@ -2,6 +2,9 @@ package com.deskpet.domain;
 
 import com.deskpet.data.DatabaseHandler;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public class Pet implements PetDataProvider, PetStateListener {
     private final ComfortSystem comfortSystem;
     private final HungerSystem hungerSystem;
@@ -16,13 +19,21 @@ public class Pet implements PetDataProvider, PetStateListener {
         socialSystem = new SocialSystem(social);
     }
 
+    // Decay need values based on time passed, if pet outside comfortable bounds.
     public void applyDecay(double delta) {
         comfortSystem.applyDecay(delta);
         hungerSystem.applyDecay(delta);
         socialSystem.applyDecay(delta);
     }
 
-// Getters
+    public double getTemperature() {
+        return comfortSystem.getTemperature();
+    }
+
+    public double getHumidity() {
+        return comfortSystem.getHumidity();
+    }
+
     @Override
     public long getPetId() {
         return petId;
@@ -33,7 +44,7 @@ public class Pet implements PetDataProvider, PetStateListener {
         return (int)hungerSystem.getHunger();
     }
 
-    // @Override
+    @Override
     public int getSocial() {
         return (int)socialSystem.getSocial();
     }
@@ -83,5 +94,33 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     public void update(double delta) {
         applyDecay(delta);
+    }
+
+    public Mood getMood() {
+        if (getHappiness() > 50) {
+            return Mood.HAPPY;
+        } else {
+            return Mood.SAD;
+        }
+    }
+
+    public Set<Need> getActiveIssues() {
+        Set<Need> issues = EnumSet.noneOf(Need.class);
+
+        if (hungerSystem.isHungry()) {
+            issues.add(Need.HUNGRY);
+        }
+
+        if (comfortSystem.isHot()) {
+            issues.add(Need.HOT);
+        } else if (comfortSystem.isCold()) {
+            issues.add(Need.COLD);
+        }
+
+         if (socialSystem.isLonely()) {
+             issues.add(Need.LONELY);
+         }
+
+         return issues;
     }
 }
