@@ -8,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // Handles database interactions.
 public class DatabaseHandler {
     Connection connection;
@@ -165,6 +168,84 @@ public class DatabaseHandler {
         }
 
         throw new SQLException("No pets found in database.");
+    }
+
+    // Get list of all pets
+    public List<String> getAllPets() throws SQLException {
+        String sql = """
+        SELECT pet_id, name
+        FROM pet
+        ORDER BY pet_id
+        """;
+
+        List<String> pets = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                pets.add(resultSet.getLong("pet_id") + ": " + resultSet.getString("name"));
+            }
+        }
+
+        return pets;
+    }
+
+    // Create a new pet
+    public Pet createPet(String name) throws SQLException {
+        String countSql = "SELECT COUNT(*) FROM pet";
+
+        try (PreparedStatement statement = connection.prepareStatement(countSql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next() && resultSet.getInt(1) >= 3) {
+                throw new SQLException("Maximum number of pets reached.");
+            }
+        }
+
+        long petId;
+
+        String petSql = """
+        INSERT INTO pet (name)
+        VALUES (?)
+        RETURNING pet_id
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(petSql)) {
+            statement.setString(1, name);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new SQLException("Could not create pet.");
+                }
+
+                petId = resultSet.getLong("pet_id");
+            }
+        }
+
+        String stateSql = """
+        INSERT INTO pet_state (pet_id, hunger, social, comfort, happiness)
+        VALUES (?, 80, 80, 80, 80)
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(stateSql)) {
+            statement.setLong(1, petId);
+            statement.executeUpdate();
+        }
+
+        String settingsSql = """
+        INSERT INTO pet_settings (
+            pet_id, temp_min, temp_max, humidity_min, humidity_max, noise_min, noise_max
+        )
+        VALUES (?, 18, 24, 30, 50, 30, 100)
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(settingsSql)) {
+            statement.setLong(1, petId);
+            statement.executeUpdate();
+        }
+
+        return loadPet(petId);
     }
 
     public Double getHungerGain(String rfidTag) throws SQLException {
