@@ -115,6 +115,15 @@ public class DeskPetApplication extends Application {
                         }
                     }
 
+
+                    else if (pet.wasNoiseDetected()) {
+                        try {
+                            dbHandler.logSensorData(pet.getPetId(), "NOISE", 1);
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+
                     pet.update(delta);
 
                     try {

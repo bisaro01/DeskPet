@@ -105,6 +105,10 @@ public class Pet implements PetDataProvider, PetStateListener {
         return socialSystem.isMovementActive();
     }
 
+    public boolean wasNoiseDetected() {
+        return socialSystem.wasNoiseDetected();
+    }
+
     @Override
     public void updateNeed(String topic, String value) {
         switch (topic) {

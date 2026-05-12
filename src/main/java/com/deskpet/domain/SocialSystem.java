@@ -14,6 +14,7 @@ public class SocialSystem {
     private static final double MOVEMENT_TIMEOUT = 30000.0; // If no movement for 30 time out
 
     // Default Social increase over time
+    private boolean noiseDetected = false;
     private static final double SOCIAL_INCREASE = 1.0;  // +1 when movement or sound within bounds
 
     public SocialSystem() {
@@ -69,17 +70,25 @@ public class SocialSystem {
         System.out.println("Movement detected");
     }
 
+    public boolean wasNoiseDetected() {
+        boolean detected = noiseDetected;
+        noiseDetected = false;
+        return detected;
+    }
+
     public void updateSocial(int noiseDecibels) {
         if (noiseDecibels >= 30 && noiseDecibels <= 100) { // Nice sound level
             double increase = 1.0;
             setSocial(social + increase);
             lastSoundTime = System.currentTimeMillis();
+            noiseDetected = true;  
             System.out.println("Sound level okay(" + noiseDecibels + "dB). Social +");
         }
         else if (noiseDecibels > 100) { // Too loud
             double decrease = ((noiseDecibels - 100) / 10.0) * 1.5;
             setSocial(social - decrease);
             lastSoundTime = System.currentTimeMillis();
+            noiseDetected = true;  
             System.out.println("Environment is too loud! (" + noiseDecibels + "dB)! Social -");
         }
     }
