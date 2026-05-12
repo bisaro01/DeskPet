@@ -114,6 +114,39 @@ public class DatabaseHandler {
         throw new SQLException("No pet found for pet_id = " + petId);
     }
 
+    // Update the settings in database
+    public void updatePetSettings(
+            long petId,
+            int tempMin,
+            int tempMax,
+            int humidityMin,
+            int humidityMax,
+            int noiseMin,
+            int noiseMax
+    ) throws SQLException {
+        String sql = """
+        UPDATE pet_settings
+        SET temp_min = ?,
+            temp_max = ?,
+            humidity_min = ?,
+            humidity_max = ?,
+            noise_min = ?,
+            noise_max = ?
+        WHERE pet_id = ?
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, tempMin);
+            statement.setInt(2, tempMax);
+            statement.setInt(3, humidityMin);
+            statement.setInt(4, humidityMax);
+            statement.setInt(5, noiseMin);
+            statement.setInt(6, noiseMax);
+            statement.setLong(7, petId);
+            statement.executeUpdate();
+        }
+    }
+
     // Get the first pet_id for loading pet at start
     public long getFirstPetId() throws SQLException {
         String sql = """
