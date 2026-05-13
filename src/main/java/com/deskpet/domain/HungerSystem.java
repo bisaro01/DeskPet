@@ -30,6 +30,9 @@ public class HungerSystem {
     public double getHunger() {
         return hunger;
     }
+    public void setHunger(double value){
+        this.hunger = value;
+    }
 
     public void feed(String rfidTag, long petId) {
 
