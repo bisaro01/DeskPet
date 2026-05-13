@@ -33,6 +33,8 @@ public class DeskPetApplication extends Application {
     private Pet pet;
 
     private long lastUpdate;
+    private long lastSensorLogTime = 0;
+    private static final long SENSOR_LOG_INTERVAL = 60000;  // save hum&tem every 60s to avoid spamming DB
 
     public DeskPetApplication() {
         dbHandler = new DatabaseHandler();
@@ -61,6 +63,9 @@ public class DeskPetApplication extends Application {
                 System.out.println("Comfort: " + pet.getComfort());
                 System.out.println("Social: " + pet.getSocial());
             }
+
+            model.updateState(pet);
+
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -110,21 +115,36 @@ public class DeskPetApplication extends Application {
             double delta = (now - lastUpdate) / 1000.0;
             lastUpdate = now;
 
-            if (pet.wasMotionDetected()) {
-                try {
-                    dbHandler.logSensorData(pet.getPetId(), "MOVEMENT", 1);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
+                // ======================    save sensor data to the DB ========================
+                // movement
+                if (pet.wasMotionDetected()) {
+                    try {
+                        dbHandler.logSensorData(pet.getPetId(), "MOVEMENT", 1);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
                 }
-            } else if (pet.wasNoiseDetected()) {
-                try {
-                    dbHandler.logSensorData(pet.getPetId(), "NOISE", 1);
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
 
-            pet.update(delta);
+                // noise
+                if (pet.wasNoiseDetected()) {
+                    try {
+                        dbHandler.logSensorData(pet.getPetId(), "NOISE", 1);
+                    } catch (SQLException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                // hum & temp
+                if (now - lastSensorLogTime > SENSOR_LOG_INTERVAL) {
+                    try {
+                        dbHandler.logSensorData(pet.getPetId(), "TEMPERATURE", pet.getTemperature());
+                        dbHandler.logSensorData(pet.getPetId(), "HUMIDITY", pet.getHumidity());
+                    } catch (SQLException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+
+                pet.update(delta);
 
             try {
                 model.updateState(pet);

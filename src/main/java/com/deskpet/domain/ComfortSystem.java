@@ -67,6 +67,15 @@ public class ComfortSystem {
         this.maxHumidity = value;
     }
 
+    // getters for writing to DB trough the pet
+    public double getTemperature() {
+        return temperature;
+    }
+
+    public double getHumidity() {
+        return humidity;
+    }
+
 
     public void updateTemperature(float currentTemp) {
         temperature = currentTemp;
