@@ -4,8 +4,11 @@ import com.deskpet.data.DatabaseHandler;
 import com.deskpet.models.DashboardModel;
 import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.beans.binding.Bindings;
+
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import com.deskpet.DeskPetApplication;
@@ -40,12 +43,19 @@ public class DashboardController {
     @FXML
     private Label favouriteFoodLabel;
 
+    @FXML
+    private ListView<String> foodStatsListView;
+
     public void setActivePetName(String name) {
         activePetLabel.setText(name);
     }
 
     public void setActivePetFavouriteFood(String favouriteFood) {
         favouriteFoodLabel.setText(favouriteFood);
+    }
+
+    public void setFoodStats(List<String> foodStats) {
+        foodStatsListView.getItems().setAll(foodStats);
     }
 
     // Creates a background scheduler that can run tasks later or repeatedly

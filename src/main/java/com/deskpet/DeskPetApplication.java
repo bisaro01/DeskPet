@@ -75,6 +75,14 @@ public class DeskPetApplication extends Application {
         controller.setActivePetFavouriteFood(pet.getFavouriteFood());
 
         try {
+            controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
+        } catch (SQLException e) {
+            System.out.println("Failed to create FoodStats" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        try {
             happinessPublisher = new HappinessPublisher();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             System.out.println("Failed to create HappinessPublisher" + e.getMessage());
@@ -145,7 +153,15 @@ public class DeskPetApplication extends Application {
                     }
                 }
 
-                pet.update(delta);
+            try {
+                controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
+            } catch (SQLException ex) {
+                System.out.println("Failed to create FoodStats" + ex.getMessage());
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
+
+            pet.update(delta);
 
             try {
                 model.updateState(pet);
@@ -246,6 +262,7 @@ public class DeskPetApplication extends Application {
 
             controller.setActivePetName(pet.getName());
             controller.setActivePetFavouriteFood(pet.getFavouriteFood());
+            controller.setFoodStats(dbHandler.getFoodStats(petId));
 
             comfortSubscriber.setPet(pet);
             hungerSubscriber.setPet(pet);

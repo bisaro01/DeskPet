@@ -23,7 +23,7 @@ public class DashboardModel {
     }
     // Updates the value of Happiness based on the four needs
     public void setHappiness() {
-        //Calculate value of happiness TODO: Will need to add the two remaining needs and change to / 4
+        //Calculate value of happiness
         //        float happinessValue = (hunger.get() + comfort.get()) / 2;
         //        happiness.set(Math.clamp(happinessValue, 0.0f, 1.0f));
     }

@@ -338,4 +338,32 @@ public class DatabaseHandler {
             }
         }
     }
+
+    public List<String> getFoodStats(Long petId) throws SQLException {
+        List<String> foodStats = new ArrayList<>();
+
+        String sql = """
+                SELECT food.name, COUNT(*) AS eat_count
+                FROM feeding_log
+                JOIN food ON feeding_log.food_id = food.food_id
+                WHERE feeding_log.pet_id = ?
+                GROUP BY food.name
+                ORDER BY eat_count DESC
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    String foodName = resultSet.getString("name");
+                    int count = resultSet.getInt("eat_count");
+                    foodStats.add(foodName + ": " + count);
+                }
+            }
+        }
+        return foodStats;
+    }
 }
