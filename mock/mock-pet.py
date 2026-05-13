@@ -15,6 +15,8 @@ state = {
 
 client = mqtt.Client()
 
+DISPLAY_TOPIC = "app/display/state"
+
 def on_connect(client, userdata, flags, rc):
     print("Connected with code:", rc)
     client.subscribe("app/state/happiness")
