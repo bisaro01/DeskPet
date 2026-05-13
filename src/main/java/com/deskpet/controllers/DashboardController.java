@@ -36,12 +36,16 @@ public class DashboardController {
 
     @FXML
     private Label activePetLabel;
-    
+
     @FXML
     private Label favouriteFoodLabel;
 
     public void setActivePetName(String name) {
         activePetLabel.setText(name);
+    }
+
+    public void setActivePetFavouriteFood(String favouriteFood) {
+        favouriteFoodLabel.setText(favouriteFood);
     }
 
     // Creates a background scheduler that can run tasks later or repeatedly
