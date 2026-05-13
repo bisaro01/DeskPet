@@ -36,6 +36,9 @@ public class DashboardController {
 
     @FXML
     private Label activePetLabel;
+    
+    @FXML
+    private Label favouriteFoodLabel;
 
     public void setActivePetName(String name) {
         activePetLabel.setText(name);
