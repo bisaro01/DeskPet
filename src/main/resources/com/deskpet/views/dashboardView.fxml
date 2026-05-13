@@ -24,7 +24,7 @@
         <ProgressBar fx:id="socialBar" layoutX="67.0" layoutY="187.0" prefHeight="20.0" prefWidth="213.0" progress="1.0" />
       <Label layoutX="67.0" layoutY="224.0" text="Favourite food: " />
       <Label fx:id="favouriteFoodLabel" layoutX="152.0" layoutY="224.0" prefHeight="17.0" prefWidth="33.0" text="N/A" />
-      <ListView layoutX="67.0" layoutY="270.0" prefHeight="106.0" prefWidth="213.0" />
-      <Label layoutX="67.0" layoutY="253.0" text="Amount of food eaten:" />
+      <ListView fx:id="foodStatsListView" layoutX="67.0" layoutY="275.0" prefHeight="95.0" prefWidth="213.0" />
+      <Label layoutX="67.0" layoutY="258.0" text="Food eaten:" />
     </children>
 </Pane>
