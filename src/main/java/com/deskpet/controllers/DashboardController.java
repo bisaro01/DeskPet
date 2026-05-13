@@ -8,6 +8,8 @@ import javafx.scene.control.ProgressBar;
 import javafx.beans.binding.Bindings;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import com.deskpet.DeskPetApplication;
+import javafx.scene.control.Label;
 
 public class DashboardController {
     @FXML
@@ -18,6 +20,26 @@ public class DashboardController {
     private ProgressBar comfortBar;
     @FXML
     private ProgressBar socialBar;
+
+    private DeskPetApplication app;
+
+    public void setApp(DeskPetApplication app) {
+        this.app = app;
+    }
+
+    @FXML
+    private void openSettings() {
+        if (app != null) {
+            app.openSettingsWindow();
+        }
+    }
+
+    @FXML
+    private Label activePetLabel;
+
+    public void setActivePetName(String name) {
+        activePetLabel.setText(name);
+    }
 
     // Creates a background scheduler that can run tasks later or repeatedly
     private final ScheduledExecutorService scheduler =

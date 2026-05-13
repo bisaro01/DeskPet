@@ -8,13 +8,15 @@ public class Pet implements PetDataProvider, PetStateListener {
     private final SocialSystem socialSystem;
 
     private long petId;
+    private String name;
     private int hunger;
     private int social;
     private int comfort;
     private int happiness;
 
-    public Pet(long petId, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
+    public Pet(long petId, String name, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
         this.petId = petId;
+        this.name = name;
         this.hunger = hunger;
         this.social = social;
         this.comfort = comfort;
@@ -55,6 +57,8 @@ public class Pet implements PetDataProvider, PetStateListener {
         return petId;
     }
 
+    public String getName() { return name; }
+
     @Override
     public int getHunger() {
         return hunger;
@@ -73,6 +77,30 @@ public class Pet implements PetDataProvider, PetStateListener {
     @Override
     public int getHappiness() {
         return happiness;
+    }
+
+    public double getMinTemp() {
+        return comfortSystem.getMinTemp();
+    }
+
+    public double getMaxTemp() {
+        return comfortSystem.getMaxTemp();
+    }
+
+    public double getMinHumidity() {
+        return comfortSystem.getMinHumidity();
+    }
+
+    public double getMaxHumidity() {
+        return comfortSystem.getMaxHumidity();
+    }
+
+    public double getMinNoise() {
+        return socialSystem.getMinSoundThreshold();
+    }
+
+    public double getMaxNoise() {
+        return socialSystem.getMaxSoundThreshold();
     }
 
 // Setters
@@ -123,6 +151,21 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     public boolean wasNoiseDetected() {
         return socialSystem.wasNoiseDetected();
+    }
+
+    public void setTemperatureSettings(int minTemp, int maxTemp) {
+        comfortSystem.setMinTemp(minTemp);
+        comfortSystem.setMaxTemp(maxTemp);
+    }
+
+    public void setHumiditySettings(int minHumidity, int maxHumidity) {
+        comfortSystem.setMinHumidity(minHumidity);
+        comfortSystem.setMaxHumidity(maxHumidity);
+    }
+
+    public void setNoiseSettings(int minNoise, int maxNoise) {
+        socialSystem.setMinSoundThreshold(minNoise);
+        socialSystem.setMaxSoundThreshold(maxNoise);
     }
 
     @Override

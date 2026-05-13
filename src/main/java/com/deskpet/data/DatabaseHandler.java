@@ -1,26 +1,20 @@
 package com.deskpet.data;
-// Imports might have to change depending on file structure
-// Assumes following classes exists: SensorData, Pet
+
+import com.deskpet.domain.Pet;
+import com.deskpet.domain.PetDataProvider;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.deskpet.domain.Pet;
-import com.deskpet.domain.PetDataProvider;
+import java.util.ArrayList;
+import java.util.List;
 
 // Handles database interactions.
-/* Assumes Class SensorData exists.
-Validation must occur externally.
-Assumes SensorData has following functions:
-- getTemperature(), returns double
-- getPetId(), returns long
-- getRecordedAt(), returns time and date
-- getHumidity(), returns double
- */
 public class DatabaseHandler {
     Connection connection;
+
     public DatabaseHandler() {
         try {
             connection = Database.getConnection();
@@ -31,9 +25,9 @@ public class DatabaseHandler {
 
     public void logSensorData(long petId, String sensorType, double value) throws SQLException {
         String sql = """
-            INSERT INTO sensor_data (pet_id, sensor_type, value)
-            VALUES (?, ?, ?)
-            """;
+                INSERT INTO sensor_data (pet_id, sensor_type, value)
+                VALUES (?, ?, ?)
+                """;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, petId);
             statement.setString(2, sensorType);
@@ -45,11 +39,11 @@ public class DatabaseHandler {
     // reading historical movement data for displaying
     public java.time.LocalDateTime getLastMovementTime(long petId) throws SQLException {
         String sql = """
-            SELECT recorded_at FROM sensor_data
-            WHERE pet_id = ? AND sensor_type = 'MOVEMENT'
-            ORDER BY recorded_at DESC
-            LIMIT 1
-            """;
+                SELECT recorded_at FROM sensor_data
+                WHERE pet_id = ? AND sensor_type = 'MOVEMENT'
+                ORDER BY recorded_at DESC
+                LIMIT 1
+                """;
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, petId);
             try (ResultSet rs = statement.executeQuery()) {
@@ -62,15 +56,6 @@ public class DatabaseHandler {
     }
 
     // Updates the current pet_state.
-    /* Assumes Class Pet exists.
-    Validation must occur externally.
-    Assumes Pet has following functions:
-    - getHunger(), returns int
-    - getSocial(), returns int
-    - getComfort(), returns int
-    - getHappiness(), returns int
-    - getPetId(), returns long
-     */
     public void updatePetState(PetDataProvider pet) throws SQLException {
         String sql = """
                 UPDATE pet_state
@@ -89,31 +74,182 @@ public class DatabaseHandler {
         }
     }
 
-    // Load current pet_state (initial load).
-    /*
-    Assumes Pet has a constructor: Pet(long petId, int hunger, int social, int comfort)
-    */
+    // Load current pet_state and settings (initial load).
     public Pet loadPet(long petId) throws SQLException {
         String sql = """
-                SELECT hunger, social, comfort 
-                FROM pet_state
-                WHERE pet_id = ?
+                SELECT
+                    p.name,
+                    ps.hunger,
+                    ps.social,
+                    ps.comfort,
+                    pset.temp_min,
+                    pset.temp_max,
+                    pset.humidity_min,
+                    pset.humidity_max,
+                    pset.noise_min,
+                    pset.noise_max
+                FROM pet_state ps
+                JOIN pet_settings pset ON ps.pet_id = pset.pet_id
+                JOIN pet p ON ps.pet_id = p.pet_id
+                WHERE ps.pet_id = ?
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, petId);
-            
+
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     int hunger = resultSet.getInt("hunger");
-                    int social = resultSet.getInt("social");   
+                    int social = resultSet.getInt("social");
                     int comfort = resultSet.getInt("comfort");
-                    
-                    return new Pet(petId, hunger, social, comfort, this);
+
+                    String name = resultSet.getString("name");
+
+                    Pet pet = new Pet(petId, name, hunger, social, comfort, this);
+
+                    pet.setTemperatureSettings(resultSet.getInt("temp_min"), resultSet.getInt("temp_max"));
+
+                    pet.setHumiditySettings(resultSet.getInt("humidity_min"), resultSet.getInt("humidity_max"));
+
+                    pet.setNoiseSettings(resultSet.getInt("noise_min"), resultSet.getInt("noise_max"));
+
+                    return pet;
                 }
             }
         }
-        throw new SQLException("No pet_state found for pet_id = " + petId);
+
+        throw new SQLException("No pet found for pet_id = " + petId);
+    }
+
+    // Update the settings in database
+    public void updatePetSettings(
+            long petId,
+            int tempMin,
+            int tempMax,
+            int humidityMin,
+            int humidityMax,
+            int noiseMin,
+            int noiseMax
+    ) throws SQLException {
+        String sql = """
+        UPDATE pet_settings
+        SET temp_min = ?,
+            temp_max = ?,
+            humidity_min = ?,
+            humidity_max = ?,
+            noise_min = ?,
+            noise_max = ?
+        WHERE pet_id = ?
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, tempMin);
+            statement.setInt(2, tempMax);
+            statement.setInt(3, humidityMin);
+            statement.setInt(4, humidityMax);
+            statement.setInt(5, noiseMin);
+            statement.setInt(6, noiseMax);
+            statement.setLong(7, petId);
+            statement.executeUpdate();
+        }
+    }
+
+    // Get the first pet_id for loading pet at start
+    public long getFirstPetId() throws SQLException {
+        String sql = """
+        SELECT pet_id
+        FROM pet
+        ORDER BY pet_id
+        LIMIT 1
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+                return resultSet.getLong("pet_id");
+            }
+        }
+
+        throw new SQLException("No pets found in database.");
+    }
+
+    // Get list of all pets
+    public List<String> getAllPets() throws SQLException {
+        String sql = """
+        SELECT pet_id, name
+        FROM pet
+        ORDER BY pet_id
+        """;
+
+        List<String> pets = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                pets.add(resultSet.getLong("pet_id") + ": " + resultSet.getString("name"));
+            }
+        }
+
+        return pets;
+    }
+
+    // Create a new pet
+    public Pet createPet(String name) throws SQLException {
+        String countSql = "SELECT COUNT(*) FROM pet";
+
+        try (PreparedStatement statement = connection.prepareStatement(countSql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next() && resultSet.getInt(1) >= 3) {
+                throw new SQLException("Maximum number of pets reached.");
+            }
+        }
+
+        long petId;
+
+        String petSql = """
+        INSERT INTO pet (name)
+        VALUES (?)
+        RETURNING pet_id
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(petSql)) {
+            statement.setString(1, name);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    throw new SQLException("Could not create pet.");
+                }
+
+                petId = resultSet.getLong("pet_id");
+            }
+        }
+
+        String stateSql = """
+        INSERT INTO pet_state (pet_id, hunger, social, comfort, happiness)
+        VALUES (?, 80, 80, 80, 80)
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(stateSql)) {
+            statement.setLong(1, petId);
+            statement.executeUpdate();
+        }
+
+        String settingsSql = """
+        INSERT INTO pet_settings (
+            pet_id, temp_min, temp_max, humidity_min, humidity_max, noise_min, noise_max
+        )
+        VALUES (?, 18, 24, 30, 50, 30, 100)
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(settingsSql)) {
+            statement.setLong(1, petId);
+            statement.executeUpdate();
+        }
+
+        return loadPet(petId);
     }
 
     public Double getHungerGain(String rfidTag) throws SQLException {
@@ -160,9 +296,9 @@ public class DatabaseHandler {
 
     public void appendFeedingLog(long petId, long foodId) throws SQLException {
         String sql = """
-                INSERT INTO feeding_log(pet_id, food_id, fed_at)
-                VALUES (?, ?, CURRENT_TIMESTAMP)
-            """;
+                    INSERT INTO feeding_log(pet_id, food_id, fed_at)
+                    VALUES (?, ?, CURRENT_TIMESTAMP)
+                """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
