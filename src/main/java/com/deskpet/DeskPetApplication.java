@@ -83,6 +83,14 @@ public class DeskPetApplication extends Application {
         }
 
         try {
+            controller.setFeedingHistory(dbHandler.getFeedingHistory(pet.getPetId()));
+        } catch (SQLException e) {
+            System.out.println("Failed to create FeedingHistory" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        try {
             happinessPublisher = new HappinessPublisher();
         } catch (org.eclipse.paho.client.mqttv3.MqttException e) {
             System.out.println("Failed to create HappinessPublisher" + e.getMessage());
@@ -157,6 +165,14 @@ public class DeskPetApplication extends Application {
                 controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
             } catch (SQLException ex) {
                 System.out.println("Failed to create FoodStats" + ex.getMessage());
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
+
+            try {
+                controller.setFeedingHistory(dbHandler.getFeedingHistory(pet.getPetId()));
+            } catch (SQLException ex) {
+                System.out.println("Failed to create FeedingHistory" + ex.getMessage());
                 ex.printStackTrace();
                 throw new RuntimeException(ex);
             }

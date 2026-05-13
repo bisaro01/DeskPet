@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -337,6 +339,37 @@ public class DatabaseHandler {
                 throw new SQLException("No feeding log found for pet_id = " + petId);
             }
         }
+    }
+
+    public List<String> getFeedingHistory(long petId) throws SQLException {
+        List<String> feedingHistory = new ArrayList<>();
+
+        String sql = """
+                SELECT feeding_id, food.name, fed_at
+                FROM feeding_log
+                JOIN food ON feeding_log.food_id = food.food_id
+                WHERE feeding_log.pet_id = ?
+                ORDER BY fed_at DESC
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    long feedingId = resultSet.getLong("feeding_id");
+                    String foodName = resultSet.getString("name");
+                    LocalDateTime fedAtDt = resultSet.getTimestamp("fed_at").toLocalDateTime();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
+                    String fedAt = fedAtDt.format(formatter);
+
+                    feedingHistory.add("#" + feedingId + "  " + foodName + "  " + fedAt);
+                }
+            }
+        }
+        return feedingHistory;
     }
 
     public List<String> getFoodStats(Long petId) throws SQLException {

@@ -46,6 +46,9 @@ public class DashboardController {
     @FXML
     private ListView<String> foodStatsListView;
 
+    @FXML
+    private ListView<String> feedingHistoryListView;
+
     public void setActivePetName(String name) {
         activePetLabel.setText(name);
     }
@@ -56,6 +59,10 @@ public class DashboardController {
 
     public void setFoodStats(List<String> foodStats) {
         foodStatsListView.getItems().setAll(foodStats);
+    }
+
+    public void setFeedingHistory(List<String> feedingHistory) {
+        feedingHistoryListView.getItems().setAll(feedingHistory);
     }
 
     // Creates a background scheduler that can run tasks later or repeatedly
