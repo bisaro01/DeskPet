@@ -105,7 +105,9 @@ public class DatabaseHandler {
 
                     String name = resultSet.getString("name");
 
-                    Pet pet = new Pet(petId, name, hunger, social, comfort, this);
+                    String favouriteFood = getFavouriteFood(petId);
+
+                    Pet pet = new Pet(petId, name, favouriteFood, hunger, social, comfort, this);
 
                     pet.setTemperatureSettings(resultSet.getInt("temp_min"), resultSet.getInt("temp_max"));
 
@@ -250,6 +252,30 @@ public class DatabaseHandler {
         }
 
         return loadPet(petId);
+    }
+
+    public String getFavouriteFood(Long petId) throws SQLException {
+        String sql = """
+            SELECT food.name AS favourite_food
+            FROM pet_food_preferences
+            JOIN food ON pet_food_preferences.liked_food = food.food_id
+            WHERE pet_food_preferences.pet_id = ?
+    """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    String name = resultSet.getString("favourite_food");
+                    return name;
+                }
+            }
+        }
+        // Default if no favourite food exists yet
+        return "N/A";
     }
 
     public Double getHungerGain(String rfidTag) throws SQLException {
