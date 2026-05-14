@@ -62,6 +62,10 @@ public class SocialSystem {
         this.soundIncreasePer10Db = value;
     }
 
+    public long getLastSoundTime() {
+        return lastSoundTime;
+    }
+
     public double getDecayRatePerMinute() {
         return decayRatePerMinute;
     }
