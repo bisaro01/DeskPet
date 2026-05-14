@@ -373,7 +373,7 @@ public class DatabaseHandler {
         List<String> feedingHistory = new ArrayList<>();
 
         String sql = """
-                SELECT feeding_id, food.name, fed_at, reaction
+                SELECT food.name, fed_at, reaction
                 FROM feeding_log
                 JOIN food ON feeding_log.food_id = food.food_id
                 WHERE feeding_log.pet_id = ?
@@ -387,14 +387,13 @@ public class DatabaseHandler {
             try (ResultSet resultSet = statement.executeQuery()) {
 
                 while (resultSet.next()) {
-                    long feedingId = resultSet.getLong("feeding_id");
                     String foodName = resultSet.getString("name");
                     LocalDateTime fedAtDt = resultSet.getTimestamp("fed_at").toLocalDateTime();
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
                     String fedAt = fedAtDt.format(formatter);
                     String reaction = resultSet.getString("reaction");
 
-                    feedingHistory.add("#" + feedingId + " " + foodName + " " + fedAt + " " + reaction);
+                    feedingHistory.add(foodName + " " + fedAt + " " + reaction);
                 }
             }
         }
