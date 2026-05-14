@@ -280,6 +280,28 @@ public class DatabaseHandler {
         return "N/A";
     }
 
+    public Long getFavouriteFoodId(Long petId) throws SQLException {
+        String sql = """
+            SELECT liked_food AS favourite_food
+            FROM pet_food_preferences
+            WHERE pet_food_preferences.pet_id = ?
+    """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    Long favouriteFood = resultSet.getLong("favourite_food");
+                    return favouriteFood;
+                }
+            }
+        }
+        return -1L;
+    }
+
     public Double getHungerGain(String rfidTag) throws SQLException {
         String sql = """
                 SELECT rfid_tag, hunger_gain
@@ -324,14 +346,20 @@ public class DatabaseHandler {
 
     public void appendFeedingLog(long petId, long foodId) throws SQLException {
         String sql = """
-                    INSERT INTO feeding_log(pet_id, food_id, fed_at)
-                    VALUES (?, ?, CURRENT_TIMESTAMP)
+                    INSERT INTO feeding_log(pet_id, food_id, fed_at, reaction)
+                    VALUES (?, ?, CURRENT_TIMESTAMP,?)
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, petId);
             statement.setLong(2, foodId);
+
+            if (getFavouriteFoodId(petId) == foodId) {
+                statement.setString(4, "🤤");
+            } else {
+                statement.setString(4, "🤢");
+            }
 
             int rowsAffected = statement.executeUpdate();
 
@@ -345,7 +373,7 @@ public class DatabaseHandler {
         List<String> feedingHistory = new ArrayList<>();
 
         String sql = """
-                SELECT feeding_id, food.name, fed_at
+                SELECT feeding_id, food.name, fed_at, reaction
                 FROM feeding_log
                 JOIN food ON feeding_log.food_id = food.food_id
                 WHERE feeding_log.pet_id = ?
@@ -364,8 +392,9 @@ public class DatabaseHandler {
                     LocalDateTime fedAtDt = resultSet.getTimestamp("fed_at").toLocalDateTime();
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
                     String fedAt = fedAtDt.format(formatter);
+                    String reaction = resultSet.getString("reaction");
 
-                    feedingHistory.add("#" + feedingId + "  " + foodName + "  " + fedAt);
+                    feedingHistory.add("#" + feedingId + " " + foodName + " " + fedAt + " " + reaction);
                 }
             }
         }
