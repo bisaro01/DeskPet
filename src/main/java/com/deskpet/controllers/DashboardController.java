@@ -6,6 +6,8 @@ import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ProgressBar;
 import javafx.beans.binding.Bindings;
+
+import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import com.deskpet.DeskPetApplication;
@@ -20,6 +22,9 @@ public class DashboardController {
     private ProgressBar comfortBar;
     @FXML
     private ProgressBar socialBar;
+    @FXML
+    private Label lastMovement;
+    private DatabaseHandler dbHandler;
 
     private DeskPetApplication app;
 
@@ -45,13 +50,30 @@ public class DashboardController {
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
 
+    public void updateLatMovement(long petId) {
+        try {
+            java.time.LocalDateTime time = dbHandler.getLastMovementTime(petId);
+            if (time != null) {
+                lastMovement.setText(time.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss dd/MM")));
+            }
+            else {
+                lastMovement.setText("No data");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     private DashboardModel model = new DashboardModel();
 
     public DashboardModel getModel() {
         return model;
     }
 
-    public void setModelDbHandler(DatabaseHandler dbHandler) {model.setDbHandler(dbHandler);}
+    public void setModelDbHandler(DatabaseHandler dbHandler) {
+        this.dbHandler = dbHandler;
+        model.setDbHandler(dbHandler);
+    }
 
     public void bindProgressBarWithColor(ProgressBar progressBar, FloatProperty property) {
         progressBar.progressProperty().bind(property);
