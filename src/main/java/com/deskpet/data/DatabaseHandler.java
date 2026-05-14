@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,7 +107,9 @@ public class DatabaseHandler {
 
                     String name = resultSet.getString("name");
 
-                    Pet pet = new Pet(petId, name, hunger, social, comfort, this);
+                    String favouriteFood = getFavouriteFood(petId);
+
+                    Pet pet = new Pet(petId, name, favouriteFood, hunger, social, comfort, this);
 
                     pet.setTemperatureSettings(resultSet.getInt("temp_min"), resultSet.getInt("temp_max"));
 
@@ -252,6 +256,52 @@ public class DatabaseHandler {
         return loadPet(petId);
     }
 
+    public String getFavouriteFood(Long petId) throws SQLException {
+        String sql = """
+            SELECT food.name AS favourite_food
+            FROM pet_food_preferences
+            JOIN food ON pet_food_preferences.liked_food = food.food_id
+            WHERE pet_food_preferences.pet_id = ?
+    """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    String name = resultSet.getString("favourite_food");
+                    return name;
+                }
+            }
+        }
+        // Default if no favourite food exists yet
+        return "N/A";
+    }
+
+    public Long getFavouriteFoodId(Long petId) throws SQLException {
+        String sql = """
+            SELECT liked_food AS favourite_food
+            FROM pet_food_preferences
+            WHERE pet_food_preferences.pet_id = ?
+    """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                if (resultSet.next()) {
+                    Long favouriteFood = resultSet.getLong("favourite_food");
+                    return favouriteFood;
+                }
+            }
+        }
+        return -1L;
+    }
+
     public Double getHungerGain(String rfidTag) throws SQLException {
         String sql = """
                 SELECT rfid_tag, hunger_gain
@@ -296,8 +346,8 @@ public class DatabaseHandler {
 
     public void appendFeedingLog(long petId, long foodId) throws SQLException {
         String sql = """
-                    INSERT INTO feeding_log(pet_id, food_id, fed_at)
-                    VALUES (?, ?, CURRENT_TIMESTAMP)
+                    INSERT INTO feeding_log(pet_id, food_id, fed_at, reaction)
+                    VALUES (?, ?, CURRENT_TIMESTAMP,?)
                 """;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -305,11 +355,76 @@ public class DatabaseHandler {
             statement.setLong(1, petId);
             statement.setLong(2, foodId);
 
+            if (getFavouriteFoodId(petId) == foodId) {
+                statement.setString(4, "🤤");
+            } else {
+                statement.setString(4, "🤢");
+            }
+
             int rowsAffected = statement.executeUpdate();
 
             if (rowsAffected == 0) {
                 throw new SQLException("No feeding log found for pet_id = " + petId);
             }
         }
+    }
+
+    public List<String> getFeedingHistory(long petId) throws SQLException {
+        List<String> feedingHistory = new ArrayList<>();
+
+        String sql = """
+                SELECT food.name, fed_at, reaction
+                FROM feeding_log
+                JOIN food ON feeding_log.food_id = food.food_id
+                WHERE feeding_log.pet_id = ?
+                ORDER BY fed_at DESC
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    String foodName = resultSet.getString("name");
+                    LocalDateTime fedAtDt = resultSet.getTimestamp("fed_at").toLocalDateTime();
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm:ss");
+                    String fedAt = fedAtDt.format(formatter);
+                    String reaction = resultSet.getString("reaction");
+
+                    feedingHistory.add(foodName + " " + fedAt + " " + reaction);
+                }
+            }
+        }
+        return feedingHistory;
+    }
+
+    public List<String> getFoodStats(Long petId) throws SQLException {
+        List<String> foodStats = new ArrayList<>();
+
+        String sql = """
+                SELECT food.name, COUNT(*) AS eat_count
+                FROM feeding_log
+                JOIN food ON feeding_log.food_id = food.food_id
+                WHERE feeding_log.pet_id = ?
+                GROUP BY food.name
+                ORDER BY eat_count DESC
+                """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    String foodName = resultSet.getString("name");
+                    int count = resultSet.getInt("eat_count");
+                    foodStats.add(foodName + ": " + count);
+                }
+            }
+        }
+        return foodStats;
     }
 }

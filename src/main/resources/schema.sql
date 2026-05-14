@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS feeding_log (
     feeding_id BIGSERIAL PRIMARY KEY,
     pet_id BIGINT NOT NULL REFERENCES pet(pet_id),
     food_id BIGINT NOT NULL REFERENCES food(food_id),
-    fed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reaction VARCHAR(50)
     );
 
 CREATE TABLE IF NOT EXISTS pet_settings (

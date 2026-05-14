@@ -55,7 +55,7 @@ public class DeskPetApplication extends Application {
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
-                pet = new Pet(1, "Bob", 80, 80, 80, dbHandler);
+                pet = new Pet(1, "Bob", "Fish", 80, 80, 80, dbHandler);
             } else {
                 System.out.println("Loaded pet " + pet.getPetId() + ":");
                 System.out.println("Happiness: " + pet.getHappiness());
@@ -72,6 +72,23 @@ public class DeskPetApplication extends Application {
         }
 
         controller.setActivePetName(pet.getName());
+        controller.setActivePetFavouriteFood(pet.getFavouriteFood());
+
+        try {
+            controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
+        } catch (SQLException e) {
+            System.out.println("Failed to create FoodStats" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        try {
+            controller.setFeedingHistory(dbHandler.getFeedingHistory(pet.getPetId()));
+        } catch (SQLException e) {
+            System.out.println("Failed to create FeedingHistory" + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
 
         try {
             happinessPublisher = new HappinessPublisher();
@@ -144,7 +161,23 @@ public class DeskPetApplication extends Application {
                     }
                 }
 
-                pet.update(delta);
+            try {
+                controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
+            } catch (SQLException ex) {
+                System.out.println("Failed to create FoodStats" + ex.getMessage());
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
+
+            try {
+                controller.setFeedingHistory(dbHandler.getFeedingHistory(pet.getPetId()));
+            } catch (SQLException ex) {
+                System.out.println("Failed to create FeedingHistory" + ex.getMessage());
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
+
+            pet.update(delta);
 
             try {
                 model.updateState(pet);
@@ -244,6 +277,8 @@ public class DeskPetApplication extends Application {
             pet = dbHandler.loadPet(petId);
 
             controller.setActivePetName(pet.getName());
+            controller.setActivePetFavouriteFood(pet.getFavouriteFood());
+            controller.setFoodStats(dbHandler.getFoodStats(petId));
 
             comfortSubscriber.setPet(pet);
             hungerSubscriber.setPet(pet);

@@ -43,6 +43,7 @@ public class HungerSystem {
                 long foodId = dbHandler.getFoodId(rfidTag);
                 dbHandler.appendFeedingLog(petId, foodId);
 
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
