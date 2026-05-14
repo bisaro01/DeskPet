@@ -65,6 +65,7 @@ public class DeskPetApplication extends Application {
             }
 
             model.updateState(pet);
+            controller.updateLatMovement(pet.getPetId());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -151,6 +152,9 @@ public class DeskPetApplication extends Application {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
+
+            // update last movement in the dashboard
+            controller.updateLatMovement(pet.getPetId());
 
             try {
                 happinessPublisher.publish(pet.getHappiness());
@@ -250,6 +254,9 @@ public class DeskPetApplication extends Application {
             socialSubscriber.setPet(pet);
 
             model.updateState(pet);
+
+            // update last movement on the dashboard after pet change
+            controller.updateLatMovement(pet.getPetId());
 
             lastUpdate = System.currentTimeMillis();
 

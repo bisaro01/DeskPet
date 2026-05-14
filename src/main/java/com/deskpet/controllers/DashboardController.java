@@ -54,7 +54,7 @@ public class DashboardController {
         try {
             java.time.LocalDateTime time = dbHandler.getLastMovementTime(petId);
             if (time != null) {
-                lastMovement.setText(time.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss dd/MM")));
+                lastMovement.setText(time.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM  HH:mm")));
             }
             else {
                 lastMovement.setText("No data");
