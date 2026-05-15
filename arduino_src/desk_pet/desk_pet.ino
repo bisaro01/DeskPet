@@ -111,7 +111,7 @@ void connectMQTT() {
 
     if (client.connect(MQTT_CLIENT_ID)) {
     Serial.println("MQTT connected");
-    client.subscribe("deskpet/state/happiness");
+    client.subscribe("app/state/happiness");
 } else {
     Serial.print("MQTT failed. State: ");
     Serial.println(client.state());
@@ -234,8 +234,8 @@ void readTempHumidity() {
     // Publish readings to MQTT broker
     String tempStr = String(temperature);
     String humStr = String(humidity);
-    client.publish("deskpet/sensors/temperature", tempStr.c_str());
-    client.publish("deskpet/sensors/humidity", humStr.c_str());
+    client.publish("wio/sensors/temperature", tempStr.c_str());
+    client.publish("wio/sensors/humidity", humStr.c_str());
 }
     // Otherwise debug on serial
     else {
@@ -290,7 +290,7 @@ void readRfidTag() {
     Serial.println(uid);
 
     // Publish reading to MQTT
-    client.publish("deskpet/events/food", uid.c_str());
+    client.publish("wio/events/food", uid.c_str());
 
     // Time last read, for cooldown
     lastRfidReadTime = millis();
@@ -307,7 +307,7 @@ void readNoiseLevel() {
     return;
 }
 
-    const char* mqttNoiseTopic = "deskpet/sensors/sound";
+    const char* mqttNoiseTopic = "wio/sensors/sound";
     int rawSoundValue = analogRead(SOUND_SENSOR_PIN); // Read raw sound value (0-1023)
 
     // Map raw value (0-1023) to around 40-100 dB
@@ -340,7 +340,7 @@ void readPirSensor() {
     // Reduce MQTT spam
     if (millis() - lastPirEvent > PIR_COOLDOWN) {
     Serial.println("Movement detected");
-    client.publish("deskpet/sensors/motion", "1");
+    client.publish("wio/sensors/motion", "1");
     lastPirEvent = millis();
 }
 }
@@ -359,7 +359,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print("payload: ");
     Serial.println(message);
 
-    if (strcmp(topic, "deskpet/state/happiness") == 0) {
+    if (strcmp(topic, "app/state/happiness") == 0) {
     mood = message.toInt();
 }
 }
