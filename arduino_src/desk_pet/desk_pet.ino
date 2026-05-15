@@ -5,66 +5,69 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-// ==================================== CONSTANTS ==============================================
-// WiFi login
-// *** HIDE THESE IN LATER IMPLEMENTATION ***
-
+// ================= WIFI =================
 // Moa's hotspot
-const char* wifiName = "OnePlusNord";
-const char* password = "hello123";
+//const char* wifiName = "OnePlusNord";
+//const char* password = "hello123";
+// Moa laptop hotspot
+const char* wifiName = "Deskpet";
+const char* password = "deskpet123";
 
-// MQTT server
-const char* mqttServer = "172.29.73.248";
+// ================= MQTT =================
+//const char* mqttServer = "172.29.73.248";
+const char* mqttServer = "10.42.0.1"; //Moa
 const int mqttPort = 1883;
+const char* MQTT_CLIENT_ID = "deskpet-wio";
 
 // MQTT client instance
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
-
-// <<< SENSOR TYPES >>>
+// ================= SENSOR TYPES =================
 #define DHTTYPE DHT11       // Humidity and temperature specifying type DH11
 
-
-// <<< DEFINED PINS >>>
-#define BUZZER WIO_BUZZER   // Inbuilt buzzer
+// ================= PINS =================
+#define BUZZER WIO_BUZZER   // Built-in buzzer
 #define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
-#define RFID_RST_PIN 0      // Change depending on physical build connections
-#define RFID_SS_PIN 1       // Change depending on physical build connections
+#define RFID_RST_PIN 0      // RFID RST
+#define RFID_SS_PIN 1       // RFID SS
 #define SOUND_SENSOR_PIN A3 // Sound sensor pin A3
 #define PIRPIN 4            // PIR motion sensor pin D3 on WIO diagram
 
-
-// <<< OTHER INSTANCES >>>
+// ================= INSTANCES =================
 TFT_eSPI tft;                               // Graphical drawing object
 DHT dht(DHTPIN, DHTTYPE);                   // Humidity and temperature object
 MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 
+// ================= TIMERS =================
 // RFID cooldown
 unsigned long lastRfidReadTime = 0;
-const unsigned long RFID_COOLDOWN = 5000;   // 5 second
+const unsigned long RFID_COOLDOWN = 1000;   // 1 seconds
 
-// PIR cooldown
+// Movement cooldown
 int lastPirState = LOW;
 unsigned long lastPirEvent = 0;
-const unsigned long PIR_COOLDOWN = 3000;    // 3 second
+const unsigned long PIR_COOLDOWN = 3000;
 
+// Sensor cooldown
 unsigned long lastSensorRead = 0;
-const unsigned long SENSOR_INTERVAL = 2000;
+const unsigned long SENSOR_INTERVAL = 2000; // 2 seconds
 
-int mood = 100;
-int lastMood = -1; // 0 = sad, 1 = happy
+// Sound cooldown
+unsigned long lastNoiseReadTime = 0;
+const unsigned long NOISE_READ_INTERVAL = 3000; // 3 seconds
 
+// MQTT Reconnection cooldown
 unsigned long lastMqttReconnectAttempt = 0;
 const unsigned long MQTT_RETRY_INTERVAL = 1000;
 
-// Noise levels
-int previousNoiseDecibels = -1; 
-unsigned long lastNoiseReadTime = 0; // Last time noise was read
-const unsigned long NOISE_READ_INTERVAL = 3000;  // Read noise level every 3 seconds
+// ================= STATE =================
+int mood = 100;
+int lastMood = -1; // 0 = sad, 1 = happy
 
-// ============================  WiFi & MQTT FUNCTIONS  =======================================
+int previousNoiseDecibels = -1;
 
+// ================= WIFI =================
 void connectWifi() {
     tft.fillScreen(TFT_WHITE);
     tft.setTextColor(TFT_BLACK);
@@ -76,9 +79,9 @@ void connectWifi() {
 
     // Keep trying to connect every 5ms untill successfull
     while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.println(".");
-    }
+    delay(500);
+    Serial.println(".");
+}
 
     // Display sucess message once connected on both serial and WIO
     tft.fillScreen(TFT_WHITE);
@@ -87,42 +90,36 @@ void connectWifi() {
     Serial.println("WiFi connected");
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
-
-    delay(1000);
 }
 
+// ================= MQTT =================
 void connectMQTT() {
     // Already connected
     if (client.connected()) {
-        return;
-    }
+    return;
+}
 
     // Retry only once per second
     if (millis() - lastMqttReconnectAttempt < MQTT_RETRY_INTERVAL) {
-        return;
-    }
-
+    return;
+}
     lastMqttReconnectAttempt = millis();
 
     Serial.println("Connecting to MQTT...");
 
-    // Unique client ID
-    String clientId = "WioTerminal-" + String(random(0xffff), HEX);
+    wifiClient.stop();
 
-    if (client.connect(clientId.c_str())) {
-        Serial.println("MQTT connected.");
-
-        client.subscribe("app/state/happiness");
-    }
-    else {
-        Serial.print("MQTT Connection failed. State: ");
-        Serial.println(client.state());
-    }
+    if (client.connect(MQTT_CLIENT_ID)) {
+    Serial.println("MQTT connected");
+    client.subscribe("deskpet/state/happiness");
+} else {
+    Serial.print("MQTT failed. State: ");
+    Serial.println(client.state());
+}
 }
 
 
-// ===============================  FACIAL FUNCTIONS  =========================================
-
+// ================= FACES =================
 void happyFace() {
     // Reset background
     tft.fillScreen(TFT_WHITE);
@@ -135,17 +132,13 @@ void happyFace() {
 
     // Draw illusion of thick smile by stacking multiple circles
     // With decreasing radius
-    for(int i = 0; i < thickness; i++) {
-        tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
-    }
+    for (int i = 0; i < thickness; i++) {
+    tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
+}
 
     // Cut off top half to make smile
     tft.fillRect(
-    mouthX - radius - 2,
-    mouthY - radius - 2,
-    (radius * 2) + 4,
-    radius + 2,
-    TFT_WHITE
+    mouthX - radius - 2, mouthY - radius - 2, (radius * 2) + 4, radius + 2, TFT_WHITE
     );
 
     // Eyes
@@ -163,17 +156,13 @@ void sadFace() {
     int radius = 25;
     int thickness = 6;
 
-    for(int i = 0; i < thickness; i++) {
-        tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
-    }
+    for (int i = 0; i < thickness; i++) {
+    tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
+}
 
     // Cut off bottom half of mouth
     tft.fillRect(
-    mouthX - radius - 2,
-    mouthY + 2,
-    (radius *2) + 4,
-    radius + 2,
-    TFT_WHITE
+    mouthX - radius - 2, mouthY + 2, (radius *2) + 4, radius + 2, TFT_WHITE
     );
 
     // Eyes
@@ -221,79 +210,77 @@ void sadSound() {
     noTone(BUZZER);
 }
 
-// ===============================  SENSOR FUNCTIONS  ========================================
-
+// ================= TEMP/HUMIDITY =================
 void readTempHumidity() {
-    /*
-        Reads the humidity and temperature values trough the DHT11 sensro, and publihses to
-        defined MQTT broker.
-
-        - Stores the values in tempHumVal array
-        - tempHumVal[0] = humidity
-        - tempHumVal[1] = temperature
-        - publishes data to MQTT broke on topic "wio/humTemp"
-    */
+    if (!client.connected()) {
+    Serial.println("Temp/humidity skipped: MQTT disconnected");
+    return;
+}
 
     // Defines array of size 2 for the readings and initialises both as 0
     float tempHumVal[2] = {0};
 
     // Check if reading didnt fail read the values
-    if(!dht.readTempAndHumidity(tempHumVal)) {
-        float humidity = tempHumVal[0];
-        float temperature = tempHumVal[1];
+    if (!dht.readTempAndHumidity(tempHumVal)) {
+    float humidity = tempHumVal[0];
+    float temperature = tempHumVal[1];
 
-        // Debugging terminal print
-        // Serial.print(humidity);
-        // Serial.print("%, ");
-        // Serial.print(temperature);
-        // Serial.println("C");
+    // Debugging terminal print
+    // Serial.print(humidity);
+    // Serial.print("%, ");
+    // Serial.print(temperature);
+    // Serial.println("C");
 
-        // Publish readings to MQTT broker
-        // String payload = String(humidity) + "," + String(temperature);
-        String tempStr = String(temperature);
-        String humStr = String(humidity);
-        client.publish("wio/sensors/temperature", tempStr.c_str());
-        client.publish("wio/sensors/humidity", humStr.c_str());
-        // client.publish("wio/humTemp", payload.c_str());
-    }
+    // Publish readings to MQTT broker
+    String tempStr = String(temperature);
+    String humStr = String(humidity);
+    client.publish("deskpet/sensors/temperature", tempStr.c_str());
+    client.publish("deskpet/sensors/humidity", humStr.c_str());
+}
     // Otherwise debug on serial
     else {
-        Serial.print("Failed to get humidity and temperature values.");
-    }
+    Serial.print("Failed to get humidity and temperature values.");
+}
 }
 
+// ================= RFID =================
 void readRfidTag() {
+    if (!client.connected()) {
+    Serial.println("RFID skipped: MQTT disconnected");
+    return;
+}
+
     // Check if cooldown has passed
     if (millis() - lastRfidReadTime < RFID_COOLDOWN) {
-        return;
-    }
+    return;
+}
 
     // Check if a tag is close enough to read
     if (!rfid.PICC_IsNewCardPresent()) {
-        return;
-    }
+    return;
+}
 
     // Read tag
     if (!rfid.PICC_ReadCardSerial()) {
-        return;
-    }
+    return;
+}
 
     String uid = "";
 
     // Loop through UID
     for (byte i = 0; i < rfid.uid.size; i++) {
-        if (rfid.uid.uidByte[i] < 0x10) {
-        uid += "0";
-        }
+    if (rfid.uid.uidByte[i] < 0x10) {
+    uid += "0";
+}
 
-        // Add as hecadecimal text
-        uid += String(rfid.uid.uidByte[i], HEX);
+    // Add as hecadecimal text
+    uid += String(rfid.uid.uidByte[i], HEX);
 
-        // Add ':' between UID sections
-        if (i < rfid.uid.size - 1) {
-        uid += ":";
-        }
-    }
+    // Add ':' between UID sections
+    if (i < rfid.uid.size - 1) {
+    uid += ":";
+}
+}
 
     // Make UID uppercase
     uid.toUpperCase();
@@ -303,18 +290,24 @@ void readRfidTag() {
     Serial.println(uid);
 
     // Publish reading to MQTT
-    client.publish("wio/events/food", uid.c_str());
+    client.publish("deskpet/events/food", uid.c_str());
 
     // Time last read, for cooldown
     lastRfidReadTime = millis();
 
     // Ends communication with current tag
-    // rfid.PICC_HaltA();
-    // rfid.PCD_StopCrypto1();
+    rfid.PICC_HaltA();
+    rfid.PCD_StopCrypto1();
 }
 
+// ================= SOUND SENSOR =================
 void readNoiseLevel() {
-    const char* mqttNoiseTopic = "wio/sensors/sound";
+    if (!client.connected()) {
+    Serial.println("Noise skipped: MQTT disconnected");
+    return;
+}
+
+    const char* mqttNoiseTopic = "deskpet/sensors/sound";
     int rawSoundValue = analogRead(SOUND_SENSOR_PIN); // Read raw sound value (0-1023)
 
     // Map raw value (0-1023) to around 40-100 dB
@@ -322,55 +315,60 @@ void readNoiseLevel() {
 
     // Ignore readings that happen at the extremes (0-10 and 1013-1023)
     if (rawSoundValue > 10 && rawSoundValue < 1013) {
-        if (abs(noiseDecibels - previousNoiseDecibels) > 3) {
-            previousNoiseDecibels = noiseDecibels;
-            client.publish(mqttNoiseTopic, String(noiseDecibels).c_str());
-            Serial.print("Noise level: ");
-            Serial.print(noiseDecibels);
-            Serial.println(" dB");
-        }
-    }
+    if (abs(noiseDecibels - previousNoiseDecibels) > 3) {
+    previousNoiseDecibels = noiseDecibels;
+    client.publish(mqttNoiseTopic, String(noiseDecibels).c_str());
+    Serial.print("Noise level: ");
+    Serial.print(noiseDecibels);
+    Serial.println(" dB");
+}
+}
 }
 
+// ================= PIR SENSOR =================
+void readPirSensor() {
+    if (!client.connected()) {
+    Serial.println("PIR skipped: MQTT disconnected");
+    return;
+}
+
+    int currentPirState = digitalRead(PIRPIN);
+
+    // Trigger a publish only if state changes
+    if (currentPirState == HIGH && lastPirState == LOW) {
+
+    // Reduce MQTT spam
+    if (millis() - lastPirEvent > PIR_COOLDOWN) {
+    Serial.println("Movement detected");
+    client.publish("deskpet/sensors/motion", "1");
+    lastPirEvent = millis();
+}
+}
+    lastPirState = currentPirState;
+}
+// ================= CALLBACK =================
 void callback(char* topic, byte* payload, unsigned int length) {
     String message = "";
 
-    for (int i = 0; i < length; i++) {
-        message += (char)payload[i];
-    }
+    for (unsigned int i = 0; i < length; i++) {
+    message += (char)payload[i];
+}
 
     Serial.print("Message received on topic: ");
     Serial.println(topic);
     Serial.print("payload: ");
     Serial.println(message);
 
-    if (strcmp(topic, "app/state/happiness") == 0) {
-        mood = message.toInt();
-    }
+    if (strcmp(topic, "deskpet/state/happiness") == 0) {
+    mood = message.toInt();
+}
 }
 
-void readPirSensor() {
-    int currentPirState = digitalRead(PIRPIN);
-
-    // Trigger a publish only if state changes
-    if(currentPirState == HIGH && lastPirState == LOW) {
-
-        // Reduce MQTT spam
-        if(millis() - lastPirEvent > PIR_COOLDOWN) {
-            Serial.println("Movement detected");
-            client.publish("wio/sensors/motion", "1");
-            lastPirEvent = millis();
-        }
-    }
-    lastPirState = currentPirState;
-}
-// ==================================  SET UP STAGE  =========================================
-// Main set up
+// ================= SETUP =================
 void setup() {
     // <<< PINS / HARDWARE >>>
     pinMode(BUZZER, OUTPUT);
     pinMode(PIRPIN, INPUT);
-
 
     // Start serial (Arduino IDE terminal)
     Serial.begin(9600);
@@ -378,6 +376,7 @@ void setup() {
     // Begin graphics drawing
     tft.begin();
     tft.setRotation(3);
+
     // Begin temperature & humidity sensor
     dht.begin();
 
@@ -385,57 +384,50 @@ void setup() {
     SPI.begin();
     rfid.PCD_Init();
 
-    // <<< CONNECTIVITY >>>
     // Connect to WiFi
     connectWifi();
 
     // Connect MQTT
     client.setServer(mqttServer, mqttPort);
     client.setCallback(callback);
-
     client.setKeepAlive(15);
-    client.setSocketTimeout(3);
+    client.setSocketTimeout(1);
 }
 
-// ===================================  MAIN LOOP =========================================
+// ================= LOOP =================
 void loop() {
     // Maintains MQTT connection on every iteration of main loop
-    if(!client.connected()) {
-        tft.drawString("MQTT: OFF", 10, 10);
-        connectMQTT();
-    } else {
-        tft.drawString("MQTT: ON", 10, 10);
-        client.loop();
-    }
-
-    // Test code for facial expressions
-    // int mood = random(0, 100);
+    if (!client.connected()) {
+    connectMQTT();
+} else {
+    client.loop();
+}
 
     int currentMood = (mood < 50) ? 0 : 1;
 
     if (currentMood != lastMood) {
-        lastMood = currentMood;
+    lastMood = currentMood;
 
-        if (currentMood == 0) {
-            sadFace();
-            sadSound();
-        } else {
-            happyFace();
-            happySound();
-        }
-    }
+    if (currentMood == 0) {
+    sadFace();
+    sadSound();
+} else {
+    happyFace();
+    happySound();
+}
+}
 
     if (millis() - lastSensorRead > SENSOR_INTERVAL) {
-        lastSensorRead = millis();
-        // Temperature and humidity test
-        readTempHumidity();
-    }
+    lastSensorRead = millis();
+    // Temperature and humidity test
+    readTempHumidity();
+}
 
     // Read noise sensor
     if (millis() - lastNoiseReadTime > NOISE_READ_INTERVAL) {
-        lastNoiseReadTime = millis();
-        readNoiseLevel();
-    }
+    lastNoiseReadTime = millis();
+    readNoiseLevel();
+}
 
     // RFID scanner function
     readRfidTag();
