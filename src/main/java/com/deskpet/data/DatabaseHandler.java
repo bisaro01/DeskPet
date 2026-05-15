@@ -356,9 +356,9 @@ public class DatabaseHandler {
             statement.setLong(2, foodId);
 
             if (getFavouriteFoodId(petId) == foodId) {
-                statement.setString(4, "🤤");
+                statement.setString(3, "🤤");
             } else {
-                statement.setString(4, "🤢");
+                statement.setString(3, "🤢");
             }
 
             int rowsAffected = statement.executeUpdate();
@@ -393,7 +393,7 @@ public class DatabaseHandler {
                     String fedAt = fedAtDt.format(formatter);
                     String reaction = resultSet.getString("reaction");
 
-                    feedingHistory.add(foodName + " " + fedAt + " " + reaction);
+                    feedingHistory.add(foodName + "  " + fedAt + "  " + reaction);
                 }
             }
         }
