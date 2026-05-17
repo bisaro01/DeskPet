@@ -13,26 +13,17 @@ public class Pet implements PetDataProvider, PetStateListener {
     private long petId;
     private String name;
     private String favouriteFood;
-    private int hunger;
-    private int social;
-    private int comfort;
-    private int happiness;
+    private double happiness;
+    // TODO get happiness from DB, update getHappiness()
 
-    public Pet(long petId, String name, String favouriteFood, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
+    public Pet(long petId, String name, String favouriteFood, int happiness, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
         this.petId = petId;
         this.name = name;
         this.favouriteFood = favouriteFood;
-        this.hunger = hunger;
-        this.social = social;
-        this.comfort = comfort;
+        this.happiness = happiness;
         comfortSystem = new ComfortSystem(comfort);
         hungerSystem = new HungerSystem(hunger, dbHandler);
         socialSystem = new SocialSystem(social);
-
-        // read and load previous states fom the DB
-        comfortSystem.setComfort(comfort);
-        hungerSystem.setHunger(hunger);
-        socialSystem.setSocial(social);
     }
 
     // Decay need values based on time passed, if pet outside comfortable bounds.
@@ -76,7 +67,7 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     @Override
     public int getHappiness() {
-        return (getHunger() + getComfort() + getSocial()) / 3;
+        return (int)Math.round(happiness);
     }
 
     public double getMinTemp() {
@@ -101,37 +92,6 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     public double getMaxNoise() {
         return socialSystem.getMaxSoundThreshold();
-    }
-
-// Setters
-    public void setHunger(int hunger) {
-        if (hunger > 100) {
-            this.hunger = 100;
-        } else if (hunger < 0) {
-            this.hunger = 0;
-        } else {
-            this.hunger = hunger;
-        }
-    }
-
-    public void setSocial(int social) {
-        if (social > 100) {
-            this.social = 100;
-        } else if (social < 0) {
-            this.social = 0;
-        } else {
-            this.social = social;
-        }
-    }
-
-    public void setComfort(int comfort) {
-        if (comfort > 100) {
-            this.comfort = 100;
-        } else if (comfort < 0) {
-            this.comfort = 0;
-        } else {
-            this.comfort = comfort;
-        }
     }
 
     public boolean wasMotionDetected() {
@@ -184,11 +144,108 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     public void update(double delta) {
         applyDecay(delta);
+        updateHappiness(delta);
+    }
+
+    private void updateHappiness(double delta) {
+        double moodDelta = 0;
+
+        moodDelta += hungerMoodEffect();
+        moodDelta += comfortMoodEffect();
+        moodDelta += socialMoodEffect();
+
+        if (moodDelta > 0) {
+            moodDelta *= 0.5;
+        }
+
+        happiness += moodDelta * delta;
+
+        if (happiness > 100) happiness = 100;
+        if (happiness < 0) happiness = 0;
+    }
+
+    private double socialMoodEffect() {
+        double social = getSocial();
+
+        // Fulfilled
+        if (social > 80) {
+            return +0.10;
+        }
+
+        // Good
+        if (social > 60) {
+            return +0.02;
+        }
+
+        // Okay
+        if (social > 40) {
+            return 0;
+        }
+
+        // Lonely
+        if (social > 20) {
+            return -0.09;
+        }
+
+        // Depressed
+        return -0.27;
+    }
+
+    private double comfortMoodEffect() {
+        double comfort = getComfort();
+
+        // Very comfortable
+        if (comfort > 80) {
+            return +0.05;
+        }
+
+        // Comfortable
+        if (comfort > 60) {
+            return +0.02;
+        }
+
+        // Okay
+        if (comfort > 40) {
+            return 0;
+        }
+
+        // Uncomfortable
+        if (comfort > 20) {
+            return -0.05;
+        }
+
+        // Miserable
+        return -0.20;
+    }
+
+    private double hungerMoodEffect() {
+        double hunger = getHunger();
+
+        // Well-fed
+        if (hunger > 80) {
+            return +0.03;
+        }
+
+        // Peckish
+        if (hunger > 60) {
+            return +0.01;
+        }
+
+        // Hungry
+        if (hunger > 40) {
+            return -0.04;
+        }
+
+        // Very hungry
+        if (hunger > 20) {
+            return -0.12;
+        }
+
+        // Starving
+        return -0.35;
     }
 
     public Mood getMood() {
-        int happiness = getHappiness();
-
         if (happiness > 80) {
             return Mood.VERY_HAPPY;
         } else if (happiness > 60) {

@@ -24,30 +24,6 @@ public class HappinessPublisher {
         System.out.println("Connected to MQTT broker!");
     }
 
-    // Sends test happiness values
-    public void sendTestMessages() throws MqttException {
-        for (int i = 0; i < 5; i++) {
-            int happiness = 60 + i * 10;  // 60, 70, 80, 90, 100
-            String payload = String.valueOf(happiness); // Convert message to string
-
-            MqttMessage message = new MqttMessage(payload.getBytes()); // Creates an MQTT message
-            mqttClient.publish(TOPIC, message); // Sends the message
-
-            System.out.println("Sent: happiness = " + happiness);
-
-            // Wait 2 seconds before sending next one
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        // Disconnect once done
-        mqttClient.disconnect();
-        System.out.println("All messages sent. Disconnected.");
-    }
-
     public void stop() throws MqttException {
         try {
             if (mqttClient != null && mqttClient.isConnected()) {
@@ -59,8 +35,6 @@ public class HappinessPublisher {
     }
 
     public void publish(PetDisplayState state) throws MqttException {
-//        MqttMessage msg = new MqttMessage(Integer.toString(happiness).getBytes());
-
         System.out.println("APP PUBLISHING: " + state.getMoodId());
         System.out.println("APP PUBLISHING: " + state.getIssueFlags());
 

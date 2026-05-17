@@ -61,7 +61,7 @@ public class DeskPetApplication extends Application {
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
-                pet = new Pet(1, "Bob", "Fish", 80, 80, 80, dbHandler);
+                pet = new Pet(1, "Bob", "Fish", 80, 80, 80, 80, dbHandler);
             } else {
                 System.out.println("Loaded pet " + pet.getPetId() + ":");
                 System.out.println("Happiness: " + pet.getHappiness());

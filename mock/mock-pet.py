@@ -249,6 +249,7 @@ def loop():
 
     publish_accumulator = 0
     sensor_accumulator = 0
+    feed_accumulator = 0
 
     while running:
         delta = clock.tick(60) / 1000.0
@@ -267,6 +268,13 @@ def loop():
         if publish_accumulator > 3.0:
             mqtt_publish()
             publish_accumulator = 0
+
+        if feed_accumulator > 10.0:
+            feed = random.randint(0, 100)
+            if feed > 95:
+                client.publish("deskpet/events/food", random.choice(sensors["rfid_tag"]))
+                print("FEEDING PET")
+                feed_accumulator = 0
 
         refresh_display()
 
