@@ -67,6 +67,16 @@ int lastMood = -1; // 0 = sad, 1 = happy
 
 int previousNoiseDecibels = -1;
 
+// ================= SOUND =================
+int melodyNotes[5];
+int melodyDurations[5];
+
+int melodyLength = 0;
+int melodyIndex = 0;
+
+unsigned long lastNoteTime = 0;
+bool melodyPlaying = false;
+
 // ================= WIFI =================
 void connectWifi() {
     tft.fillScreen(TFT_WHITE);
@@ -117,7 +127,6 @@ void connectMQTT() {
     Serial.println(client.state());
 }
 }
-
 
 // ================= FACES =================
 void happyFace() {
@@ -170,44 +179,68 @@ void sadFace() {
     tft. fillCircle(200, 80, 8, TFT_BLACK);
 }
 
+// ================= MELODY =================
+void updateSound() {
+    if (!melodyPlaying) {
+    return;
+}
+
+    if (millis() - lastNoteTime < melodyDurations[melodyIndex]) {
+    return;
+}
+
+    lastNoteTime = millis();
+
+    if (melodyNotes[melodyIndex] == 0) {
+    noTone(BUZZER);
+    } else {
+    tone(BUZZER, melodyNotes[melodyIndex]);
+}
+
+    melodyIndex++;
+
+    if (melodyIndex >= melodyLength) {
+    melodyPlaying = false;
+    noTone(BUZZER);
+}
+}
+
 void happySound() {
-    //TODO: Consider a different design:
-    // Array of tones + array of durations
-    // startMelody(const int* notes, const int* durations, int length) to start playing a startMelody
-    // in loop(): updateMelody(), bool isPlaying
-    // in loop(): if (millis() - lastNoteTime >= currentDurations[melodyIndex])
-    //     if (melodyIndex >= melodyLength) isPlaying = false, noTone
-    //     lastNoteTime = millis()
-    //     play next tone
-    tone(BUZZER, 1000);
-    delay(80);
+    melodyNotes[0] = 1000;
+    melodyNotes[1] = 1600;
+    melodyNotes[2] = 1200;
+    melodyNotes[3] = 0;
+    melodyNotes[4] = 1800;
 
-    tone(BUZZER, 1600);
-    delay(80);
+    melodyDurations[0] = 80;
+    melodyDurations[1] = 80;
+    melodyDurations[2] = 120;
+    melodyDurations[3] = 50;
+    melodyDurations[4] = 100;
 
-    tone(BUZZER, 1200);
-    delay(120);
+    melodyLength = 5;
+    melodyIndex = 0;
+    melodyPlaying = true;
+    lastNoteTime = millis() - melodyDurations[0];
 
-    noTone(BUZZER);
-    delay(50);
-
-    tone(BUZZER, 1800);
-    delay(100);
-
-    noTone(BUZZER);
+    updateSound();
 }
 
 void sadSound() {
-    tone(BUZZER, 1000);
-    delay(300);
+    melodyNotes[0] = 1000;
+    melodyNotes[1] = 500;
+    melodyNotes[2] = 200;
 
-    tone(BUZZER, 500);
-    delay(200);
+    melodyDurations[0] = 300;
+    melodyDurations[1] = 200;
+    melodyDurations[2] = 100;
 
-    tone(BUZZER, 200);
-    delay(100);
+    melodyLength = 3;
+    melodyIndex = 0;
+    melodyPlaying = true;
+    lastNoteTime = millis() - melodyDurations[0];
 
-    noTone(BUZZER);
+    updateSound();
 }
 
 // ================= TEMP/HUMIDITY =================
@@ -401,6 +434,7 @@ void loop() {
     connectMQTT();
 } else {
     client.loop();
+    updateSound();
 }
 
     int currentMood = (mood < 50) ? 0 : 1;
