@@ -6,10 +6,7 @@
 #include <MFRC522.h>
 
 // ================= WIFI =================
-// Moa's hotspot
-//const char* wifiName = "OnePlusNord";
-//const char* password = "hello123";
-// Moa laptop hotspot
+// Moas laptop hotspot (For demo only)
 const char* wifiName = "Deskpet";
 const char* password = "deskpet123";
 
@@ -24,25 +21,25 @@ WiFiClient wifiClient;
 PubSubClient client(wifiClient);
 
 // ================= SENSOR TYPES =================
-#define DHTTYPE DHT11       // Humidity and temperature specifying type DH11
+#define DHTTYPE DHT11       // Humidity and temperature sensor
 
 // ================= PINS =================
 #define BUZZER WIO_BUZZER   // Built-in buzzer
-#define DHTPIN 2            // Humidity and temperature sensor pin D2 on WIO diagram
-#define RFID_RST_PIN 0      // RFID RST
-#define RFID_SS_PIN 1       // RFID SS
-#define SOUND_SENSOR_PIN A3 // Sound sensor pin A3
-#define PIRPIN 4            // PIR motion sensor pin D3 on WIO diagram
+#define DHTPIN 2            // Humidity and temperature sensor
+#define RFID_RST_PIN 0      // RFID
+#define RFID_SS_PIN 1       // RFID
+#define SOUND_SENSOR_PIN A3 // Sound sensor
+#define PIRPIN 4            // PIR motion sensor
 
 // ================= INSTANCES =================
-TFT_eSPI tft;                               // Graphical drawing object
-DHT dht(DHTPIN, DHTTYPE);                   // Humidity and temperature object
+TFT_eSPI tft;   // Graphical drawing object
+DHT dht(DHTPIN, DHTTYPE);   // Humidity and temperature object
 MFRC522 rfid(RFID_SS_PIN, RFID_RST_PIN);    // RFID object
 
 // ================= TIMERS =================
 // RFID cooldown
 unsigned long lastRfidReadTime = 0;
-const unsigned long RFID_COOLDOWN = 1000;   // 1 seconds
+const unsigned long RFID_COOLDOWN = 1000;
 
 // Movement cooldown
 int lastPirState = LOW;
@@ -51,11 +48,11 @@ const unsigned long PIR_COOLDOWN = 3000;
 
 // Sensor cooldown
 unsigned long lastSensorRead = 0;
-const unsigned long SENSOR_INTERVAL = 2000; // 2 seconds
+const unsigned long SENSOR_INTERVAL = 2000;
 
 // Sound cooldown
 unsigned long lastNoiseReadTime = 0;
-const unsigned long NOISE_READ_INTERVAL = 3000; // 3 seconds
+const unsigned long NOISE_READ_INTERVAL = 3000;
 
 // MQTT Reconnection cooldown
 unsigned long lastMqttReconnectAttempt = 0;
@@ -63,7 +60,7 @@ const unsigned long MQTT_RETRY_INTERVAL = 1000;
 
 // ================= STATE =================
 int mood = 100;
-int lastMood = -1; // 0 = sad, 1 = happy
+int lastMood = -1;  // 0 = sad, 1 = happy
 
 int previousNoiseDecibels = -1;
 
@@ -87,11 +84,10 @@ void connectWifi() {
     // Begin connection attempt
     WiFi.begin(wifiName, password);
 
-    // Keep trying to connect every 5ms untill successfull
+    // Wait until WiFi is connected
     while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.println(".");
-}
+    }
 
     // Display sucess message once connected on both serial and WIO
     tft.fillScreen(TFT_WHITE);
@@ -107,25 +103,23 @@ void connectMQTT() {
     // Already connected
     if (client.connected()) {
     return;
-}
+    }
 
     // Retry only once per second
     if (millis() - lastMqttReconnectAttempt < MQTT_RETRY_INTERVAL) {
     return;
-}
+    }
     lastMqttReconnectAttempt = millis();
 
     Serial.println("Connecting to MQTT...");
 
+    // Clears TCP sockets before reconnecting
     wifiClient.stop();
 
     if (client.connect(MQTT_CLIENT_ID)) {
     Serial.println("MQTT connected");
     client.subscribe("app/state/happiness");
-} else {
-    Serial.print("MQTT failed. State: ");
-    Serial.println(client.state());
-}
+    }
 }
 
 // ================= FACES =================
@@ -143,7 +137,7 @@ void happyFace() {
     // With decreasing radius
     for (int i = 0; i < thickness; i++) {
     tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
-}
+    }
 
     // Cut off top half to make smile
     tft.fillRect(
@@ -167,7 +161,7 @@ void sadFace() {
 
     for (int i = 0; i < thickness; i++) {
     tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
-}
+    }
 
     // Cut off bottom half of mouth
     tft.fillRect(
@@ -180,14 +174,15 @@ void sadFace() {
 }
 
 // ================= MELODY =================
+// Update the melody without blocking
 void updateSound() {
     if (!melodyPlaying) {
     return;
-}
+    }
 
     if (millis() - lastNoteTime < melodyDurations[melodyIndex]) {
     return;
-}
+    }
 
     lastNoteTime = millis();
 
@@ -195,14 +190,14 @@ void updateSound() {
     noTone(BUZZER);
     } else {
     tone(BUZZER, melodyNotes[melodyIndex]);
-}
+    }
 
     melodyIndex++;
 
     if (melodyIndex >= melodyLength) {
     melodyPlaying = false;
     noTone(BUZZER);
-}
+    }
 }
 
 void happySound() {
@@ -245,87 +240,60 @@ void sadSound() {
 
 // ================= TEMP/HUMIDITY =================
 void readTempHumidity() {
-    if (!client.connected()) {
-    Serial.println("Temp/humidity skipped: MQTT disconnected");
-    return;
-}
+    // If not connected to MQTT do not attempt to send sensor value
+    if (!client.connected()) {return;}
 
     // Defines array of size 2 for the readings and initialises both as 0
     float tempHumVal[2] = {0};
 
     // Check if reading didnt fail read the values
     if (!dht.readTempAndHumidity(tempHumVal)) {
-    float humidity = tempHumVal[0];
-    float temperature = tempHumVal[1];
+        float humidity = tempHumVal[0];
+        float temperature = tempHumVal[1];
 
-    // Debugging terminal print
-    // Serial.print(humidity);
-    // Serial.print("%, ");
-    // Serial.print(temperature);
-    // Serial.println("C");
-
-    // Publish readings to MQTT broker
-    String tempStr = String(temperature);
-    String humStr = String(humidity);
-    client.publish("wio/sensors/temperature", tempStr.c_str());
-    client.publish("wio/sensors/humidity", humStr.c_str());
-}
-    // Otherwise debug on serial
-    else {
-    Serial.print("Failed to get humidity and temperature values.");
-}
+        // Publish readings to MQTT broker
+        String tempStr = String(temperature);
+        String humStr = String(humidity);
+        client.publish("wio/sensors/temperature", tempStr.c_str());
+        client.publish("wio/sensors/humidity", humStr.c_str());
+    } else {
+        Serial.print("Failed to get humidity and temperature values.");
+    }
 }
 
 // ================= RFID =================
 void readRfidTag() {
-    if (!client.connected()) {
-    Serial.println("RFID skipped: MQTT disconnected");
-    return;
-}
+    // If not connected to MQTT do not attempt to send sensor value
+    if (!client.connected()) {return;}
 
-    // Check if cooldown has passed
-    if (millis() - lastRfidReadTime < RFID_COOLDOWN) {
-    return;
-}
+    if (millis() - lastRfidReadTime < RFID_COOLDOWN) {return;}
 
-    // Check if a tag is close enough to read
-    if (!rfid.PICC_IsNewCardPresent()) {
-    return;
-}
+    if (!rfid.PICC_IsNewCardPresent()) {return;}
 
-    // Read tag
-    if (!rfid.PICC_ReadCardSerial()) {
-    return;
-}
+    if (!rfid.PICC_ReadCardSerial()) {return;}
 
     String uid = "";
 
-    // Loop through UID
+    // Loop through UID string
     for (byte i = 0; i < rfid.uid.size; i++) {
-    if (rfid.uid.uidByte[i] < 0x10) {
-    uid += "0";
-}
+        if (rfid.uid.uidByte[i] < 0x10) {
+            uid += "0";
+        }
 
-    // Add as hecadecimal text
-    uid += String(rfid.uid.uidByte[i], HEX);
+        // Add as hexadecimal text
+        uid += String(rfid.uid.uidByte[i], HEX);
 
-    // Add ':' between UID sections
-    if (i < rfid.uid.size - 1) {
-    uid += ":";
-}
-}
-
+        // Add ':' between UID sections
+        if (i < rfid.uid.size - 1) {
+        uid += ":";
+        }
+    }
     // Make UID uppercase
     uid.toUpperCase();
-
-    // Debugging
-    Serial.print("RFID UID: ");
-    Serial.println(uid);
 
     // Publish reading to MQTT
     client.publish("wio/events/food", uid.c_str());
 
-    // Time last read, for cooldown
     lastRfidReadTime = millis();
 
     // Ends communication with current tag
@@ -335,10 +303,8 @@ void readRfidTag() {
 
 // ================= SOUND SENSOR =================
 void readNoiseLevel() {
-    if (!client.connected()) {
-    Serial.println("Noise skipped: MQTT disconnected");
-    return;
-}
+    // If not connected to MQTT do not attempt to send sensor value
+    if (!client.connected()) {return;}
 
     const char* mqttNoiseTopic = "wio/sensors/sound";
     int rawSoundValue = analogRead(SOUND_SENSOR_PIN); // Read raw sound value (0-1023)
@@ -348,58 +314,47 @@ void readNoiseLevel() {
 
     // Ignore readings that happen at the extremes (0-10 and 1013-1023)
     if (rawSoundValue > 10 && rawSoundValue < 1013) {
-    if (abs(noiseDecibels - previousNoiseDecibels) > 3) {
-    previousNoiseDecibels = noiseDecibels;
-    client.publish(mqttNoiseTopic, String(noiseDecibels).c_str());
-    Serial.print("Noise level: ");
-    Serial.print(noiseDecibels);
-    Serial.println(" dB");
-}
-}
+        if (abs(noiseDecibels - previousNoiseDecibels) > 3) {
+            previousNoiseDecibels = noiseDecibels;
+            client.publish(mqttNoiseTopic, String(noiseDecibels).c_str());
+        }
+    }
 }
 
 // ================= PIR SENSOR =================
 void readPirSensor() {
-    if (!client.connected()) {
-    Serial.println("PIR skipped: MQTT disconnected");
-    return;
-}
+    // If not connected to MQTT do not attempt to send sensor value
+    if (!client.connected()) {return;}
 
     int currentPirState = digitalRead(PIRPIN);
 
     // Trigger a publish only if state changes
     if (currentPirState == HIGH && lastPirState == LOW) {
-
-    // Reduce MQTT spam
-    if (millis() - lastPirEvent > PIR_COOLDOWN) {
-    Serial.println("Movement detected");
-    client.publish("wio/sensors/motion", "1");
-    lastPirEvent = millis();
-}
-}
+        // Reduce MQTT spam
+        if (millis() - lastPirEvent > PIR_COOLDOWN) {
+        client.publish("wio/sensors/motion", "1");
+        lastPirEvent = millis();
+        }
+    }
     lastPirState = currentPirState;
 }
+
 // ================= CALLBACK =================
+// Receives happiness value from the backend and stores it for the display happy/sad face logic
 void callback(char* topic, byte* payload, unsigned int length) {
     String message = "";
 
     for (unsigned int i = 0; i < length; i++) {
-    message += (char)payload[i];
-}
-
-    Serial.print("Message received on topic: ");
-    Serial.println(topic);
-    Serial.print("payload: ");
-    Serial.println(message);
+        message += (char)payload[i];
+    }
 
     if (strcmp(topic, "app/state/happiness") == 0) {
-    mood = message.toInt();
-}
+        mood = message.toInt();
+    }
 }
 
 // ================= SETUP =================
 void setup() {
-    // <<< PINS / HARDWARE >>>
     pinMode(BUZZER, OUTPUT);
     pinMode(PIRPIN, INPUT);
 
@@ -431,40 +386,42 @@ void setup() {
 void loop() {
     // Maintains MQTT connection on every iteration of main loop
     if (!client.connected()) {
-    connectMQTT();
-} else {
-    client.loop();
-    updateSound();
-}
+        connectMQTT();
+    } else {
+        client.loop();
+        updateSound();
+    }
 
+    // Display face depending on happiness level
     int currentMood = (mood < 50) ? 0 : 1;
 
     if (currentMood != lastMood) {
-    lastMood = currentMood;
+        lastMood = currentMood;
 
-    if (currentMood == 0) {
-    sadFace();
-    sadSound();
-} else {
-    happyFace();
-    happySound();
-}
-}
+        if (currentMood == 0) {
+            sadFace();
+            sadSound();
+        } else {
+            happyFace();
+            happySound();
+        }
+    }
 
+    // Read temperature and humidity
     if (millis() - lastSensorRead > SENSOR_INTERVAL) {
-    lastSensorRead = millis();
-    // Temperature and humidity test
-    readTempHumidity();
-}
+        lastSensorRead = millis();
+        readTempHumidity();
+    }
 
     // Read noise sensor
     if (millis() - lastNoiseReadTime > NOISE_READ_INTERVAL) {
-    lastNoiseReadTime = millis();
-    readNoiseLevel();
-}
+        lastNoiseReadTime = millis();
+        readNoiseLevel();
+    }
 
     // RFID scanner function
     readRfidTag();
+
     // PIR motion function
     readPirSensor();
 
