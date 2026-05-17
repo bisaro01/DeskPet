@@ -256,6 +256,40 @@ public class DatabaseHandler {
         return loadPet(petId);
     }
 
+    public void deletePet(long petId) throws SQLException {
+        String countSql = "SELECT COUNT(*) FROM pet";
+
+        try (PreparedStatement statement = connection.prepareStatement(countSql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next() && resultSet.getInt(1) <= 1) {
+                throw new SQLException("Cannot delete the last pet.");
+            }
+        }
+
+        deleteFromTable("feeding_log", petId);
+        deleteFromTable("sensor_data", petId);
+        deleteFromTable("pet_food_preferences", petId);
+        deleteFromTable("pet_settings", petId);
+        deleteFromTable("pet_state", petId);
+
+        String sql = "DELETE FROM pet WHERE pet_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            statement.executeUpdate();
+        }
+    }
+
+    private void deleteFromTable(String tableName, long petId) throws SQLException {
+        String sql = "DELETE FROM " + tableName + " WHERE pet_id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            statement.executeUpdate();
+        }
+    }
+
     public String getFavouriteFood(Long petId) throws SQLException {
         String sql = """
             SELECT food.name AS favourite_food

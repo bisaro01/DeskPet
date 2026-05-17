@@ -253,4 +253,33 @@ public class SettingsController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void deleteSelectedPet() {
+        String selected = petComboBox.getValue();
+
+        if (selected == null) {
+            messageLabel.setText("Choose a pet first.");
+            return;
+        }
+
+        long petId = Long.parseLong(selected.split(":")[0]);
+
+        try {
+            dbHandler.deletePet(petId);
+            loadPets();
+
+            long firstPetId = dbHandler.getFirstPetId();
+            app.switchPet(firstPetId);
+            currentPet = app.getCurrentPet();
+
+            updateCurrentSettingsLabels();
+            updateCurrentFoodLabels();
+
+            messageLabel.setText("Pet deleted.");
+        } catch (SQLException e) {
+            messageLabel.setText(e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
