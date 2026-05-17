@@ -97,6 +97,7 @@ public class SettingsController {
         }
     }
 
+    // Allows text fields to be left empty
     private int getNewOrCurrentValue(TextField field, double currentValue) {
         String text = field.getText().trim();
 
@@ -139,15 +140,18 @@ public class SettingsController {
 
         long petId = Long.parseLong(selected.split(":")[0]);
 
+        // Updates the app to load the new pet
         app.switchPet(petId);
         currentPet = app.getCurrentPet();
 
+        // Updates to display the loaded pets settings
         updateCurrentSettingsLabels();
         updateCurrentFoodLabels();
 
         messageLabel.setText("Loaded pet " + petId);
     }
 
+    // Updated the setting labels
     private void updateCurrentSettingsLabels() {
         currentTempMinLabel.setText(String.valueOf((int) currentPet.getMinTemp()));
         currentTempMaxLabel.setText(String.valueOf((int) currentPet.getMaxTemp()));
