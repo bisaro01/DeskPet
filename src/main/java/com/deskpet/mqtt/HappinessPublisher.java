@@ -1,5 +1,6 @@
 package com.deskpet.mqtt;
 
+import com.deskpet.domain.PetDisplayState;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -10,7 +11,7 @@ public class HappinessPublisher {
     private IMqttClient mqttClient; // MQTT client instance
     private final static String BROKER = "tcp://localhost:1883"; // If on another computer, use IP instead
     private final static String CLIENT_ID = "happiness-publisher"; // Client name
-    private final static String TOPIC = "deskpet/happiness"; // Topic we want to send to
+    private final static String TOPIC = "deskpet/display/state"; // Topic we want to send to
 
     // Constructor, runs when we create a new HappinessPublisher
     public HappinessPublisher() throws MqttException {
@@ -57,8 +58,14 @@ public class HappinessPublisher {
         }
     }
 
-    public void publish(int happiness) throws MqttException {
-        MqttMessage msg = new MqttMessage(Integer.toString(happiness).getBytes());
-        mqttClient.publish("app/state/happiness", msg);
+    public void publish(PetDisplayState state) throws MqttException {
+//        MqttMessage msg = new MqttMessage(Integer.toString(happiness).getBytes());
+
+        System.out.println("APP PUBLISHING: " + state.getMoodId());
+        System.out.println("APP PUBLISHING: " + state.getIssueFlags());
+
+        MqttMessage msg = new MqttMessage(state.toPayload().getBytes());
+
+        mqttClient.publish(TOPIC, msg);
     }
 }

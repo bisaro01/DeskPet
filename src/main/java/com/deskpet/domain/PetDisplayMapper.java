@@ -60,14 +60,23 @@ public class PetDisplayMapper {
     // Different faces are represented by an integer ID value where 0 is happy, 1 is sad. More can be added.
     private byte encodeMood(Mood mood) {
         switch(mood) {
-            case HAPPY:
+            case VERY_SAD:
                 return 0;
 
             case SAD:
                 return 1;
 
+            case NEUTRAL:
+                return 2;
+
+            case HAPPY:
+                return 3;
+
+            case VERY_HAPPY:
+                return 4;
+
             default:
-                return 0;
+                return 2;
         }
     }
 }

@@ -142,17 +142,18 @@ public class DeskPetApplication extends Application {
 
                 try {
                     // TODO(Mark): publish currentPetState instead of happiness. Maybe rename publisher. Refactor WIO sketch.
-                    happinessPublisher.publish(pet.getHappiness());
+                    happinessPublisher.publish(currentPetState);
+//                    happinessPublisher.publish(pet.getHappiness());
                 } catch (MqttException ex) {
                     ex.printStackTrace();
                 }
 
-                    System.out.println("----------------------------------");
-                    System.out.println("Happiness: " + pet.getHappiness());
-                    System.out.println("Comfort: " + pet.getComfort());
-                    System.out.println("Social: " + pet.getSocial());
-                    System.out.println("Hunger: " + pet.getHunger());
-                })
+                System.out.println("----------------------------------");
+                System.out.println("Happiness: " + pet.getHappiness());
+                System.out.println("Comfort: " + pet.getComfort());
+                System.out.println("Social: " + pet.getSocial());
+                System.out.println("Hunger: " + pet.getHunger());
+            })
         );
 
         fixedUpdate.setCycleCount(Animation.INDEFINITE);

@@ -9,4 +9,16 @@ public class PetDisplayState {
         moodId = mood;
         issueFlags = issues;
     }
+
+    public byte getMoodId() {
+        return moodId;
+    }
+
+    public byte getIssueFlags() {
+        return issueFlags;
+    }
+
+    public String toPayload() {
+        return (moodId + "|" + issueFlags);
+    }
 }

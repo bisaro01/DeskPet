@@ -97,10 +97,18 @@ public class Pet implements PetDataProvider, PetStateListener {
     }
 
     public Mood getMood() {
-        if (getHappiness() > 50) {
+        int happiness = getHappiness();
+
+        if (happiness > 80) {
+            return Mood.VERY_HAPPY;
+        } else if (happiness > 60) {
             return Mood.HAPPY;
-        } else {
+        } else if (happiness > 40) {
+            return Mood.NEUTRAL;
+        } else if (happiness > 20) {
             return Mood.SAD;
+        } else {
+            return Mood.VERY_SAD;
         }
     }
 
@@ -115,6 +123,12 @@ public class Pet implements PetDataProvider, PetStateListener {
             issues.add(Need.HOT);
         } else if (comfortSystem.isCold()) {
             issues.add(Need.COLD);
+        }
+
+        if (comfortSystem.isHumid()) {
+            issues.add(Need.HUMID);
+        } else if (comfortSystem.isDry()) {
+            issues.add(Need.DRY);
         }
 
          if (socialSystem.isLonely()) {

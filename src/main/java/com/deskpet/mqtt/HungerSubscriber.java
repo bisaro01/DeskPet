@@ -9,7 +9,7 @@ public class HungerSubscriber implements MqttCallback {
     private IMqttClient mqttClient;
     private static final String BROKER = "tcp://localhost:1883";
     private static final String CLIENT_ID = "hunger-subscriber";
-    private static final String TOPIC = "wio/events/food"; //Changed to rfid_tag topic for testing purposes
+    private static final String TOPIC = "deskpet/events/food"; //Changed to rfid_tag topic for testing purposes
 
     private PetStateListener pet;
 
