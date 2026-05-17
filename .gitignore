@@ -33,3 +33,4 @@ src/main/resources/config.properties
 happiness-subscriber-*
 comfort-subscriber-*
 hunger-subscriber-*
+bin/
