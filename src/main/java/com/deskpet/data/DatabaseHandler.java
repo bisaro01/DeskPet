@@ -280,6 +280,27 @@ public class DatabaseHandler {
         return "N/A";
     }
 
+    public String getDislikedFood(long petId) throws SQLException {
+        String sql = """
+        SELECT food.name AS disliked_food
+        FROM pet_food_preferences
+        JOIN food ON pet_food_preferences.disliked_food = food.food_id
+        WHERE pet_food_preferences.pet_id = ?
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("disliked_food");
+                }
+            }
+        }
+
+        return "N/A";
+    }
+
     public Long getFavouriteFoodId(Long petId) throws SQLException {
         String sql = """
             SELECT liked_food AS favourite_food
@@ -426,5 +447,42 @@ public class DatabaseHandler {
             }
         }
         return foodStats;
+    }
+
+    public List<String> getAllFood() throws SQLException {
+        String sql = """
+                SELECT food_id, name
+                FROM food
+                ORDER BY food_id
+                """;
+
+        List<String> foods = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                foods.add(resultSet.getString("food_id") + ": " + resultSet.getString("name"));
+            }
+        }
+        return foods;
+    }
+
+    public void updateFoodPreferences(long petId, long likedFoodId, long dislikedFoodId) throws SQLException {
+        String sql = """
+        INSERT INTO pet_food_preferences (pet_id, liked_food, disliked_food)
+        VALUES (?, ?, ?)
+        ON CONFLICT (pet_id)
+        DO UPDATE SET
+        liked_food = EXCLUDED.liked_food,
+        disliked_food = EXCLUDED.disliked_food
+        """;
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, petId);
+            statement.setLong(2, likedFoodId);
+            statement.setLong(3, dislikedFoodId);
+            statement.executeUpdate();
+        }
     }
 }

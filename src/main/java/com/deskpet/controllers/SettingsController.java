@@ -60,6 +60,18 @@ public class SettingsController {
     @FXML
     private Label currentNoiseMaxLabel;
 
+    @FXML
+    private ComboBox<String> likedFoodComboBox;
+
+    @FXML
+    private ComboBox<String> dislikedFoodComboBox;
+
+    @FXML
+    private Label currentLikedFoodLabel;
+
+    @FXML
+    private Label currentDislikedFoodLabel;
+
     public void setApp(DeskPetApplication app) {
         this.app = app;
     }
@@ -67,11 +79,13 @@ public class SettingsController {
     public void setDbHandler(DatabaseHandler dbHandler) {
         this.dbHandler = dbHandler;
         loadPets();
+        loadFood();
     }
 
     public void setCurrentPet(Pet currentPet) {
         this.currentPet = currentPet;
         updateCurrentSettingsLabels();
+        updateCurrentFoodLabels();
     }
 
     private void loadPets() {
@@ -129,6 +143,7 @@ public class SettingsController {
         currentPet = app.getCurrentPet();
 
         updateCurrentSettingsLabels();
+        updateCurrentFoodLabels();
 
         messageLabel.setText("Loaded pet " + petId);
     }
@@ -180,6 +195,62 @@ public class SettingsController {
             messageLabel.setText("Could not save settings.");
             e.printStackTrace();
         }
+    }
 
+    private void loadFood() {
+        try {
+            likedFoodComboBox.getItems().setAll(dbHandler.getAllFood());
+            dislikedFoodComboBox.getItems().setAll(dbHandler.getAllFood());
+        } catch (SQLException e) {
+            messageLabel.setText("Could not load food.");
+            e.printStackTrace();
+        }
+    }
+
+    private void updateCurrentFoodLabels() {
+        try {
+            currentLikedFoodLabel.setText(dbHandler.getFavouriteFood(currentPet.getPetId()));
+            currentDislikedFoodLabel.setText(dbHandler.getDislikedFood(currentPet.getPetId()));
+        } catch (SQLException e) {
+            messageLabel.setText("Could not load food preferences.");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void saveFoodPreferences() {
+        if (currentPet == null) {
+            messageLabel.setText("No pet loaded.");
+            return;
+        }
+
+        String likedFood = likedFoodComboBox.getValue();
+        String dislikedFood = dislikedFoodComboBox.getValue();
+
+        if (likedFood == null || dislikedFood == null) {
+            messageLabel.setText("Choose liked and disliked food.");
+            return;
+        }
+
+        long likedFoodId = Long.parseLong(likedFood.split(":")[0]);
+        long dislikedFoodId = Long.parseLong(dislikedFood.split(":")[0]);
+
+        if (likedFoodId == dislikedFoodId) {
+            messageLabel.setText("Liked and disliked food cannot be the same.");
+            return;
+        }
+
+        try {
+            dbHandler.updateFoodPreferences(currentPet.getPetId(), likedFoodId, dislikedFoodId);
+            updateCurrentFoodLabels();
+
+            likedFoodComboBox.setValue(null);
+            dislikedFoodComboBox.setValue(null);
+
+            messageLabel.setText("Food preferences saved.");
+        } catch (SQLException e) {
+            messageLabel.setText("Could not save food preferences.");
+            e.printStackTrace();
+        }
     }
 }

@@ -40,6 +40,35 @@
 
     <Separator/>
 
+    <Label text="Food Preferences"/>
+
+    <GridPane hgap="10" vgap="10">
+        <Label text="Liked food:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="likedFoodComboBox"
+                  promptText="Choose liked food"
+                  prefWidth="160"
+                  GridPane.rowIndex="0"
+                  GridPane.columnIndex="1"/>
+        <Label fx:id="currentLikedFoodLabel"
+               GridPane.rowIndex="0"
+               GridPane.columnIndex="2"/>
+
+        <Label text="Disliked food:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="dislikedFoodComboBox"
+                  promptText="Choose disliked food"
+                  prefWidth="160"
+                  GridPane.rowIndex="1"
+                  GridPane.columnIndex="1"/>
+        <Label fx:id="currentDislikedFoodLabel"
+               GridPane.rowIndex="1"
+               GridPane.columnIndex="2"/>
+    </GridPane>
+
+    <Button text="Save Food Preferences"
+            onAction="#saveFoodPreferences"/>
+
+    <Separator/>
+
     <Label text="Environment Settings"/>
 
     <GridPane hgap="10" vgap="10">
