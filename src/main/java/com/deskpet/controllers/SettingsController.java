@@ -172,6 +172,21 @@ public class SettingsController {
             int noiseMin = getNewOrCurrentValue(noiseMinField, currentPet.getMinNoise());
             int noiseMax = getNewOrCurrentValue(noiseMaxField, currentPet.getMaxNoise());
 
+            if (tempMin >= tempMax) {
+                messageLabel.setText("Temperature min must be lower than max.");
+                return;
+            }
+
+            if (humidityMin >= humidityMax) {
+                messageLabel.setText("Humidity min must be lower than max.");
+                return;
+            }
+
+            if (noiseMin >= noiseMax) {
+                messageLabel.setText("Noise min must be lower than max.");
+                return;
+            }
+
             dbHandler.updatePetSettings(currentPet.getPetId(), tempMin, tempMax, humidityMin, humidityMax, noiseMin, noiseMax);
 
             currentPet.setTemperatureSettings(tempMin, tempMax);
