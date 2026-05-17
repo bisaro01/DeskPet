@@ -1,11 +1,14 @@
 package com.deskpet.domain;
 
+import java.sql.SQLException;
+
 import com.deskpet.data.DatabaseHandler;
 
 public class Pet implements PetDataProvider, PetStateListener {
     private final ComfortSystem comfortSystem;
     private final HungerSystem hungerSystem;
     private final SocialSystem socialSystem;
+    private final DatabaseHandler dbHandler; 
 
     private long petId;
     private String name;
@@ -20,9 +23,10 @@ public class Pet implements PetDataProvider, PetStateListener {
         this.hunger = hunger;
         this.social = social;
         this.comfort = comfort;
+        this.dbHandler = dbHandler;
         comfortSystem = new ComfortSystem();
         hungerSystem = new HungerSystem(dbHandler);
-        socialSystem = new SocialSystem();
+        socialSystem = new SocialSystem(dbHandler);
 
         // read and load previous states fom the DB
         comfortSystem.setComfort(comfort);
@@ -190,6 +194,12 @@ public class Pet implements PetDataProvider, PetStateListener {
                 int soundDecibels = Integer.parseInt(value);  
                 socialSystem.updateSocial(soundDecibels);
                 social = (int)socialSystem.getSocial();
+                
+                try {
+                    dbHandler.logSensorData(petId, "SOUND", soundDecibels);
+                } catch (SQLException e) {
+                    System.err.println("Failed to log sound sensor data: " + e.getMessage());
+                }
                 break;
 
             case "wio/sensors/motion":
