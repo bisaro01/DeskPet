@@ -36,3 +36,9 @@ VALUES (1, 1, CURRENT_TIMESTAMP - INTERVAL '2 hours', '🤤'),
 
 INSERT INTO pet_settings (pet_id, temp_min, temp_max, humidity_min, humidity_max, noise_min, noise_max)
 VALUES (1, 18, 24, 30, 50, 30, 100);
+
+-- Reset pet_id auto increment sequence
+SELECT setval(
+               pg_get_serial_sequence('pet', 'pet_id'),
+                (SELECT MAX(pet_id) FROM pet)
+);

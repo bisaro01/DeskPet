@@ -73,7 +73,7 @@ public class DeskPetApplication extends Application {
         }
 
         controller.setActivePetName(pet.getName());
-        controller.setActivePetFavouriteFood(pet.getFavouriteFood());
+        updateDashboardFoodInfo();
 
         try {
             controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
@@ -281,8 +281,7 @@ public class DeskPetApplication extends Application {
             pet = dbHandler.loadPet(petId);
 
             controller.setActivePetName(pet.getName());
-            controller.setActivePetFavouriteFood(pet.getFavouriteFood());
-            controller.setFoodStats(dbHandler.getFoodStats(petId));
+            updateDashboardFoodInfo();
 
             comfortSubscriber.setPet(pet);
             hungerSubscriber.setPet(pet);
@@ -297,6 +296,17 @@ public class DeskPetApplication extends Application {
 
             System.out.println("Switched to pet " + petId);
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Updates the food information on the dashboard
+    public void updateDashboardFoodInfo() {
+        try {
+            controller.setActivePetFavouriteFood(dbHandler.getFavouriteFood(pet.getPetId()));
+            controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
+            controller.setFeedingHistory(dbHandler.getFeedingHistory(pet.getPetId()));
         } catch (SQLException e) {
             e.printStackTrace();
         }
