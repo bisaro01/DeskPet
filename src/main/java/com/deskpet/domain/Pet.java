@@ -12,14 +12,16 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     private long petId;
     private String name;
+    private String favouriteFood;
     private int hunger;
     private int social;
     private int comfort;
     private int happiness;
 
-    public Pet(long petId, String name, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
+    public Pet(long petId, String name, String favouriteFood, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
         this.petId = petId;
         this.name = name;
+        this.favouriteFood = favouriteFood;
         this.hunger = hunger;
         this.social = social;
         this.comfort = comfort;
@@ -62,6 +64,8 @@ public class Pet implements PetDataProvider, PetStateListener {
     }
 
     public String getName() { return name; }
+
+    public String getFavouriteFood() { return favouriteFood; }
 
     @Override
     public int getHunger() {

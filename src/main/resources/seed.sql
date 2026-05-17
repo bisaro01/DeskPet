@@ -30,9 +30,9 @@ VALUES (1, 1, 'TEMPERATURE', 21.5, CURRENT_TIMESTAMP - INTERVAL '20 minutes'),
        (10, 1, 'MOVEMENT', 1, CURRENT_TIMESTAMP - INTERVAL '3 minutes'),
        (11, 1, 'MOVEMENT', 1, CURRENT_TIMESTAMP - INTERVAL '1 minute');
 
-INSERT INTO feeding_log (pet_id, food_id, fed_at)
-VALUES (1, 1, CURRENT_TIMESTAMP - INTERVAL '2 hours'),
-       (1, 2, CURRENT_TIMESTAMP - INTERVAL '30 minutes');
+INSERT INTO feeding_log (pet_id, food_id, fed_at, reaction)
+VALUES (1, 1, CURRENT_TIMESTAMP - INTERVAL '2 hours', '🤤'),
+       (1, 2, CURRENT_TIMESTAMP - INTERVAL '30 minutes', '🤢');
 
 INSERT INTO pet_settings (pet_id, temp_min, temp_max, humidity_min, humidity_max, noise_min, noise_max)
 VALUES (1, 18, 24, 30, 50, 30, 100);
