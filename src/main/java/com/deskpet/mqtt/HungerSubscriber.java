@@ -27,6 +27,10 @@ public class HungerSubscriber implements MqttCallback {
         mqttClient.connect(options);
     }
 
+    public void setPet(PetStateListener pet) {
+        this.pet = pet;
+    }
+
     public void start() throws MqttException {
         mqttClient.subscribe(TOPIC);
     }

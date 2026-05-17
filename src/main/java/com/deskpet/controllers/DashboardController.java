@@ -4,10 +4,15 @@ import com.deskpet.data.DatabaseHandler;
 import com.deskpet.models.DashboardModel;
 import javafx.beans.property.FloatProperty;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.beans.binding.Bindings;
+
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import com.deskpet.DeskPetApplication;
+import javafx.scene.control.Label;
 
 public class DashboardController {
     @FXML
@@ -18,6 +23,47 @@ public class DashboardController {
     private ProgressBar comfortBar;
     @FXML
     private ProgressBar socialBar;
+
+    private DeskPetApplication app;
+
+    public void setApp(DeskPetApplication app) {
+        this.app = app;
+    }
+
+    @FXML
+    private void openSettings() {
+        if (app != null) {
+            app.openSettingsWindow();
+        }
+    }
+
+    @FXML
+    private Label activePetLabel;
+
+    @FXML
+    private Label favouriteFoodLabel;
+
+    @FXML
+    private ListView<String> foodStatsListView;
+
+    @FXML
+    private ListView<String> feedingHistoryListView;
+
+    public void setActivePetName(String name) {
+        activePetLabel.setText(name);
+    }
+
+    public void setActivePetFavouriteFood(String favouriteFood) {
+        favouriteFoodLabel.setText(favouriteFood);
+    }
+
+    public void setFoodStats(List<String> foodStats) {
+        foodStatsListView.getItems().setAll(foodStats);
+    }
+
+    public void setFeedingHistory(List<String> feedingHistory) {
+        feedingHistoryListView.getItems().setAll(feedingHistory);
+    }
 
     // Creates a background scheduler that can run tasks later or repeatedly
     private final ScheduledExecutorService scheduler =

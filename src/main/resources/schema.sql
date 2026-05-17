@@ -39,5 +39,20 @@ CREATE TABLE IF NOT EXISTS feeding_log (
     feeding_id BIGSERIAL PRIMARY KEY,
     pet_id BIGINT NOT NULL REFERENCES pet(pet_id),
     food_id BIGINT NOT NULL REFERENCES food(food_id),
-    fed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reaction VARCHAR(50)
+    );
+
+CREATE TABLE IF NOT EXISTS pet_settings (
+    pet_id BIGINT PRIMARY KEY REFERENCES pet(pet_id),
+    temp_min INTEGER DEFAULT 18 CHECK (temp_min BETWEEN 0 AND 50),
+    temp_max INTEGER DEFAULT 24 CHECK (temp_max BETWEEN 0 AND 50),
+    humidity_min INTEGER DEFAULT 30 CHECK (humidity_min BETWEEN 20 AND 90),
+    humidity_max INTEGER DEFAULT 50 CHECK (humidity_max BETWEEN 20 AND 90),
+    noise_min INTEGER DEFAULT 30 CHECK (noise_min BETWEEN 0 AND 100),
+    noise_max INTEGER DEFAULT 100 CHECK (noise_max BETWEEN 0 AND 100),
+
+    CHECK (temp_min < temp_max),
+    CHECK (humidity_min < humidity_max),
+    CHECK (noise_min < noise_max)
     );

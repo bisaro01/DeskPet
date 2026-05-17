@@ -31,6 +31,9 @@ public class HungerSystem {
     public double getHunger() {
         return hunger;
     }
+    public void setHunger(double value){
+        this.hunger = value;
+    }
 
     public void feed(String rfidTag, long petId) {
 
@@ -40,6 +43,7 @@ public class HungerSystem {
                 hunger += hunger_increase;
                 long foodId = dbHandler.getFoodId(rfidTag);
                 dbHandler.appendFeedingLog(petId, foodId);
+
 
             } catch (SQLException e) {
                 e.printStackTrace();
