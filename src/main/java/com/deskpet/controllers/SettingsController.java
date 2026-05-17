@@ -247,6 +247,9 @@ public class SettingsController {
             likedFoodComboBox.setValue(null);
             dislikedFoodComboBox.setValue(null);
 
+            // Update the dashboard food information
+            app.updateDashboardFoodInfo();
+
             messageLabel.setText("Food preferences saved.");
         } catch (SQLException e) {
             messageLabel.setText("Could not save food preferences.");
