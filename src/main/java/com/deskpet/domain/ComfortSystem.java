@@ -15,11 +15,12 @@ public class ComfortSystem {
 
     // Values for comfort calculations
     private static final double COMFORT_INCREASE = 1.0;
-    private static final double COMFORT_DECREASE = 5.0;
+    private static final double COMFORT_DECREASE = 1.0;
 
     private double comfort = 100.0;
 
-    public ComfortSystem() {
+    public ComfortSystem(double comfort) {
+        this.comfort = comfort;
         temperature = 23.0;
         humidity = 40.0;
     }
@@ -53,6 +54,10 @@ public class ComfortSystem {
         this.maxTemp = value;
     }
 
+    public double getTemperature() {
+        return temperature;
+    }
+
     public double getMinHumidity() {
         return  minHumidity;
     }
@@ -67,15 +72,9 @@ public class ComfortSystem {
         this.maxHumidity = value;
     }
 
-    // getters for writing to DB trough the pet
-    public double getTemperature() {
-        return temperature;
-    }
-
     public double getHumidity() {
         return humidity;
     }
-
 
     public void updateTemperature(float currentTemp) {
         temperature = currentTemp;
@@ -86,7 +85,7 @@ public class ComfortSystem {
     }
 
     // Method for calculating comfort levels and applying decay
-    public int applyDecay(double delta) {
+    public void applyDecay(double delta) {
         if (temperature < minTemp) {
             comfort -= (COMFORT_DECREASE / 60.0) * (minTemp - temperature) * delta;
         } else if (temperature > maxTemp) {
@@ -107,7 +106,21 @@ public class ComfortSystem {
         if (comfort < 0) {comfort = 0;}
 
         System.out.println("Pet.applyDecay - Temperature: " + temperature + ", Humidity: " + humidity);
+    }
 
-        return (int)comfort;
+    public boolean isHot() {
+        return temperature > maxTemp;
+    }
+
+    public boolean isCold() {
+        return temperature < minTemp;
+    }
+
+    public boolean isHumid() {
+        return humidity > maxHumidity;
+    }
+
+    public boolean isDry() {
+        return humidity < minHumidity;
     }
 }

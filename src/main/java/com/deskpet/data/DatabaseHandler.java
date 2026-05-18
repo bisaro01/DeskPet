@@ -83,6 +83,7 @@ public class DatabaseHandler {
                     ps.hunger,
                     ps.social,
                     ps.comfort,
+                    ps.happiness,
                     pset.temp_min,
                     pset.temp_max,
                     pset.humidity_min,
@@ -100,6 +101,7 @@ public class DatabaseHandler {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
+                    int happiness = resultSet.getInt("happiness");
                     int hunger = resultSet.getInt("hunger");
                     int social = resultSet.getInt("social");
                     int comfort = resultSet.getInt("comfort");
@@ -108,7 +110,7 @@ public class DatabaseHandler {
 
                     String favouriteFood = getFavouriteFood(petId);
 
-                    Pet pet = new Pet(petId, name, favouriteFood, hunger, social, comfort, this);
+                    Pet pet = new Pet(petId, name, favouriteFood, happiness, hunger, social, comfort, this);
 
                     pet.setTemperatureSettings(resultSet.getInt("temp_min"), resultSet.getInt("temp_max"));
 

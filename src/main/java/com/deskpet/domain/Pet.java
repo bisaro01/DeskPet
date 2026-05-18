@@ -4,60 +4,47 @@ import java.sql.SQLException;
 
 import com.deskpet.data.DatabaseHandler;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 public class Pet implements PetDataProvider, PetStateListener {
     private final ComfortSystem comfortSystem;
     private final HungerSystem hungerSystem;
     private final SocialSystem socialSystem;
-    private final DatabaseHandler dbHandler; 
+    private final DatabaseHandler dbHandler;
 
     private long petId;
     private String name;
     private String favouriteFood;
-    private int hunger;
-    private int social;
-    private int comfort;
-    private int happiness;
+    private double happiness;
+    // TODO get happiness from DB, update getHappiness()
 
-    public Pet(long petId, String name, String favouriteFood, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
+    public Pet(long petId, String name, String favouriteFood, int happiness, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
         this.petId = petId;
         this.name = name;
         this.favouriteFood = favouriteFood;
-        this.hunger = hunger;
-        this.social = social;
-        this.comfort = comfort;
+        this.happiness = happiness;
         this.dbHandler = dbHandler;
-        comfortSystem = new ComfortSystem();
-        hungerSystem = new HungerSystem(dbHandler);
-        socialSystem = new SocialSystem(dbHandler);
-
-        // read and load previous states fom the DB
-        comfortSystem.setComfort(comfort);
-        hungerSystem.setHunger(hunger);
-        socialSystem.setSocial(social);
-        
-        calculateHappiness();
+        comfortSystem = new ComfortSystem(comfort);
+        hungerSystem = new HungerSystem(hunger, dbHandler);
+        socialSystem = new SocialSystem(social);
     }
 
+    // Decay need values based on time passed, if pet outside comfortable bounds.
     public void applyDecay(double delta) {
-        comfort = comfortSystem.applyDecay(delta);
-        hunger = hungerSystem.applyDecay(delta);
-        social = socialSystem.applyDecay(delta);
+        comfortSystem.applyDecay(delta);
+        hungerSystem.applyDecay(delta);
+        socialSystem.applyDecay(delta);
     }
 
-
-    public void calculateHappiness() {
-        int happiness = (comfort + hunger + social) / 3;
-
-        if (happiness > 100) {
-            this.happiness = 100;
-        } else if (happiness < 0) {
-            this.happiness = 0;
-        } else {
-            this.happiness = happiness;
-        }
+    public double getTemperature() {
+        return comfortSystem.getTemperature();
     }
 
-// Getters
+    public double getHumidity() {
+        return comfortSystem.getHumidity();
+    }
+
     @Override
     public long getPetId() {
         return petId;
@@ -69,22 +56,22 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     @Override
     public int getHunger() {
-        return hunger;
+        return (int)hungerSystem.getHunger();
     }
 
-    // @Override
+    @Override
     public int getSocial() {
-        return social;
+        return (int)socialSystem.getSocial();
     }
 
     @Override
     public int getComfort() {
-        return comfort;
+        return (int)comfortSystem.getComfort();
     }
 
     @Override
     public int getHappiness() {
-        return happiness;
+        return (int)Math.round(happiness);
     }
 
     public double getMinTemp() {
@@ -111,48 +98,6 @@ public class Pet implements PetDataProvider, PetStateListener {
         return socialSystem.getMaxSoundThreshold();
     }
 
-// Setters
-    public void setHunger(int hunger) {
-        if (hunger > 100) {
-            this.hunger = 100;
-        } else if (hunger < 0) {
-            this.hunger = 0;
-        } else {
-            this.hunger = hunger;
-        }
-        calculateHappiness();
-    }
-
-    public void setSocial(int social) {
-        if (social > 100) {
-            this.social = 100;
-        } else if (social < 0) {
-            this.social = 0;
-        } else {
-            this.social = social;
-        }
-        calculateHappiness();
-    }
-
-    public void setComfort(int comfort) {
-        if (comfort > 100) {
-            this.comfort = 100;
-        } else if (comfort < 0) {
-            this.comfort = 0;
-        } else {
-            this.comfort = comfort;
-        }
-        calculateHappiness();
-    }
-
-    // Methods to get the last temperature and humidity readings for the DB
-    public double getTemperature() {
-        return comfortSystem.getTemperature();
-    }
-    public double getHumidity() {
-        return comfortSystem.getHumidity();
-    }
-
     public boolean wasMotionDetected() {
         return socialSystem.isMovementActive();
     }
@@ -177,50 +122,170 @@ public class Pet implements PetDataProvider, PetStateListener {
     }
 
     @Override
-    public void updateNeed(String topic, String value) {
-        switch (topic) {
-            case "wio/sensors/temperature":
-                float temp = Float.parseFloat(value);
-                comfortSystem.updateTemperature(temp);
-                break;
+    public void updateTemperature(float temperature) {
+        comfortSystem.updateTemperature(temperature);
+    }
 
-            case "wio/sensors/humidity":
-                float hum = Float.parseFloat(value);
-                comfortSystem.updateHumidity(hum);
-                break;
+    @Override
+    public void updateHumidity(float humidity) {
+        comfortSystem.updateHumidity(humidity);
+    }
 
-            case "wio/events/food":
-                hungerSystem.feed(value, petId);
-                hunger = (int)hungerSystem.getHunger();
-                break;
+    @Override
+    public void feed(String food) {
+        hungerSystem.feed(food, petId);
+    }
 
-            case "wio/sensors/sound":  
-                int soundDecibels = Integer.parseInt(value);  
-                socialSystem.updateSocial(soundDecibels);
-                social = (int)socialSystem.getSocial();
-                
-                try {
-                    dbHandler.logSensorData(petId, "SOUND", soundDecibels);
-                } catch (SQLException e) {
-                    System.err.println("Failed to log sound sensor data: " + e.getMessage());
-                }
-                break;
+    @Override
+    public void registerNoise(int db) {
+        socialSystem.updateSocial(db);
+    }
 
-            case "wio/sensors/motion":
-                if (value.equals("1")) {
-                    socialSystem.onMovement();
-                    social = (int)socialSystem.getSocial();
-                }
-                break;
-            
-            default:
-                break;
-        }
-        calculateHappiness();
+    @Override
+    public void registerMovement() {
+        socialSystem.onMovement();
     }
 
     public void update(double delta) {
         applyDecay(delta);
-        calculateHappiness();
+        updateHappiness(delta);
+    }
+
+    private void updateHappiness(double delta) {
+        double moodDelta = 0;
+
+        moodDelta += hungerMoodEffect();
+        moodDelta += comfortMoodEffect();
+        moodDelta += socialMoodEffect();
+
+//        if (moodDelta > 0) {
+//            moodDelta *= 0.5;
+//        }
+
+        happiness += moodDelta * delta;
+
+        if (happiness > 100) happiness = 100;
+        if (happiness < 0) happiness = 0;
+    }
+
+    private double socialMoodEffect() {
+        double social = getSocial();
+
+        // Fulfilled
+        if (social > 80) {
+            return +0.12;
+        }
+
+        // Good
+        if (social > 60) {
+            return +0.05;
+        }
+
+        // Okay
+        if (social > 40) {
+            return 0;
+        }
+
+        // Lonely
+        if (social > 20) {
+            return -0.09;
+        }
+
+        // Depressed
+        return -0.27;
+    }
+
+    private double comfortMoodEffect() {
+        double comfort = getComfort();
+
+        // Very comfortable
+        if (comfort > 80) {
+            return +0.08;
+        }
+
+        // Comfortable
+        if (comfort > 60) {
+            return +0.03;
+        }
+
+        // Okay
+        if (comfort > 40) {
+            return 0;
+        }
+
+        // Uncomfortable
+        if (comfort > 20) {
+            return -0.05;
+        }
+
+        // Miserable
+        return -0.20;
+    }
+
+    private double hungerMoodEffect() {
+        double hunger = getHunger();
+
+        // Well-fed
+        if (hunger > 80) {
+            return +0.18;
+        }
+
+        // Peckish
+        if (hunger > 60) {
+            return +0.06;
+        }
+
+        // Hungry
+        if (hunger > 40) {
+            return 0;
+        }
+
+        // Very hungry
+        if (hunger > 20) {
+            return -0.12;
+        }
+
+        // Starving
+        return -0.35;
+    }
+
+    public Mood getMood() {
+        if (happiness > 80) {
+            return Mood.VERY_HAPPY;
+        } else if (happiness > 60) {
+            return Mood.HAPPY;
+        } else if (happiness > 40) {
+            return Mood.NEUTRAL;
+        } else if (happiness > 20) {
+            return Mood.SAD;
+        } else {
+            return Mood.VERY_SAD;
+        }
+    }
+
+    public Set<Need> getActiveIssues() {
+        Set<Need> issues = EnumSet.noneOf(Need.class);
+
+        if (hungerSystem.isHungry()) {
+            issues.add(Need.HUNGRY);
+        }
+
+        if (comfortSystem.isHot()) {
+            issues.add(Need.HOT);
+        } else if (comfortSystem.isCold()) {
+            issues.add(Need.COLD);
+        }
+
+        if (comfortSystem.isHumid()) {
+            issues.add(Need.HUMID);
+        } else if (comfortSystem.isDry()) {
+            issues.add(Need.DRY);
+        }
+
+         if (socialSystem.isLonely()) {
+             issues.add(Need.LONELY);
+         }
+
+         return issues;
     }
 }

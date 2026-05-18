@@ -1,5 +1,12 @@
 package com.deskpet;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
+import com.deskpet.domain.PetDisplayMapper;
+import com.deskpet.domain.PetDisplayState;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.data.DatabaseHandler;
 import com.deskpet.domain.Pet;
@@ -30,6 +37,7 @@ public class DeskPetApplication extends Application {
     private ComfortSubscriber comfortSubscriber;
     private SocialSubscriber socialSubscriber;
     private HungerSubscriber hungerSubscriber;
+    private PetDisplayMapper displayMapper;
     private Pet pet;
 
     private long lastUpdate;
@@ -49,13 +57,15 @@ public class DeskPetApplication extends Application {
         controller.setModelDbHandler(dbHandler);
         model = controller.getModel();
 
+        displayMapper = new PetDisplayMapper();
+
         try {
             long firstPetId = dbHandler.getFirstPetId();
             pet = dbHandler.loadPet(firstPetId);
 
             if (pet == null) {
                 System.out.println("DB error: unable to load pet. Using demo pet.");
-                pet = new Pet(1, "Bob", "Fish", 80, 80, 80, dbHandler);
+                pet = new Pet(1, "Bob", "Fish", 80, 80, 80, 80, dbHandler);
             } else {
                 System.out.println("Loaded pet " + pet.getPetId() + ":");
                 System.out.println("Happiness: " + pet.getHappiness());
@@ -127,11 +137,13 @@ public class DeskPetApplication extends Application {
         }
 
         lastUpdate = System.currentTimeMillis();
+        PetDisplayState lastPublishedState;
 
-        Timeline fixedUpdate = new Timeline(new KeyFrame(Duration.millis(3000), e -> {
-            long now = System.currentTimeMillis();
-            double delta = (now - lastUpdate) / 1000.0;
-            lastUpdate = now;
+        Timeline fixedUpdate = new Timeline(
+            new KeyFrame(Duration.millis(3000), e -> {
+                long now = System.currentTimeMillis();
+                double delta = (now - lastUpdate) / 1000.0;
+                lastUpdate = now;
 
                 // ======================    save sensor data to the DB ========================
                 // movement
@@ -162,45 +174,50 @@ public class DeskPetApplication extends Application {
                     }
                 }
 
-            try {
-                controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
-            } catch (SQLException ex) {
-                System.out.println("Failed to create FoodStats" + ex.getMessage());
-                ex.printStackTrace();
-                throw new RuntimeException(ex);
-            }
+                try {
+                    controller.setFoodStats(dbHandler.getFoodStats(pet.getPetId()));
+                } catch (SQLException ex) {
+                    System.out.println("Failed to create FoodStats" + ex.getMessage());
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
+                }
 
-            try {
-                controller.setFeedingHistory(dbHandler.getFeedingHistory(pet.getPetId()));
-            } catch (SQLException ex) {
-                System.out.println("Failed to create FeedingHistory" + ex.getMessage());
-                ex.printStackTrace();
-                throw new RuntimeException(ex);
-            }
+                try {
+                    controller.setFeedingHistory(dbHandler.getFeedingHistory(pet.getPetId()));
+                } catch (SQLException ex) {
+                    System.out.println("Failed to create FeedingHistory" + ex.getMessage());
+                    ex.printStackTrace();
+                    throw new RuntimeException(ex);
+                }
 
-            pet.update(delta);
+                pet.update(delta);
 
-            try {
-                model.updateState(pet);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+                try {
+                    model.updateState(pet);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
 
-            // update last movement in the dashboard
-            controller.updateLatMovement(pet.getPetId());
+                PetDisplayState currentPetState = displayMapper.map(pet);
 
-            try {
-                happinessPublisher.publish(pet.getHappiness());
-            } catch (MqttException ex) {
-                ex.printStackTrace();
-            }
+                // update last movement in the dashboard
+                controller.updateLatMovement(pet.getPetId());
 
-            System.out.println("----------------------------------");
-            System.out.println("Happiness: " + pet.getHappiness());
-            System.out.println("Comfort: " + pet.getComfort());
-            System.out.println("Social: " + pet.getSocial());
-            System.out.println("Hunger: " + pet.getHunger());
-        }));
+                try {
+                    // TODO(Mark): publish currentPetState instead of happiness. Maybe rename publisher. Refactor WIO sketch.
+                    happinessPublisher.publish(currentPetState);
+//                    happinessPublisher.publish(pet.getHappiness());
+                } catch (MqttException ex) {
+                    ex.printStackTrace();
+                }
+
+                System.out.println("----------------------------------");
+                System.out.println("Happiness: " + pet.getHappiness());
+                System.out.println("Comfort: " + pet.getComfort());
+                System.out.println("Social: " + pet.getSocial());
+                System.out.println("Hunger: " + pet.getHunger());
+            })
+        );
 
         fixedUpdate.setCycleCount(Animation.INDEFINITE);
         fixedUpdate.play();

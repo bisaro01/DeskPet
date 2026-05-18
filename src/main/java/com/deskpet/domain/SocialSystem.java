@@ -3,8 +3,6 @@ package com.deskpet.domain;
 import com.deskpet.data.DatabaseHandler;
 
 public class SocialSystem {
-    private final DatabaseHandler dbHandler;
-    
     private double soundIncreasePer10Db = 1.5;
     private double decayRatePerMinute = 2.0;
     private double maxSoundThreshold = 75.0;
@@ -23,12 +21,18 @@ public class SocialSystem {
     private static final double SOCIAL_INCREASE = 1.0;  // +1 when movement or sound within bounds
     private static final double SOCIAL_DECAY = 3.0;
 
-    public SocialSystem(DatabaseHandler dbHandler) {
-        this.dbHandler = dbHandler;
-        social = 100.0;
+    public SocialSystem(double social) {
+        this.social = social;
     }
 
-    // Getters and setters
+    public boolean getMovementActive() {
+        return movementActive;
+    }
+
+    public boolean getNoiseDetected() {
+        return noiseDetected;
+    }
+
     public double getSocial() {
         return social;
     }
@@ -111,7 +115,7 @@ public class SocialSystem {
         }
     }
 
-    public int applyDecay(double delta) {
+    public void applyDecay(double delta) {
         long currentTime = System.currentTimeMillis();
         double minutesSinceSound = (currentTime - lastSoundTime) / 60000.0;
 
@@ -136,7 +140,9 @@ public class SocialSystem {
         if (social < 0) {
             social = 0;
         }
+    }
 
-        return (int) social;
+    public boolean isLonely() {
+        return social < 50;
     }
 }

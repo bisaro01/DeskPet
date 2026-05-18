@@ -22,7 +22,8 @@ public class HungerSystem {
             "9C:DA:6C:06",
             "2A:88:64:06");
 
-    public HungerSystem(DatabaseHandler dbHandler) {
+    public HungerSystem(int hunger, DatabaseHandler dbHandler) {
+        this.hunger = (double)hunger;
         this.dbHandler = dbHandler;
     }
 
@@ -53,12 +54,14 @@ public class HungerSystem {
         if (hunger < 0) {hunger = 0.0;}
     }
 
-    public int applyDecay(double delta) {
+    public void applyDecay(double delta) {
         hunger -= hunger_decrease * delta;
 
         if (hunger > 100) {hunger = 100;}
         if (hunger < 0) {hunger = 0.0;}
+    }
 
-        return (int)hunger;
+    public boolean isHungry() {
+        return hunger < 50;
     }
 }

@@ -1,5 +1,9 @@
 package com.deskpet.domain;
 
 public interface PetStateListener {
-    void updateNeed(String topic, String value);
+    void updateTemperature(float temperature);
+    void updateHumidity(float humidity);
+    void feed(String food);
+    void registerNoise(int db);
+    void registerMovement();
 }

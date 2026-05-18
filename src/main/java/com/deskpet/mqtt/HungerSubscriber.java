@@ -49,10 +49,15 @@ public class HungerSubscriber implements MqttCallback {
     public void messageArrived(String topic, MqttMessage message) {
         String payload = new String(message.getPayload());
 
-        Platform.runLater(() -> {
-            pet.updateNeed(topic, payload);
-        });
-        System.out.println("RFID Tag = " + payload);
+        switch (topic) {
+            case TOPIC:
+                Platform.runLater(() -> {
+                    pet.feed(payload);
+                });
+                break;
+        }
+//        System.out.println("Hunger = " + hungerSystem.getHunger() + "%");
+//        System.out.println("RFID Tag = " + payload);
 //
 //        if (hungerSystem != null) {
 //            hungerSystem.updateHunger(payload);

@@ -16,6 +16,8 @@ const char* mqttServer = "10.42.0.1"; //Moa
 const int mqttPort = 1883;
 const char* MQTT_CLIENT_ID = "deskpet-wio";
 
+const char* PET_STATE_TOPIC = "deskpet/display/state";
+
 // MQTT client instance
 WiFiClient wifiClient;
 PubSubClient client(wifiClient);
@@ -62,7 +64,23 @@ const unsigned long MQTT_RETRY_INTERVAL = 1000;
 int mood = 100;
 int lastMood = -1;  // 0 = sad, 1 = happy
 
+int faceId = 2;
+int previousFaceId = -1;
+
+byte issues = 0;
+byte previousIssues = 255;
+
+#define FL_HUNGRY (1 << 0)
+#define FL_HOT (1 << 1)
+#define FL_COLD (1 << 2)
+#define FL_HUMID (1 << 3)
+#define FL_DRY (1 << 4)
+#define FL_LONELY (1 << 5)
+
 int previousNoiseDecibels = -1;
+
+// =============== RENDERING ===============
+#define ICON_HEIGHT 40
 
 // ================= SOUND =================
 int melodyNotes[5];
@@ -86,7 +104,7 @@ void connectWifi() {
 
     // Wait until WiFi is connected
     while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+        delay(500);
     }
 
     // Display sucess message once connected on both serial and WIO
@@ -102,12 +120,12 @@ void connectWifi() {
 void connectMQTT() {
     // Already connected
     if (client.connected()) {
-    return;
+        return;
     }
 
     // Retry only once per second
     if (millis() - lastMqttReconnectAttempt < MQTT_RETRY_INTERVAL) {
-    return;
+        return;
     }
     lastMqttReconnectAttempt = millis();
 
@@ -117,86 +135,215 @@ void connectMQTT() {
     wifiClient.stop();
 
     if (client.connect(MQTT_CLIENT_ID)) {
-    Serial.println("MQTT connected");
-    client.subscribe("app/state/happiness");
+        Serial.println("MQTT connected");
+        client.subscribe(PET_STATE_TOPIC);
     }
 }
 
-// ================= FACES =================
-void happyFace() {
-    // Reset background
-    tft.fillScreen(TFT_WHITE);
+// ================ DISPLAY ===============
+int mouthX = 165;
+int mouthY = 110;
 
-    // Mouth full circle pixel points
-    int mouthX = 165;
-    int mouthY = 110;
-    int radius = 25;
-    int thickness = 6;
-
-    // Draw illusion of thick smile by stacking multiple circles
-    // With decreasing radius
-    for (int i = 0; i < thickness; i++) {
-    tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
-    }
-
-    // Cut off top half to make smile
-    tft.fillRect(
-    mouthX - radius - 2, mouthY - radius - 2, (radius * 2) + 4, radius + 2, TFT_WHITE
-    );
-
+void drawEyes() {
     // Eyes
     tft.fillCircle(130, 80, 8, TFT_BLACK);
     tft.fillCircle(200, 80, 8, TFT_BLACK);
 }
 
-void sadFace() {
-    // Reset background
-    tft.fillScreen(TFT_WHITE);
+void clearFace() {
+    tft.fillRect(0, ICON_HEIGHT, 320, 240 - ICON_HEIGHT, TFT_WHITE);
+}
 
-    // Full cirlce mouth pixel points
-    int mouthX = 165;
-    int mouthY = 130;
+void veryHappyFace() {
+    // Reset background
+    // tft.fillScreen(TFT_WHITE);
+    clearFace();
+    drawEyes();
+    
+    int radius = 35;
+    int thickness = 8;
+
+    for (int i = 0; i < thickness; i++) {
+        tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
+    }
+
+    // Cut top half
+    tft.fillRect(
+        mouthX - radius - 2,
+        mouthY - radius - 2,
+        radius * 2 + 4,
+        radius + 2,
+        TFT_WHITE
+    );
+}
+
+void happyFace() {
+    // Reset background
+    // tft.fillScreen(TFT_WHITE);
+    clearFace();
+    drawEyes();
+    
     int radius = 25;
     int thickness = 6;
 
     for (int i = 0; i < thickness; i++) {
-    tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
+        tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
     }
 
-    // Cut off bottom half of mouth
+    // Cut top half
     tft.fillRect(
-    mouthX - radius - 2, mouthY + 2, (radius *2) + 4, radius + 2, TFT_WHITE
+        mouthX - radius - 2,
+        mouthY - radius - 2,
+        radius * 2 + 4,
+        radius + 2,
+        TFT_WHITE
     );
+}
 
-    // Eyes
-    tft. fillCircle(130, 80, 8, TFT_BLACK);
-    tft. fillCircle(200, 80, 8, TFT_BLACK);
+void neutralFace() {
+    // Reset background
+    // tft.fillScreen(TFT_WHITE);
+    clearFace();
+    drawEyes();
+
+    tft.fillRect(135, 115, 60, 6, TFT_BLACK);
+}
+
+void sadFace() {
+    // Reset background
+    // tft.fillScreen(TFT_WHITE);
+    clearFace();
+    drawEyes();
+
+    int radius = 25;
+    int thickness = 6;
+
+    int sadY = 135;
+
+    for (int i = 0; i < thickness; i++) {
+        tft.drawCircle(mouthX, sadY, radius - i, TFT_BLACK);
+    }
+
+    // Cut bottom half
+    tft.fillRect(
+        mouthX - radius - 2,
+        sadY + 2,
+        radius * 2 + 4,
+        radius + 2,
+        TFT_WHITE
+    );
+}
+
+void verySadFace() {
+    // Reset background
+    // tft.fillScreen(TFT_WHITE);
+    clearFace();
+    drawEyes();
+
+    int radius = 35;
+    int thickness = 8;
+
+    int sadY = 145;
+
+    for (int i = 0; i < thickness; i++) {
+        tft.drawCircle(mouthX, sadY, radius - i, TFT_BLACK);
+    }
+
+    // Cut bottom half
+    tft.fillRect(
+        mouthX - radius - 2,
+        sadY + 2,
+        radius * 2 + 4,
+        radius + 2,
+        TFT_WHITE
+    );
+}
+
+void drawIcons() {
+    tft.fillRect(0, 0, 320, ICON_HEIGHT, TFT_LIGHTGREY);
+
+    int x = 10;
+
+    tft.setTextColor(TFT_BLACK);
+    tft.setTextSize(2);
+
+    if (issues & FL_HUNGRY) {
+        tft.drawString("FOOD", x, 10);
+        x += 55;
+    }
+
+    if (issues & FL_HOT) {
+        tft.drawString("HOT", x, 10);
+        x += 45;
+    }
+
+    if (issues & FL_COLD) {
+        tft.drawString("COLD", x, 10);
+        x += 55;
+    }
+
+    if (issues & FL_HUMID) {
+        tft.drawString("HUMID", x, 10);
+        x += 70;
+    }
+
+    if (issues & FL_DRY) {
+        tft.drawString("DRY", x, 10);
+        x += 50;
+    }
+
+    if (issues & FL_LONELY) {
+        tft.drawString("LONE", x, 10);
+    }
+}
+
+void drawFace() {
+    switch(faceId) {
+        case 0:
+            verySadFace();
+            break;
+        case 1:
+            sadFace();
+            break;
+        case 2:
+            neutralFace();
+            break;
+        case 3:
+            happyFace();
+            break;
+        case 4:
+            veryHappyFace();
+            break;
+        default:
+            neutralFace();
+            break;
+    }
 }
 
 // ================= MELODY =================
 // Update the melody without blocking
 void updateSound() {
     if (!melodyPlaying) {
-    return;
+        return;
     }
 
     if (millis() - lastNoteTime < melodyDurations[melodyIndex]) {
-    return;
+        return;
     }
 
     lastNoteTime = millis();
 
     if (melodyNotes[melodyIndex] == 0) {
-    noTone(BUZZER);
+        noTone(BUZZER);
     } else {
-    tone(BUZZER, melodyNotes[melodyIndex]);
+        tone(BUZZER, melodyNotes[melodyIndex]);
     }
 
     melodyIndex++;
 
     if (melodyIndex >= melodyLength) {
-    melodyPlaying = false;
-    noTone(BUZZER);
+        melodyPlaying = false;
+        noTone(BUZZER);
     }
 }
 
@@ -285,7 +432,7 @@ void readRfidTag() {
 
         // Add ':' between UID sections
         if (i < rfid.uid.size - 1) {
-        uid += ":";
+            uid += ":";
         }
     }
     // Make UID uppercase
@@ -332,8 +479,8 @@ void readPirSensor() {
     if (currentPirState == HIGH && lastPirState == LOW) {
         // Reduce MQTT spam
         if (millis() - lastPirEvent > PIR_COOLDOWN) {
-        client.publish("wio/sensors/motion", "1");
-        lastPirEvent = millis();
+            client.publish("wio/sensors/motion", "1");
+            lastPirEvent = millis();
         }
     }
     lastPirState = currentPirState;
@@ -348,8 +495,24 @@ void callback(char* topic, byte* payload, unsigned int length) {
         message += (char)payload[i];
     }
 
-    if (strcmp(topic, "app/state/happiness") == 0) {
-        mood = message.toInt();
+    if (strcmp(topic, PET_STATE_TOPIC) == 0) {
+        int separatorIndex = message.indexOf('|');
+
+        if (separatorIndex == -1) {
+            return;
+        }
+
+        String facePart = message.substring(0, separatorIndex);
+        String issuePart = message.substring(separatorIndex + 1);
+
+        faceId = facePart.toInt();
+        issues = (byte)issuePart.toInt();
+
+        Serial.print("Face: ");
+        Serial.print(faceId);
+
+        Serial.print(" Issues: ");
+        Serial.print(issues);
     }
 }
 
@@ -393,18 +556,36 @@ void loop() {
     }
 
     // Display face depending on happiness level
-    int currentMood = (mood < 50) ? 0 : 1;
+    // int currentMood = (mood < 50) ? 0 : 1;
 
-    if (currentMood != lastMood) {
-        lastMood = currentMood;
+    // if (currentMood != lastMood) {
+    //     lastMood = currentMood;
 
-        if (currentMood == 0) {
-            sadFace();
+    //     if (currentMood == 0) {
+    //         sadFace();
+    //         sadSound();
+    //     } else {
+    //         happyFace();
+    //         happySound();
+    //     }
+    // }
+
+    if (faceId != previousFaceId) {
+        previousFaceId = faceId;
+
+        drawFace();
+
+        if (faceId <= 1) {
             sadSound();
-        } else {
-            happyFace();
+        } else if (faceId >= 3) {
             happySound();
         }
+    }
+
+    if (issues != previousIssues) {
+        previousIssues = issues;
+
+        drawIcons();
     }
 
     // Read temperature and humidity
