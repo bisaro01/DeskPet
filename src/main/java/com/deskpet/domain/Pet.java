@@ -1,11 +1,9 @@
 package com.deskpet.domain;
 
-import java.sql.SQLException;
-
-import com.deskpet.data.DatabaseHandler;
-
 import java.util.EnumSet;
 import java.util.Set;
+
+import com.deskpet.data.DatabaseHandler;
 
 public class Pet implements PetDataProvider, PetStateListener {
     private final ComfortSystem comfortSystem;
@@ -17,7 +15,6 @@ public class Pet implements PetDataProvider, PetStateListener {
     private String name;
     private String favouriteFood;
     private double happiness;
-    // TODO get happiness from DB, update getHappiness()
 
     public Pet(long petId, String name, String favouriteFood, int happiness, int hunger, int social, int comfort, DatabaseHandler dbHandler) {
         this.petId = petId;
@@ -53,6 +50,8 @@ public class Pet implements PetDataProvider, PetStateListener {
     public String getName() { return name; }
 
     public String getFavouriteFood() { return favouriteFood; }
+
+    public String getLastSoundTime() { return socialSystem.getLastSoundTime(); }
 
     @Override
     public int getHunger() {
