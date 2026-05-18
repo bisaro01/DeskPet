@@ -3,8 +3,6 @@ package com.deskpet.domain;
 import com.deskpet.data.DatabaseHandler;
 
 public class SocialSystem {
-    private final DatabaseHandler dbHandler;
-
     private double soundIncreasePer10Db = 1.5;
     private double decayRatePerMinute = 2.0;
     private double maxSoundThreshold = 75.0;
