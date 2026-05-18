@@ -1,8 +1,83 @@
-# Desk pet
+# Desk Pet
+
+A desk pet companion that responds to its physical environment trough hardware sensors.
+Your Desk Pet lives on a [Wio Terminal](https://wiki.seeedstudio.com/Wio-Terminal-Getting-Started/) and a [JavaFX](https://openjfx.io/) desktop application it reacts in real time to movement, sound, temperature, humidity and feeding events.
+
+
+## Purpose and Benefits
+
+Other productivity tools are purely functional the Desk Pet adds a layer of personality to your workspace by providing a physical device to a digital companion some of the benefits:
+
+- **Engagement** - a physical pet that reacts to you and your environment and encourages you to maintain a comfortable workspace
+- **Awareness** - real time feedback on hunger, temperature, humidity, movement and noise levels
+- **Persistence** - the pets state saves between sessions so neglect has real consequences
+- **Customization** - adjustable thresholds allowing for personal customization for what are comfortable levels
+
+
+### Pets Needs
+| Need | Affected By |
+| ---- | ------------- |
+| Hunger | RFID Food tags  |
+| Comfort | Temperature & Humidity sensor |
+| Social | PIR motion & Microphone sensors |
+| Happiness | Calculated from all above needs |
+
+## Demo Video
+[Watch the demo here](<link>)
+
+## Team Contributions
+| Member | Contributions |
+|--------|--------------|
+| [Name] | ... |
+| [Name] | ... |
+| [Name] | ... |
+| [Name] | ... |
+| [Name] | ... |
+
 
 ## Pre-requisites
 
-1. PostgreSQL (version 13+ recommended)
+1. **Java** (version 21+)
+2. **PostgreSQL** (version 13+)
+3. **MQTT Broker** (Mosquitto on 'localhost:1883')
+
+See the below installation guide per OS.
+
+
+### Pre-requisites installation
+
+1. Java (version 21+)
+    - Ensure installed:
+      - Arch
+      ```bash
+        sudo pacman -S jdk21-openjdk
+      ```
+      - Ubuntu
+        ```bash
+        sudo apt install openjdk-21-jdk
+        ```
+      - MacOS
+        ```bash
+        brew install openjdk@21
+        ```
+      - Windows
+        - Windows<br>
+        Download installer from [official website](https://www.oracle.com/java/technologies/downloads/?utm_source=chatgpt.com)
+
+      - Verify installation:
+        ```bash
+          java --version
+        ```
+        - Expected output
+        ```bash
+          openjdk 21
+        ```
+        or
+        ```bash
+          java version "21"
+        ```
+
+2. PostgreSQL (version 13+ recommended)
     - Ensure installed
       - Arch
         ```bash
@@ -45,9 +120,6 @@
         - password
         - database name
 
-2. Python 3 (for mock Pet)
-    - Verify with: `python --version` or `py --version`
-
 3. MQTT Broker (Mosquitto)
     - Ensure installed
         - Arch
@@ -68,7 +140,8 @@
         - host: `localhost`
         - port: `1883`
 
-## Setup
+
+## Getting started
 
 ### Linux/MacOS
 
@@ -79,25 +152,22 @@ In a terminal:
     git clone <repo-url>
     cd <repo>
     ```
-2. Set up database:<br>
+2. Set up config:
+    ```bash
+    cp src/main/resources/config.properties.example src/main/resources/config.properties
+    ```
+    Edit `config.properties` with your database credentials as explained in prerequisites installation.
+
+3. Set up database:<br>
    From project root
      ```bash
      sh src/main/scripts/db-setup.sh
      ```
 
-3. Build the project:
+4. Build the project:
     ```bash
     ./gradlew build
     ```
-
-4. Set up mock pet (Python):
-    ```bash
-    cd mock
-    python3 -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    ```
-    - For fish/csh shell users, activation scripts available in bin directory
 
 ### Windows (PowerShell)
 
@@ -107,24 +177,23 @@ In a terminal:
     cd <repo>
     ```
 
-2. Set up database:<br>
+2. Set up config:
+```powershell
+    copy src\main\resources\config.properties.example src\main\resources\config.properties
+```
+    Edit `config.properties` with your database credentials as explained in prerequisites installation.
+
+3. Set up database:<br>
    From project root
     ```bash
     powershell -ExecutionPolicy Bypass -File src/main/scripts/db-setup.ps1
     ```
 
-3. Build the project:
+4. Build the project:
     ```powershell
     .\gradlew.bat build
     ```
 
-4. Set up mock pet (Python):
-    ```powershell
-    cd mock
-    py -m venv .venv
-    .\.venv\Scripts\Activate.ps1
-    pip install -r requirements.txt
-    ```
 
 PowerShell may block script execution:
 
@@ -132,134 +201,66 @@ PowerShell may block script execution:
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```
 
+## Running
+
+Start in order in separate terminals
+
+**1. PostgreSQL**
+  ```bash
+    sudo systemctl start postgresql   # Linux
+    brew services start postgresql    # MacOS
+    # Windows: starts automatically
+  ```
+
+**2. MQTT Broker**
+  ```bash
+    mosquitto -v          # Linux/MacOS
+    mosquitto.exe -v      # Windows
+  ```
+
+**3. Application**
+  ```bash
+    ./gradlew run         # Linux/macOS
+    .\gradlew.bat run     # Windows
+  ```
+
 ## Verify setup
 
-- Run tests:
-    ```bash
-    ./gradlew test          # Linux/macOS
-    .\gradlew.bat test      # Windows
-    ```
+Run tests to confirm everything is working:
+  ```bash
+    ./gradlew test        # Linux/macOS
+    .\gradlew.bat test    # Windows
+  ```
 
-- Start PostgreSQL
-  - Linux
-    ```bash
-    sudo systemctl start postgresql
-    ```
-  - MacOS
-    ```bash
-    brew services start postgresql
-    ```
-  - Windows<br>
-  Starts automatically (or use Services panel)
 
-- Start MQTT broker<br>
-    Linux/MacOS
-    ```bash
-    mosquitto -v
-    ```
-    Windows
-    ```powershell
-    mosquitto.exe -v
-    ```
+# Project Structure
 
-- Start mock pet:
-    ```bash
-    python mock/mock-pet.py # Linux/macOS
-    py mock\mock-pet.py     # Windows
-    ```
+## Hardware
+- **Wio Terminal** - main microcontroller and display
+- **DHT11** - temperature and humidity
+- **MFRC522 RFID** - food tag reader
+- **Mini PIR motion sensor** - motion detector
+- **Sound Sensor** — sound level detection
 
-- Start Application
-    ```bash
-    ./gradlew run           # Linux/macOS
-    .\gradlew.bat run       # Windows
-    ```
+## MQTT Topics
+| Topic | Direction | Description |
+|-------|-----------|-------------|
+| `wio/sensors/temperature` | Wio → App | Temperature in °C |
+| `wio/sensors/humidity` | Wio → App | Humidity % |
+| `wio/sensors/motion` | Wio → App | PIR trigger (`"1"`) |
+| `wio/sensors/sound` | Wio → App | Noise level in dB |
+| `wio/events/food` | Wio → App | RFID tag UID |
+| `deskpet/happiness` | App → Wio | Happiness 0–100 |
 
-## Getting started
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Database Schema
+- `pet` — pet identity
+- `pet_state` — current hunger, social, comfort, happiness (updated every 3s)
+- `pet_settings` — per-pet environment thresholds
+- `sensor_data` — historical sensor readings (TEMPERATURE, HUMIDITY, NOISE, MOVEMENT)
+- `food` — known RFID food tags
+- `feeding_log` — feeding history
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
-## Add your files
-
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://git.chalmers.se/courses/dit113/2026/group1/desk-pet.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-* [Set up project integrations](https://git.chalmers.se/courses/dit113/2026/group1/desk-pet/-/settings/integrations)
-
-## Collaborate with your team
-
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+## Authors
+Group 1 - DIT113, University of Gothenburg, 2026
