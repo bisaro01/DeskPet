@@ -143,8 +143,6 @@ void connectMQTT() {
 // ================ DISPLAY ===============
 int mouthX = 165;
 int mouthY = 110;
-int mouthRadius = 25;
-int mouthThickness = 6;
 
 void drawEyes() {
     // Eyes
@@ -152,45 +150,113 @@ void drawEyes() {
     tft.fillCircle(200, 80, 8, TFT_BLACK);
 }
 
+void clearFace() {
+    tft.fillRect(0, ICON_HEIGHT, 320, 240 - ICON_HEIGHT, TFT_WHITE);
+}
+
 void veryHappyFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    tft.fillRect(0, ICON_HEIGHT, 320, 240 - ICON_HEIGHT, TFT_WHITE);
+    clearScreen();
     drawEyes();
-    tft.drawArc(mouthX, mouthY, mouthRadius, mouthRadius - mouthThickness, 270, 90, TFT_BLACK, TFT_WHITE);
+    
+    int radius = 35;
+    int thickness = 8;
 
+    for (int i = 0; i < thickness; i++) {
+        tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
+    }
+
+    // Cut top half
+    tft.fillRect(
+        mouthX - radius - 2,
+        mouthY - radius - 2,
+        radius * 2 + 4,
+        radius + 2,
+        TFT_WHITE
+    );
 }
 
 void happyFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    tft.fillRect(0, ICON_HEIGHT, 320, 240 - ICON_HEIGHT, TFT_WHITE);
+    clearScreen();
     drawEyes();
-    tft.drawArc(mouthX, mouthY, mouthRadius, mouthRadius - mouthThickness, 315, 45, TFT_BLACK, TFT_WHITE);
+    
+    int radius = 25;
+    int thickness = 6;
+
+    for (int i = 0; i < thickness; i++) {
+        tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
+    }
+
+    // Cut top half
+    tft.fillRect(
+        mouthX - radius - 2,
+        mouthY - radius - 2,
+        radius * 2 + 4,
+        radius + 2,
+        TFT_WHITE
+    );
 }
 
 void neutralFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    tft.fillRect(0, ICON_HEIGHT, 320, 240 - ICON_HEIGHT, TFT_WHITE);
+    clearScreen();
     drawEyes();
-    tft.drawArc(mouthX, mouthY, mouthRadius, mouthRadius - mouthThickness, 345, 15, TFT_BLACK, TFT_WHITE);
+
+    tft.fillRect(135, 115, 60, 6, TFT_BLACK);
 }
 
 void sadFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    tft.fillRect(0, ICON_HEIGHT, 320, 240 - ICON_HEIGHT, TFT_WHITE);
+    clearScreen();
     drawEyes();
-    tft.drawArc(mouthX, mouthY, mouthRadius, mouthRadius - mouthThickness, 45, 315, TFT_BLACK, TFT_WHITE);
+
+    int radius = 25;
+    int thickness = 6;
+
+    int sadY = 135;
+
+    for (int i = 0; i < thickness; i++) {
+        tft.drawCircle(mouthX, sadY, radius - i, TFT_BLACK);
+    }
+
+    // Cut bottom half
+    tft.fillRect(
+        mouthX - radius - 2,
+        sadY + 2,
+        radius * 2 + 4,
+        radius + 2,
+        TFT_WHITE
+    );
 }
 
 void verySadFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    tft.fillRect(0, ICON_HEIGHT, 320, 240 - ICON_HEIGHT, TFT_WHITE);
+    clearScreen();
     drawEyes();
-    tft.drawArc(mouthX, mouthY, mouthRadius, mouthRadius - mouthThickness, 90, 270, TFT_BLACK, TFT_WHITE);
+
+    int radius = 35;
+    int thickness = 8;
+
+    int sadY = 145;
+
+    for (int i = 0; i < thickness; i++) {
+        tft.drawCircle(mouthX, sadY, radius - i, TFT_BLACK);
+    }
+
+    // Cut bottom half
+    tft.fillRect(
+        mouthX - radius - 2,
+        sadY + 2,
+        radius * 2 + 4,
+        radius + 2,
+        TFT_WHITE
+    );
 }
 
 void drawIcons() {
