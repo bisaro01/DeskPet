@@ -157,7 +157,7 @@ void clearFace() {
 void veryHappyFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    clearScreen();
+    clearFace();
     drawEyes();
     
     int radius = 35;
@@ -180,7 +180,7 @@ void veryHappyFace() {
 void happyFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    clearScreen();
+    clearFace();
     drawEyes();
     
     int radius = 25;
@@ -203,7 +203,7 @@ void happyFace() {
 void neutralFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    clearScreen();
+    clearFace();
     drawEyes();
 
     tft.fillRect(135, 115, 60, 6, TFT_BLACK);
@@ -212,7 +212,7 @@ void neutralFace() {
 void sadFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    clearScreen();
+    clearFace();
     drawEyes();
 
     int radius = 25;
@@ -237,7 +237,7 @@ void sadFace() {
 void verySadFace() {
     // Reset background
     // tft.fillScreen(TFT_WHITE);
-    clearScreen();
+    clearFace();
     drawEyes();
 
     int radius = 35;
