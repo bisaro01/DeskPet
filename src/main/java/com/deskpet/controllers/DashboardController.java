@@ -28,6 +28,8 @@ public class DashboardController {
     @FXML
     private Label lastMovement;
     private DatabaseHandler dbHandler;
+    @FXML 
+    private Label lastSound;
 
     private DeskPetApplication app;
 
@@ -74,7 +76,7 @@ public class DashboardController {
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
 
-    public void updateLatMovement(long petId) {
+    public void updateLastMovement(long petId) {
         try {
             java.time.LocalDateTime time = dbHandler.getLastMovementTime(petId);
             if (time != null) {
@@ -85,6 +87,12 @@ public class DashboardController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void updateLastSound(String time) {
+        if (lastSound != null) {
+            lastSound.setText(time);
         }
     }
 

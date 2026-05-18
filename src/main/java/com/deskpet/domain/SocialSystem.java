@@ -1,7 +1,5 @@
 package com.deskpet.domain;
 
-import com.deskpet.data.DatabaseHandler;
-
 public class SocialSystem {
     private double soundIncreasePer10Db = 1.5;
     private double decayRatePerMinute = 2.0;
@@ -71,8 +69,8 @@ public class SocialSystem {
         this.soundIncreasePer10Db = value;
     }
 
-    public long getLastSoundTime() {
-        return lastSoundTime;
+    public String getLastSoundTime() {
+        return new java.text.SimpleDateFormat("dd/MM HH:mm").format(new java.util.Date(lastSoundTime));
     }
 
     public double getDecayRatePerMinute() {

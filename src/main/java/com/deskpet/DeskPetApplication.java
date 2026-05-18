@@ -3,18 +3,19 @@ package com.deskpet;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import com.deskpet.domain.PetDisplayMapper;
-import com.deskpet.domain.PetDisplayState;
 import org.eclipse.paho.client.mqttv3.MqttException;
 
 import com.deskpet.controllers.DashboardController;
 import com.deskpet.data.DatabaseHandler;
 import com.deskpet.domain.Pet;
+import com.deskpet.domain.PetDisplayMapper;
+import com.deskpet.domain.PetDisplayState;
 import com.deskpet.models.DashboardModel;
 import com.deskpet.mqtt.ComfortSubscriber;
 import com.deskpet.mqtt.HappinessPublisher;
 import com.deskpet.mqtt.HungerSubscriber;
 import com.deskpet.mqtt.SocialSubscriber;
+
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -24,10 +25,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.eclipse.paho.client.mqttv3.MqttException;
-
-import java.io.IOException;
-import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
     private DashboardModel model;
@@ -42,7 +39,7 @@ public class DeskPetApplication extends Application {
 
     private long lastUpdate;
     private long lastSensorLogTime = 0;
-    private static final long SENSOR_LOG_INTERVAL = 60000;  // save hum&tem every 60s to avoid spamming DB
+    private static final long SENSOR_LOG_INTERVAL = 60000;  // Save hum&tem every 60s to avoid spamming DB
 
     public DeskPetApplication() {
         dbHandler = new DatabaseHandler();
@@ -75,7 +72,7 @@ public class DeskPetApplication extends Application {
             }
 
             model.updateState(pet);
-            controller.updateLatMovement(pet.getPetId());
+            controller.updateLastMovement(pet.getPetId());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -145,8 +142,8 @@ public class DeskPetApplication extends Application {
                 double delta = (now - lastUpdate) / 1000.0;
                 lastUpdate = now;
 
-                // ======================    save sensor data to the DB ========================
-                // movement
+                // ======================    Save sensor data to the DB ========================
+                // Movement
                 if (pet.wasMotionDetected()) {
                     try {
                         dbHandler.logSensorData(pet.getPetId(), "MOVEMENT", 1);
@@ -155,16 +152,17 @@ public class DeskPetApplication extends Application {
                     }
                 }
 
-                // noise
+                // Noise
                 if (pet.wasNoiseDetected()) {
                     try {
                         dbHandler.logSensorData(pet.getPetId(), "NOISE", 1);
+                        controller.updateLastSound(pet.getLastSoundTime());
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
                 }
 
-                // hum & temp
+                // Hum & temp
                 if (now - lastSensorLogTime > SENSOR_LOG_INTERVAL) {
                     try {
                         dbHandler.logSensorData(pet.getPetId(), "TEMPERATURE", pet.getTemperature());
@@ -200,13 +198,11 @@ public class DeskPetApplication extends Application {
 
                 PetDisplayState currentPetState = displayMapper.map(pet);
 
-                // update last movement in the dashboard
-                controller.updateLatMovement(pet.getPetId());
+                // Update last movement in the dashboard
+                controller.updateLastMovement(pet.getPetId());
 
                 try {
-                    // TODO(Mark): publish currentPetState instead of happiness. Maybe rename publisher. Refactor WIO sketch.
                     happinessPublisher.publish(currentPetState);
-//                    happinessPublisher.publish(pet.getHappiness());
                 } catch (MqttException ex) {
                     ex.printStackTrace();
                 }
@@ -306,8 +302,8 @@ public class DeskPetApplication extends Application {
 
             model.updateState(pet);
 
-            // update last movement on the dashboard after pet change
-            controller.updateLatMovement(pet.getPetId());
+            // Update last movement on the dashboard after pet change
+            controller.updateLastMovement(pet.getPetId());
 
             lastUpdate = System.currentTimeMillis();
 

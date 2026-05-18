@@ -48,6 +48,6 @@
 
         <!-- Sound historical data -->
         <Label layoutX="50.0" layoutY="360.0" text="Last sound detected:" />
-        <Label fx:id="lastSoundLabel" layoutX="200.0" layoutY="360.0" text="No data" />
+        <Label fx:id="lastSound" layoutX="200.0" layoutY="360.0" text="No data" />
     </children>
 </Pane>
