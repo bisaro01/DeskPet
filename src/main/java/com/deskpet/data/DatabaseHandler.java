@@ -1,17 +1,16 @@
 package com.deskpet.data;
 
-import com.deskpet.domain.Pet;
-import com.deskpet.domain.PetDataProvider;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.deskpet.domain.Pet;
+import com.deskpet.domain.PetDataProvider;
 
 // Handles database interactions.
 public class DatabaseHandler {

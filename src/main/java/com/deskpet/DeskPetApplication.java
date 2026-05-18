@@ -24,6 +24,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 public class DeskPetApplication extends Application {
     private DashboardModel model;
@@ -71,6 +75,7 @@ public class DeskPetApplication extends Application {
             }
 
             model.updateState(pet);
+            controller.updateLatMovement(pet.getPetId());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -195,6 +200,9 @@ public class DeskPetApplication extends Application {
 
                 PetDisplayState currentPetState = displayMapper.map(pet);
 
+                // update last movement in the dashboard
+                controller.updateLatMovement(pet.getPetId());
+
                 try {
                     // TODO(Mark): publish currentPetState instead of happiness. Maybe rename publisher. Refactor WIO sketch.
                     happinessPublisher.publish(currentPetState);
@@ -297,6 +305,9 @@ public class DeskPetApplication extends Application {
             socialSubscriber.setPet(pet);
 
             model.updateState(pet);
+
+            // update last movement on the dashboard after pet change
+            controller.updateLatMovement(pet.getPetId());
 
             lastUpdate = System.currentTimeMillis();
 
