@@ -1,10 +1,14 @@
 package com.deskpet.domain;
 
+import com.deskpet.data.DatabaseHandler;
+
 public class SocialSystem {
+    private final DatabaseHandler dbHandler;
+    
     private double soundIncreasePer10Db = 1.5;
     private double decayRatePerMinute = 2.0;
-    private double maxSoundThreshold = 100.0;
-    private double minSoundThreshold = 30.0;
+    private double maxSoundThreshold = 75.0;
+    private double minSoundThreshold = 40.0;
 
     private double social = 100.0;
     private long lastSoundTime = System.currentTimeMillis();
@@ -19,7 +23,8 @@ public class SocialSystem {
     private static final double SOCIAL_INCREASE = 1.0;  // +1 when movement or sound within bounds
     private static final double SOCIAL_DECAY = 3.0;
 
-    public SocialSystem() {
+    public SocialSystem(DatabaseHandler dbHandler) {
+        this.dbHandler = dbHandler;
         social = 100.0;
     }
 
@@ -62,6 +67,10 @@ public class SocialSystem {
         this.soundIncreasePer10Db = value;
     }
 
+    public long getLastSoundTime() {
+        return lastSoundTime;
+    }
+
     public double getDecayRatePerMinute() {
         return decayRatePerMinute;
     }
@@ -92,13 +101,13 @@ public class SocialSystem {
             setSocial(social + increase);
             lastSoundTime = System.currentTimeMillis();
             noiseDetected = true;
-            System.out.println("Sound level okay(" + noiseDecibels + "dB). Social +");
+            System.out.println("Sound level okay(" + noiseDecibels + "dB). Social increased.");
         } else if (noiseDecibels > maxSoundThreshold) { // Too loud
             double decrease = ((noiseDecibels - 100) / 10.0) * 1.5;
             setSocial(social - decrease);
             lastSoundTime = System.currentTimeMillis();
             noiseDetected = true;
-            System.out.println("Environment is too loud! (" + noiseDecibels + "dB)! Social -");
+            System.out.println("Environment is too loud! (" + noiseDecibels + "dB)! Social decreased.");
         }
     }
 
