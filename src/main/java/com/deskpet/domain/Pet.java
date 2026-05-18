@@ -154,9 +154,9 @@ public class Pet implements PetDataProvider, PetStateListener {
         moodDelta += comfortMoodEffect();
         moodDelta += socialMoodEffect();
 
-        if (moodDelta > 0) {
-            moodDelta *= 0.5;
-        }
+//        if (moodDelta > 0) {
+//            moodDelta *= 0.5;
+//        }
 
         happiness += moodDelta * delta;
 
@@ -169,12 +169,12 @@ public class Pet implements PetDataProvider, PetStateListener {
 
         // Fulfilled
         if (social > 80) {
-            return +0.10;
+            return +0.12;
         }
 
         // Good
         if (social > 60) {
-            return +0.02;
+            return +0.05;
         }
 
         // Okay
@@ -196,12 +196,12 @@ public class Pet implements PetDataProvider, PetStateListener {
 
         // Very comfortable
         if (comfort > 80) {
-            return +0.05;
+            return +0.08;
         }
 
         // Comfortable
         if (comfort > 60) {
-            return +0.02;
+            return +0.03;
         }
 
         // Okay
@@ -223,17 +223,17 @@ public class Pet implements PetDataProvider, PetStateListener {
 
         // Well-fed
         if (hunger > 80) {
-            return +0.03;
+            return +0.18;
         }
 
         // Peckish
         if (hunger > 60) {
-            return +0.01;
+            return +0.06;
         }
 
         // Hungry
         if (hunger > 40) {
-            return -0.04;
+            return 0;
         }
 
         // Very hungry

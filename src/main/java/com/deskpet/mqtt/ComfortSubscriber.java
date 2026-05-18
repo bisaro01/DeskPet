@@ -16,8 +16,8 @@ public class ComfortSubscriber implements MqttCallback {
     private IMqttClient MqttClient;
     private final static String BROKER = "tcp://localhost:1883";
     private final static String CLIENT_ID = "comfort-subscriber";
-    private final static String TEMP_TOPIC = "deskpet/sensors/temperature";
-    private final static String HUM_TOPIC = "deskpet/sensors/humidity";
+    private final static String TEMP_TOPIC = "wio/sensors/temperature";
+    private final static String HUM_TOPIC = "wio/sensors/humidity";
 
 
     // talking directly to the dashboard through the PetStateListener

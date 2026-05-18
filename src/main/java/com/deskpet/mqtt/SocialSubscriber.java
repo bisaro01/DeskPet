@@ -8,8 +8,8 @@ public class SocialSubscriber implements MqttCallback {
     private IMqttClient MqttClient;
     private final static String BROKER = "tcp://localhost:1883";
     private final static String CLIENT_ID = "social-subscriber";
-    private final static String MOTION_TOPIC = "deskpet/sensors/motion";
-    private final static String SOUND_TOPIC = "deskpet/sensors/sound";
+    private final static String MOTION_TOPIC = "wio/sensors/motion";
+    private final static String SOUND_TOPIC = "wio/sensors/sound";
 
     // talking directly to the dashboard through the PetStateListener
     private PetStateListener pet;
