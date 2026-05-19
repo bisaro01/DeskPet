@@ -412,9 +412,9 @@ public class DatabaseHandler {
             statement.setLong(2, foodId);
 
             if (getFavouriteFoodId(petId) == foodId) {
-                statement.setString(3, "🤤");
+                statement.setString(3, ":-)");
             } else {
-                statement.setString(3, "🤢");
+                statement.setString(3, ":-(");
             }
 
             int rowsAffected = statement.executeUpdate();
