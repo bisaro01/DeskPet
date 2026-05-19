@@ -4,7 +4,7 @@ public class SocialSystem {
     private double soundIncreasePer10Db = 1.5;
     private double decayRatePerMinute = 2.0;
     private double maxSoundThreshold = 75.0;
-    private double minSoundThreshold = 40.0;
+    private double minSoundThreshold = 55.0;
 
     private double social = 100.0;
     private long lastSoundTime = System.currentTimeMillis();
@@ -98,14 +98,26 @@ public class SocialSystem {
     }
 
     public void updateSocial(int noiseDecibels) {
-        if (noiseDecibels >= minSoundThreshold && noiseDecibels <= maxSoundThreshold) { // Nice sound level
+        if (noiseDecibels >= minSoundThreshold && noiseDecibels <= maxSoundThreshold) {
+            // Nice sound level (55-75 dB)
             double increase = 1.0;
             setSocial(social + increase);
             lastSoundTime = System.currentTimeMillis();
             noiseDetected = true;
             System.out.println("Sound level okay(" + noiseDecibels + "dB). Social increased.");
-        } else if (noiseDecibels > maxSoundThreshold) { // Too loud
-            double decrease = ((noiseDecibels - 100) / 10.0) * 1.5;
+            
+        } else if (noiseDecibels > maxSoundThreshold) {
+            // Too loud (> 75 dB)
+            double decrease;
+            
+            if (noiseDecibels > 90) {
+                decrease = 2.0;  // Very loud
+            } else if (noiseDecibels > 80) {
+                decrease = 1.0;  // Moderately loud
+            } else {
+                decrease = ((noiseDecibels - 75) / 10.0) * 2;  // Slightly loud (1-3 decrease)
+            }
+            
             setSocial(social - decrease);
             lastSoundTime = System.currentTimeMillis();
             noiseDetected = true;
