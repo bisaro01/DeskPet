@@ -56,12 +56,6 @@ public class HungerSubscriber implements MqttCallback {
                 });
                 break;
         }
-//        System.out.println("Hunger = " + hungerSystem.getHunger() + "%");
-//        System.out.println("RFID Tag = " + payload);
-//
-//        if (hungerSystem != null) {
-//            hungerSystem.updateHunger(payload);
-//        }
     }
 
     @Override

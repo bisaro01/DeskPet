@@ -11,7 +11,7 @@ public class HungerSystem {
     private double hunger = 100.0;
     private DatabaseHandler dbHandler;
 
-    // How much hunger decreases per second (-0.4 per minute, 0.4/60.0)
+    // How much hunger decreases per second
     private static final double hunger_decrease = 1.0; // For demo purposes
 
     // Scheduler to repeatedly decrease hunger over time
@@ -30,9 +30,6 @@ public class HungerSystem {
     // Returns current hunger value
     public double getHunger() {
         return hunger;
-    }
-    public void setHunger(double value){
-        this.hunger = value;
     }
 
     public void feed(String rfidTag, long petId) {
