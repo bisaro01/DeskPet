@@ -61,9 +61,6 @@ unsigned long lastMqttReconnectAttempt = 0;
 const unsigned long MQTT_RETRY_INTERVAL = 1000;
 
 // ================= STATE =================
-int mood = 100;
-int lastMood = -1;  // 0 = sad, 1 = happy
-
 int faceId = 2;
 int previousFaceId = -1;
 
@@ -155,10 +152,7 @@ void clearFace() {
 }
 
 void veryHappyFace() {
-    // Reset background
-    // tft.fillScreen(TFT_WHITE);
     clearFace();
-    drawEyes();
     
     int radius = 35;
     int thickness = 8;
@@ -167,7 +161,7 @@ void veryHappyFace() {
         tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
     }
 
-    // Cut top half
+    // Cut top half of mouth-circle
     tft.fillRect(
         mouthX - radius - 2,
         mouthY - radius - 2,
@@ -175,13 +169,12 @@ void veryHappyFace() {
         radius + 2,
         TFT_WHITE
     );
+
+    drawEyes();
 }
 
 void happyFace() {
-    // Reset background
-    // tft.fillScreen(TFT_WHITE);
     clearFace();
-    drawEyes();
     
     int radius = 25;
     int thickness = 6;
@@ -190,7 +183,7 @@ void happyFace() {
         tft.drawCircle(mouthX, mouthY, radius - i, TFT_BLACK);
     }
 
-    // Cut top half
+    // Cut top half of mouth-circle
     tft.fillRect(
         mouthX - radius - 2,
         mouthY - radius - 2,
@@ -198,22 +191,21 @@ void happyFace() {
         radius + 2,
         TFT_WHITE
     );
+    
+    drawEyes();
 }
 
 void neutralFace() {
-    // Reset background
-    // tft.fillScreen(TFT_WHITE);
     clearFace();
-    drawEyes();
 
+    // Straight line mouth
     tft.fillRect(135, 115, 60, 6, TFT_BLACK);
+
+    drawEyes();
 }
 
 void sadFace() {
-    // Reset background
-    // tft.fillScreen(TFT_WHITE);
     clearFace();
-    drawEyes();
 
     int radius = 25;
     int thickness = 6;
@@ -224,7 +216,7 @@ void sadFace() {
         tft.drawCircle(mouthX, sadY, radius - i, TFT_BLACK);
     }
 
-    // Cut bottom half
+    // Cut bottom half of mouth-circle
     tft.fillRect(
         mouthX - radius - 2,
         sadY + 2,
@@ -232,13 +224,12 @@ void sadFace() {
         radius + 2,
         TFT_WHITE
     );
+
+    drawEyes();
 }
 
 void verySadFace() {
-    // Reset background
-    // tft.fillScreen(TFT_WHITE);
     clearFace();
-    drawEyes();
 
     int radius = 35;
     int thickness = 8;
@@ -249,7 +240,7 @@ void verySadFace() {
         tft.drawCircle(mouthX, sadY, radius - i, TFT_BLACK);
     }
 
-    // Cut bottom half
+    // Cut bottom half of mouth-circle
     tft.fillRect(
         mouthX - radius - 2,
         sadY + 2,
@@ -257,6 +248,8 @@ void verySadFace() {
         radius + 2,
         TFT_WHITE
     );
+
+    drawEyes();
 }
 
 void drawIcons() {
@@ -554,21 +547,6 @@ void loop() {
         client.loop();
         updateSound();
     }
-
-    // Display face depending on happiness level
-    // int currentMood = (mood < 50) ? 0 : 1;
-
-    // if (currentMood != lastMood) {
-    //     lastMood = currentMood;
-
-    //     if (currentMood == 0) {
-    //         sadFace();
-    //         sadSound();
-    //     } else {
-    //         happyFace();
-    //         happySound();
-    //     }
-    // }
 
     if (faceId != previousFaceId) {
         previousFaceId = faceId;
