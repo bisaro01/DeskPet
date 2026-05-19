@@ -26,13 +26,13 @@ Other productivity tools are purely functional the Desk Pet adds a layer of pers
 [Watch the demo here](<link>)
 
 ## Team Contributions
-| Member | Contributions |
-|--------|--------------|
-| [Name] | ... |
-| [Name] | ... |
-| [Name] | ... |
-| [Name] | ... |
-| [Name] | ... |
+| Member   | Contributions |
+|----------|--------------|
+| Natalija | Created the initial Arduino baseline script loop, including core libraries, facial expressions, noise functions, wifi connectivity, and MQTT setup on the Wio, which the team built upon throughout the project. Owned the comfort system end-to-end hardware wiring, Arduino implementation, and logic for publishing temperature and humidity sensor readings via MQTT. Implemented backend logic for the comfort system affecting the Pet, ensuring the readings were saved in the database, as well as the UI presentation of the comfort progress bar. Assisted with code refactoring following the system overhaul, improving readability and removing redundant code. Collaborated on the social system, specifically motion-related functionality. Integrating the motion sensor from hardware through to the backend and database, and implemented the historical data view showing the last detected movement in the UI.|
+| Lovisa   | Developed the base setup for the desktop UI so that the user can monitor the pet’s need levels in real time as they change. Implemented the hunger and feeding system, including retrieving hunger data from the database, increasing hunger level when an RFID tag is detected and updating the UI dynamically. Created the food preferences functionality, allowing pet profiles to store liked and disliked food, differentiate between different food types through the RFID tags, and apply different hunger increase values depending on the read food type. Additionally, implemented functionality for saving feeding events to the database and displaying feeding history, food preferences, feeding counts, timestamps, and pet redactions in the desktop interface. Also contributed to displaying the pet’s hunger, comfort, and happiness levels in the desktop app. |
+| Sophie   | Set up MQTT backend communication (HappinessPublisher, HappinessSubscriber), created the base code for sad/happy face. Created the base for the Pet class with the applyDecay, updateNeed, and updateState functions. Implemented the sound sensor integration. Collaborated on the logic of the SocialSystem, specifically sound-related functionality (sound thresholds, calculation of social needs). Added the time of the last detected sound to the dashboard. Integrated social needs into the happiness calculation.|
+| Moa      | Created the database schema, connection class, set-up script, and seed data script, as well as the README instructions for the database set-up. Wrote the Arduino code for the RFID scanner. Made the Arduino set-up script. Solved the MQTT connection and delay issues. Updated the WIO happy/sad sounds to be non-blocking. Created the settings page where the user can edit environment ranges and food preferences, create and delete pets. Authored the build script for the WIO sketch.|
+| Mark     | Created a mock of the WIO with Python and MQTT to enable independent development when a member was not in possession of the WIO terminal. Connected the desktop application, MQTT subscribers to the domain model, database, and frontend application. Added MQTT publishing from desktop application to WIO terminal, and added code to WIO sketch to interpret Pet state and manage display of face and icons. Wrote readme guide for setting up and running the project. Setup Pet maintenance loop architecture to update Pet state continuously. Setup Continuous Integration with GitLab Runner, as well as the build script for Java/JavaFX. |
 
 
 ## Pre-requisites
