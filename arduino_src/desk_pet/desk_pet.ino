@@ -11,7 +11,7 @@ const char* wifiName = "Deskpet";
 const char* password = "deskpet123";
 
 // ================= MQTT =================
-//const char* mqttServer = "172.29.73.248";
+// IP set-up for demo
 const char* mqttServer = "10.42.0.1"; //Moa
 const int mqttPort = 1883;
 const char* MQTT_CLIENT_ID = "deskpet-wio";

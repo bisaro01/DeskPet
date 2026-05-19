@@ -48,18 +48,12 @@ public class ComfortSubscriber implements MqttCallback {
     public void start() throws MqttException {
         MqttClient.subscribe(TEMP_TOPIC);
         MqttClient.subscribe(HUM_TOPIC);
-
-        // Debugging lines
-        // System.out.println("Listening to: " + TOPIC);
-        // System.out.println("Waiting for happiness values...");
-        // System.out.println("Press Ctrl+C to stop");
     }
 
     public void stop() throws MqttException {
         try {
             if (MqttClient != null && MqttClient.isConnected()) {
                 MqttClient.disconnect();
-                // System.out.println("MQTT disconnected.");
             }
         } catch (MqttException e) {
             e.printStackTrace();

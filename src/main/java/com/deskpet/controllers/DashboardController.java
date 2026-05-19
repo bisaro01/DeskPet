@@ -2,8 +2,6 @@ package com.deskpet.controllers;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import com.deskpet.DeskPetApplication;
 import com.deskpet.data.DatabaseHandler;
@@ -71,10 +69,6 @@ public class DashboardController {
     public void setFeedingHistory(List<String> feedingHistory) {
         feedingHistoryListView.getItems().setAll(feedingHistory);
     }
-
-    // Creates a background scheduler that can run tasks later or repeatedly
-    private final ScheduledExecutorService scheduler =
-        Executors.newSingleThreadScheduledExecutor();
 
     public void updateLastMovement(long petId) {
         try {

@@ -49,8 +49,6 @@ public class Pet implements PetDataProvider, PetStateListener {
 
     public String getName() { return name; }
 
-    public String getFavouriteFood() { return favouriteFood; }
-
     public String getLastSoundTime() { return socialSystem.getLastSoundTime(); }
 
     @Override
@@ -156,10 +154,6 @@ public class Pet implements PetDataProvider, PetStateListener {
         moodDelta += hungerMoodEffect();
         moodDelta += comfortMoodEffect();
         moodDelta += socialMoodEffect();
-
-//        if (moodDelta > 0) {
-//            moodDelta *= 0.5;
-//        }
 
         happiness += moodDelta * delta;
 
