@@ -23,7 +23,7 @@ Other productivity tools are purely functional the Desk Pet adds a layer of pers
 | Happiness | Calculated from all above needs |
 
 ## Demo Video
-[Watch the demo here](<link>)
+[Watch the demo here](https://www.youtube.com/watch?v=qyZr7S53Htk)
 
 ## Team Contributions
 | Member | Contributions |
